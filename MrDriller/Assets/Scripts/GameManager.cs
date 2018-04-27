@@ -8,11 +8,21 @@ public class GameManager : MonoBehaviour {
     float lifeDeductionTick = 0.9f;
     float lifeDeductionCounter = 0;
     BlockManager bm;
+    float score;
+    float highScore;
 
     private void Start() {
         bm = FindObjectOfType<BlockManager>();
         bm.AtLevelStart();
+        highScore = PlayerPrefs.GetFloat("highScore", 0);
+        AtGameStart();
         //different levels?
+    }
+
+
+
+    void AtGameStart() {
+        // Load level, generate blocks, drop player in scene
     }
 
     void Update() {
@@ -20,10 +30,10 @@ public class GameManager : MonoBehaviour {
         while (lifeDeductionCounter > lifeDeductionTick) {
             lifeLeft -= 1;
             lifeDeductionCounter -= lifeDeductionTick;
-            print(lifeLeft + "% To Death");
+            // print(lifeLeft + "% To Death");
         }
 
-        if (lifeLeft <= 0) {
+        if (lifeLeft <= 0) { // Life amount deducter
             if (livesLeft > 0) {
                 livesLeft--;
                 lifeLeft = 100;
@@ -35,6 +45,7 @@ public class GameManager : MonoBehaviour {
 
     void GameOver() {
         print("GameOver!");
+        PlayerPrefs.SetFloat("highScore", highScore);
     }
 
     //create level & level end blocks
