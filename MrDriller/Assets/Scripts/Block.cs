@@ -10,23 +10,47 @@ public enum BlockColor {
 }
 //väri: 4 eri väriä
 
+public enum BlockState {
+    Static,
+    Hold,
+    Falling
+}
+
 public class Block : MonoBehaviour {
 
     public float velocity;
-    public bool falling;
+    //public bool falling;
     //tila: staattinen vai tippumassa?
     public int gridPos;
     // paikka taulukossa?
     //ja sit onko blokki perus, X vai AIR
+    public float holdTimer = 2f;
+    public BlockState bs;
 
 	void Start () {
 		
 	}
 	
 	void Update () {
-        // if block underneath destroyed, falling = true
+        // if block underneath destroyed, hold & wobble for 2 seconds, falling = true
 
-        ///if falling = true start with hold & wobble, then fall with velocity, 
+        //if (no block underneath) {
+        //wobble
+        if (bs == BlockState.Hold) {
+            holdTimer -= Time.deltaTime;
+            print(holdTimer);
+        }
+
+        if (holdTimer < 0) {
+            bs = BlockState.Falling;
+            holdTimer = 2f;
+        }
+
+        if(bs == BlockState.Falling) {
+            Fall();
+        }
+
+        ///then fall with velocity, 
         ///then stop on top of next block OR merge with a same color block
         ///
 
@@ -44,6 +68,11 @@ public class Block : MonoBehaviour {
         /// 
         ///if (yes and) the block's center would pass the same colored block's center,
         ///snap the centers on the same hrzntl level
+    }
+
+    void Fall() {
+        transform.Translate(0, -velocity * Time.deltaTime, 0);
+        //if (block underneath) {bs = BlockState.Static}
     }
 
 
