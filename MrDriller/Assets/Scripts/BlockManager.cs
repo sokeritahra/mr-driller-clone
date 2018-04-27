@@ -8,12 +8,17 @@ public class BlockManager : MonoBehaviour {
     public int[,] blockGrid;
     public int rows;
     public int columns;
+    //blokki prefabi
 
     void Start () {
         //luodaan taulukko ja generoidaan blokit sinne
-        for (int x = 0; x < 4; x++) {
-            for (int y = 0; y < 5; y++) {
-                blockGrid[x, y] = VALUE_HERE;
+        blockGrid = new int[rows, columns];
+
+        for (int x = 0; x < rows; x++) {
+            for (int y = 0; y < columns; y++) {
+                //blockGrid[x, y] = some block;
+                //aseta blockit paikoilleen scenessä 
+                //tell the block where it is?
             }
         }
     }
