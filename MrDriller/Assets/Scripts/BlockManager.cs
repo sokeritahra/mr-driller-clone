@@ -5,19 +5,22 @@ using UnityEngine;
 public class BlockManager : MonoBehaviour {
 
     //taulukko
-    public int[,] blockGrid;
+    public GameObject[,] blockGrid;
     public int rows;
     public int columns;
+    public GameObject block;
     //blokki prefabi
 
-    void Start () {
+    public void AtLevelStart () {
         //luodaan taulukko ja generoidaan blokit sinne
-        blockGrid = new int[rows, columns];
+        blockGrid = new GameObject[rows, columns];
 
         for (int x = 0; x < rows; x++) {
             for (int y = 0; y < columns; y++) {
-                //blockGrid[x, y] = some block;
-                //aseta blockit paikoilleen scenessä 
+                Vector3 pos = new Vector3(x, y, 0);
+                //TODO: pos so that blocks are around middle vertical axis
+                //also where is the first row?
+                blockGrid[x,y] = Instantiate(block, pos, Quaternion.identity);
                 //tell the block where it is?
             }
         }

@@ -7,6 +7,13 @@ public class GameManager : MonoBehaviour {
     int livesLeft = 3;
     float lifeDeductionTick = 0.9f;
     float lifeDeductionCounter = 0;
+    BlockManager bm;
+
+    private void Start() {
+        bm = FindObjectOfType<BlockManager>();
+        bm.AtLevelStart();
+        //different levels?
+    }
 
     void Update() {
         lifeDeductionCounter += Time.deltaTime;
@@ -30,4 +37,6 @@ public class GameManager : MonoBehaviour {
         print("GameOver!");
     }
 
+    //create level & level end blocks
+    //the level end blocks are below the last row of blocks
 }

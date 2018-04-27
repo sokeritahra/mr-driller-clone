@@ -13,7 +13,8 @@ public enum BlockColor {
 public enum BlockState {
     Static,
     Hold,
-    Falling
+    Falling,
+    LevelEnd
 }
 
 public class Block : MonoBehaviour {
