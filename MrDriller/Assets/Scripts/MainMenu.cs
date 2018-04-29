@@ -10,7 +10,7 @@ public class MainMenu : MonoBehaviour {
         SceneManager.LoadScene("AriDev");
     }
 
- public void QuitGame()
+    public void QuitGame()
     {
         Application.Quit();
     }

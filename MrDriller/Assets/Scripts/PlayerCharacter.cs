@@ -10,8 +10,8 @@ public class PlayerCharacter : MonoBehaviour {
     float horizontal; 
     float vertical;
     float drillTimer = 0f; // Drill cooldown timer
-    float level = 1; // Level counter
-    float depth = 0; // Drilling depth counter
+    //float level = 1; // Level counter
+    //float depth = 0; // Drilling depth counter
 
     void Start() {
         rb = GetComponent<Rigidbody2D>();
