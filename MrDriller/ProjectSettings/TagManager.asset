@@ -15,7 +15,7 @@ TagManager:
   - 
   - PlayerCharacter
   - Blocks
-  - 
+  - BlockingLayer
   - 
   - 
   - 
@@ -40,4 +40,7 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Units
+    uniqueID: 161970111
     locked: 0
