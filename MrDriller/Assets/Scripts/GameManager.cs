@@ -12,8 +12,7 @@ public class GameManager : MonoBehaviour {
     float highScore;
 
     private void Start() {
-        //bm = FindObjectOfType<BlockManager>();
-        //bm.AtLevelStart();
+
         highScore = PlayerPrefs.GetFloat("highScore", 0);
         AtGameStart();
         //different levels?
@@ -23,6 +22,8 @@ public class GameManager : MonoBehaviour {
 
     void AtGameStart() {
         // Load level, generate blocks, drop player in scene
+        bm = FindObjectOfType<BlockManager>();
+        bm.AtLevelStart();
     }
 
     void Update() {
