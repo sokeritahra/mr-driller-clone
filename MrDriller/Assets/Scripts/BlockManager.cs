@@ -25,61 +25,91 @@ public class BlockManager : MonoBehaviour {
                 //TODO: pos so that blocks are in the right place in the scene
                 //also where is the first row?
                 GameObject tempObj = Instantiate(blockPrefab, pos, Quaternion.identity);
+
                 blockGrid[x,y] = tempObj.GetComponent<BlockScript>();
                 blockGrid[x, y].SetGridPos(x, y);
-                FindGroups();
+                
             }
         }
+        FindGroups();
     }
 
-    void FindGroups () {
+    void FindGroups() {
         List<List<BlockScript>> AllGroups = new List<List<BlockScript>>();
         for (int x = 0; x < columns; x++) {
             for (int y = 0; y < rows; y++) {
+
+                var thisSquare = blockGrid[x, y];
+
                 if (x != 0 && y != 0) {
-                    if (blockGrid[x, y].bc == blockGrid[x - 1, y].bc && blockGrid[x, y].bc == blockGrid[x, y - 1].bc) {
-                        //jokuryhmä.Contains(ylempi) ja jokuryhmä.Contains(vasempi)
-                        //if (ne on jo samaa ryhmää) { lisää vaan siihen ryhmään }
-                        //else { AllGroups[jokuindeksi nimittäin juuri se ylempi].Add(blockGrid[x,y])
-                        //lisätään vasemmalta 
-                        //tuhotaan }
+
+                    var leftSquare = blockGrid[x - 1, y];
+                    var topSquare = blockGrid[x, y - 1];
+
+                    if (thisSquare.bc == leftSquare.bc && thisSquare.bc == topSquare.bc) {
+                        //jos on samanvärinen sekä vasemmalla että ylempänä lisätään ylempään
+                        AllGroups[topSquare.groupNumber].Add(thisSquare);
+                        if (leftSquare.groupNumber != topSquare.groupNumber) {
+                            AllGroups[topSquare.groupNumber].Add(leftSquare);
+                            AllGroups.RemoveAt(leftSquare.groupNumber);
+                            //jos vasemmalla oleva blokki ei vielä samassa ryhmässä, lisätään se samaan ryhmään
+                            //TODO: vaihda blokin ryhmänumero: thisSquare.SetGroupNumber(
+                            //ja tuhotaan sen ryhmä
+                            print("this block " + thisSquare.gridPos + " and the one(s) on the left added to the one on top");
+                        }
+                        else {
+                            //jos vasemmalla ja ylhäällä olevat blokit on samassa ryhmässä, mitään ei tuhota 
+                            //TODO: vaihda blokin ryhmänumero: thisSquare.SetGroupNumber(
+                            print("added to the same group, should pop now!");
+                        }
+
 
                     }
                 }
                 //onko vasemmalla
                 else if (x != 0) {
-                    //tän gridpos on blockGrid[x,y]
-                    //edellisen on blockGrid[x-1,y]
-                    if (blockGrid[x, y].bc == blockGrid[x - 1, y].bc) {
+
+                    var leftSquare = blockGrid[x - 1, y];
+
+                    if (thisSquare.bc == leftSquare.bc) {
                         //samanvärisiä joten laitetaan samaan ryhmään
+                        AllGroups[leftSquare.groupNumber].Add(thisSquare);
 
                     }
                     else {
                         //tee uusi ryhmä
-                        AllGroups.Add(new List<BlockScript>());
+                        List<BlockScript> tempList = new List<BlockScript> { thisSquare };
+                        AllGroups.Add(tempList);
+                        int tempInt = AllGroups.FindIndex(l => l == tempList);
+                        thisSquare.SetGroupNumber(tempInt);
                     }
                 }
                 //onko ylhäällä
                 else if (y != 0) {
-                    if (blockGrid[x, y].bc == blockGrid[x, y - 1].bc) {
 
+                    var topSquare = blockGrid[x, y - 1];
+                    print(topSquare);
+                    if (thisSquare.bc == topSquare.bc) {
+                        AllGroups[topSquare.groupNumber].Add(thisSquare);
                     }
                     else {
-
+                        List<BlockScript> tempList = new List<BlockScript> { thisSquare };
+                        AllGroups.Add(tempList);
+                        int tempInt = AllGroups.FindIndex(l => l == tempList);
+                        thisSquare.SetGroupNumber(tempInt);
                     }
                 }
 
                 else {
-                    List<BlockScript> tempList = new List<BlockScript> { blockGrid[x, y] };
+                    List<BlockScript> tempList = new List<BlockScript> { thisSquare };
                     AllGroups.Add(tempList);
-
-                    int tempInt = AllGroups.FindIndex(l => l == tempList);
-                    blockGrid[x, y].SetGroupNumber(tempInt);
                     //kerro blockscriptille missä ryhmässä se on
+                    int tempInt = AllGroups.FindIndex(l => l == tempList);
+                    thisSquare.SetGroupNumber(tempInt);
+                }
                 }
             }
         }
-    }
 	
 	void Update () {
         //if (blockGrid[0, 0] != null) {

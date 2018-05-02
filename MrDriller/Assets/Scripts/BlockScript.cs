@@ -31,6 +31,7 @@ public class BlockScript : MonoBehaviour {
 
     private void Awake() {
         bm = FindObjectOfType<BlockManager>().GetComponent<BlockManager>();
+        bc = (BlockColor)Random.Range(0, 3); //TODO: generalize
     }
 
     void Update () {
@@ -84,7 +85,7 @@ public class BlockScript : MonoBehaviour {
 
     public void SetGroupNumber(int nr) {
         groupNumber = nr;
-       
+        print("blokki nro " + gridPos + " on ryhmässä nro " + groupNumber);
     }
 
     public void Pop() {
