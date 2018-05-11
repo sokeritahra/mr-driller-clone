@@ -6,6 +6,7 @@ enum PlayerMode { Up, Down, Left, Right, Falling }; // Modes for the sprites and
 public class PlayerCharacter : MonoBehaviour {
     Rigidbody2D rb;
     PlayerMode pm;
+    Animator anim;
     public float speed; // Player horizontal speed
     float horizontal; 
     float vertical;
@@ -15,6 +16,8 @@ public class PlayerCharacter : MonoBehaviour {
 
     void Start() {
         rb = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
+        pm = PlayerMode.Down;
     }
 
 
@@ -26,16 +29,20 @@ public class PlayerCharacter : MonoBehaviour {
         if (Mathf.Abs(horizontal) < Mathf.Abs(vertical)) { // Set player (drilling) mode
             if (vertical < 0) {
                 pm = PlayerMode.Down;
+                anim.Play("Aim_Down");
             }
             if (vertical > 0) {
                 pm = PlayerMode.Up;
+                anim.Play("Aim_Up");
             }
         } else {
             if (horizontal > 0) {
                 pm = PlayerMode.Right;
+                anim.Play("Aim_Right");
             }
             if (horizontal < 0) {
                 pm = PlayerMode.Left;
+                anim.Play("Aim_Left");
             }
         }
 
@@ -47,18 +54,22 @@ public class PlayerCharacter : MonoBehaviour {
             if (pm == PlayerMode.Down) {
                 print("Jos minulla olisi porattavaa, niin poraisin alla olevan blokin!");
                 drillTimer = 0.5f;
+                anim.Play("Drill_Down");
             }
             if (pm == PlayerMode.Up) {
                 print("Jos minulla olisi porattavaa, niin poraisin yllä olevan blokin!");
                 drillTimer = 0.5f;
+                anim.Play("Drill_Up");
             }
             if (pm == PlayerMode.Left) {
                 print("Jos minulla olisi porattavaa, niin saattaisin porata vasemmalle!");
                 drillTimer = 0.5f;
+                anim.Play("Drill_Left");
             }
             if (pm == PlayerMode.Right) {
                 print("Jos minulla olisi porattavaa, niin kaikki olisi hyvin!");
                 drillTimer = 0.5f;
+                anim.Play("Drill_Right");
             }
         }
 
