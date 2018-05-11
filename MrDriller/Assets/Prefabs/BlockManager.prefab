@@ -51,7 +51,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9f992c9dfc215a47ab5c8d260a26bd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rows: 3
-  columns: 7
+  rows: 4
+  columns: 3
   blockPrefab: {fileID: 1608645521931510, guid: 2cee8dca6467e6b4c9e476293ff013d0,
     type: 2}

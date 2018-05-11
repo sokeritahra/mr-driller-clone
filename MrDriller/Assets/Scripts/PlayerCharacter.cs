@@ -13,15 +13,20 @@ public class PlayerCharacter : MonoBehaviour {
     float drillTimer = 0f; // Drill cooldown timer
     //float level = 1; // Level counter
     //float depth = 0; // Drilling depth counter
+    BlockScript bs;
+    BlockManager bm;
 
     void Start() {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         pm = PlayerMode.Down;
+        bm = FindObjectOfType<BlockManager>();
+
     }
 
 
     void FixedUpdate() {
+
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");  // Read input from controller/keyboard
         rb.velocity = new Vector2(horizontal * speed, rb.velocity.y); // Move player horizontally
@@ -50,29 +55,70 @@ public class PlayerCharacter : MonoBehaviour {
             drillTimer -= Time.deltaTime;
         }
 
-        if (Input.GetButton("Fire1") && drillTimer <= 0) { // Drilling direction
-            if (pm == PlayerMode.Down) {
-                print("Jos minulla olisi porattavaa, niin poraisin alla olevan blokin!");
-                drillTimer = 0.5f;
-                anim.Play("Drill_Down");
+        if (Input.GetButton("Fire1") && drillTimer <= 0) { 
+            CheckBlock(pm);
+
+            print("poranäppäintä painettu!");
+
             }
-            if (pm == PlayerMode.Up) {
-                print("Jos minulla olisi porattavaa, niin poraisin yllä olevan blokin!");
-                drillTimer = 0.5f;
-                anim.Play("Drill_Up");
-            }
-            if (pm == PlayerMode.Left) {
-                print("Jos minulla olisi porattavaa, niin saattaisin porata vasemmalle!");
-                drillTimer = 0.5f;
-                anim.Play("Drill_Left");
-            }
-            if (pm == PlayerMode.Right) {
-                print("Jos minulla olisi porattavaa, niin kaikki olisi hyvin!");
-                drillTimer = 0.5f;
-                anim.Play("Drill_Right");
-            }
+            //if (pm == PlayerMode.Up) {
+            //    print("Jos minulla olisi porattavaa, niin poraisin yllä olevan blokin!");
+            //    drillTimer = 0.5f;
+            //    anim.Play("Drill_Up");
+            //}
+            //if (pm == PlayerMode.Left) {
+            //    print("Jos minulla olisi porattavaa, niin saattaisin porata vasemmalle!");
+            //    drillTimer = 0.5f;
+            //    anim.Play("Drill_Left");
+            //}
+            //if (pm == PlayerMode.Right) {
+            //    print("Jos minulla olisi porattavaa, niin kaikki olisi hyvin!");
+            //    drillTimer = 0.5f;
+            //    anim.Play("Drill_Right");
+            //}
         }
 
+
+    void CheckBlock(PlayerMode mode) {
+        float x = transform.position.x;
+        float y = transform.position.y * -1f;
+        string animS = "";
+
+        if (mode == PlayerMode.Down) {
+            y += 0.75f;
+            animS = "Drill_Down";
+        }
+        else if (mode == PlayerMode.Left) {
+            x -= 0.75f;
+            animS = "Drill_Left";
+        }
+        else if (mode == PlayerMode.Right) {
+            x += 0.75f;
+            animS = "Drill_Right";
+        }
+        else if (mode == PlayerMode.Up) {
+            y -= 0.75f;
+            animS = "Drill_Up";
+        }
+        else {
+            return;
+        }
+
+        bs = bm.blockGrid[(int)x, (int)y];
+
+        if (bs) {
+            DrillBlock(bs);
+            anim.Play(animS);
+        }
+
+        print("porattiin " + bs + " paikassa " + transform.position);
+
+    }
+
+    void DrillBlock(BlockScript block) {
+        block.Pop();
+        drillTimer = 0.5f;
+        //tarviiks muuta
     }
 
     void ColdAndLonelyDeath() { // Name probably says it all
