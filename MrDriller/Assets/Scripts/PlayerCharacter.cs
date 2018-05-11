@@ -15,6 +15,7 @@ public class PlayerCharacter : MonoBehaviour {
     //float depth = 0; // Drilling depth counter
     BlockScript bs;
     BlockManager bm;
+    public float drillDepth = 0.75f;
 
     void Start() {
         rb = GetComponent<Rigidbody2D>();
@@ -85,26 +86,26 @@ public class PlayerCharacter : MonoBehaviour {
         string animS = "";
 
         if (mode == PlayerMode.Down) {
-            y += 0.75f;
+            y += drillDepth;
             animS = "Drill_Down";
         }
         else if (mode == PlayerMode.Left) {
-            x -= 0.75f;
+            x -= drillDepth;
             animS = "Drill_Left";
         }
         else if (mode == PlayerMode.Right) {
-            x += 0.75f;
+            x += drillDepth;
             animS = "Drill_Right";
         }
         else if (mode == PlayerMode.Up) {
-            y -= 0.75f;
+            y -= drillDepth;
             animS = "Drill_Up";
         }
         else {
             return;
         }
 
-        bs = bm.blockGrid[(int)x, (int)y];
+        bs = bm.blockGrid[Mathf.RoundToInt(x), Mathf.RoundToInt(y)];
 
         if (bs) {
             DrillBlock(bs);
