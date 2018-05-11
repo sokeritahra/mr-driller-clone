@@ -27,11 +27,15 @@ public class BlockScript : MonoBehaviour {
     public BlockState bs;
     public BlockColor bc;
     BlockManager bm;
-    public int groupNumber;
+    public int groupNumber = -1;
+    SpriteRenderer sr;
 
     private void Awake() {
         bm = FindObjectOfType<BlockManager>().GetComponent<BlockManager>();
-        bc = (BlockColor)Random.Range(0, 3); //TODO: generalize
+        //int tempInt = Random.Range(0, 3); //TODO: generalize
+        //bc = (BlockColor)tempInt;
+        //sr = GetComponent<SpriteRenderer>();
+        //sr.color = new Color(0, tempInt / 4f, 0);
     }
 
     void Update () {
@@ -79,13 +83,13 @@ public class BlockScript : MonoBehaviour {
 
     }
 
-    public void SetGridPos(int posX, int posY) {
-        gridPos = 7 * posY + posX ;
+    public void SetGridPos(int posX, int posY, int columns) {
+        gridPos = columns * posY + posX ;
     }
 
     public void SetGroupNumber(int nr) {
         groupNumber = nr;
-        print("blokki nro " + gridPos + " on ryhmässä nro " + groupNumber);
+        //print("blokki nro " + gridPos + " on ryhmässä nro " + groupNumber);
     }
 
     public void Pop() {
