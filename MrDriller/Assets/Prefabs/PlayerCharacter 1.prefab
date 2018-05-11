@@ -9,48 +9,48 @@ Prefab:
     m_Modifications: []
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 1528063983564378}
+  m_RootGameObject: {fileID: 1084697962286654}
   m_IsPrefabParent: 1
---- !u!1 &1528063983564378
+--- !u!1 &1084697962286654
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 5
   m_Component:
-  - component: {fileID: 4065979746044622}
-  - component: {fileID: 212935686234247558}
-  - component: {fileID: 114181322643294690}
-  - component: {fileID: 50421447920880614}
-  - component: {fileID: 95089614056825592}
-  - component: {fileID: 61192671946995636}
+  - component: {fileID: 4854683892145090}
+  - component: {fileID: 212575028152671266}
+  - component: {fileID: 114214035766334672}
+  - component: {fileID: 50042470666920922}
+  - component: {fileID: 95857443742469130}
+  - component: {fileID: 61038525095108028}
   m_Layer: 10
-  m_Name: PlayerCharacter
+  m_Name: PlayerCharacter 1
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4065979746044622
+--- !u!4 &4854683892145090
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1528063983564378}
+  m_GameObject: {fileID: 1084697962286654}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 5, y: 5, z: 1}
+  m_LocalPosition: {x: 1, y: 1, z: 0}
+  m_LocalScale: {x: 2.5, y: 2.5, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!50 &50421447920880614
+--- !u!50 &50042470666920922
 Rigidbody2D:
   serializedVersion: 4
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1528063983564378}
+  m_GameObject: {fileID: 1084697962286654}
   m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
@@ -64,12 +64,12 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!61 &61192671946995636
+--- !u!61 &61038525095108028
 BoxCollider2D:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1528063983564378}
+  m_GameObject: {fileID: 1084697962286654}
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
@@ -89,13 +89,13 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.32, y: 0.32}
   m_EdgeRadius: 0
---- !u!95 &95089614056825592
+--- !u!95 &95857443742469130
 Animator:
   serializedVersion: 3
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1528063983564378}
+  m_GameObject: {fileID: 1084697962286654}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 024a82c510bad9f4e9c5166f1b221647, type: 2}
@@ -106,24 +106,26 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &114181322643294690
+  m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &114214035766334672
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1528063983564378}
+  m_GameObject: {fileID: 1084697962286654}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: abcc978a012281f4f9d24c3c74aa2edf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 10
---- !u!212 &212935686234247558
+  drillDepth: 0.75
+--- !u!212 &212575028152671266
 SpriteRenderer:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1528063983564378}
+  m_GameObject: {fileID: 1084697962286654}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -131,6 +133,7 @@ SpriteRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 4294967295
   m_Materials:
   - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
