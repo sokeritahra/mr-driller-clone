@@ -27,7 +27,7 @@ public class BlockScript : MonoBehaviour {
     public BlockState bs;
     public BlockColor bc;
     BlockManager bm;
-    public int groupNumber = -1;
+    public List<BlockScript> group;
     SpriteRenderer sr;
 
     private void Awake() {
@@ -87,8 +87,8 @@ public class BlockScript : MonoBehaviour {
         gridPos = columns * posY + posX ;
     }
 
-    public void SetGroupNumber(int nr) {
-        groupNumber = nr;
+    public void SetGroup(List<BlockScript> g) {
+        group = g;
         //print("blokki nro " + gridPos + " on ryhmässä nro " + groupNumber);
     }
 
