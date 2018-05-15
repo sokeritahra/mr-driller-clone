@@ -16,7 +16,7 @@ public class BlockManager : MonoBehaviour {
     //Block testBlock;
     List<List<BlockScript>> AllGroups;
 
-    public void AtLevelStart () {
+    public void AtLevelStart() {
         //luodaan taulukko ja generoidaan blokit sinne
         blockGrid = new BlockScript[columns, rows];
 
@@ -42,12 +42,12 @@ public class BlockManager : MonoBehaviour {
         float posx = 0;
         float posy = 0;
 
-        foreach ( BlockScript block in blockArray) {
+        foreach (BlockScript block in blockArray) {
             posx = block.transform.position.x;
             posy = block.transform.position.y;
             blockGrid[(int)posx, -(int)posy] = block;
             blockGrid[(int)posx, -(int)posy].SetGridPos((int)posx, -(int)posy, columns);
-            print(posx + " mitä " + posy + " numero " + blockGrid[(int)posx, -(int)posy].gridPos);
+
         }
 
         //rows = -(int)posy;
@@ -57,7 +57,7 @@ public class BlockManager : MonoBehaviour {
 
         AllGroups = new List<List<BlockScript>>();
         for (int y = 0; y < rows; y++) {
-             for (int x = 0; x < columns; x++) {
+            for (int x = 0; x < columns; x++) {
 
                 var thisSquare = blockGrid[x, y];
 
@@ -68,15 +68,24 @@ public class BlockManager : MonoBehaviour {
 
                     if (thisSquare.bc == leftSquare.bc && thisSquare.bc == topSquare.bc) {
                         //jos on samanvärinen sekä vasemmalla että ylempänä lisätään ylempään
-                        AllGroups[topSquare.groupNumber].Add(thisSquare);
-                        thisSquare.SetGroupNumber(topSquare.groupNumber);
+                        topSquare.group.Add(thisSquare);
+                        //thegroupiwant.Add(thisSquare);
+                        thisSquare.SetGroup(topSquare.group);
 
-                        if (leftSquare.groupNumber != topSquare.groupNumber) {
-                            AllGroups[topSquare.groupNumber].Add(leftSquare);
-                            AllGroups.RemoveAt(leftSquare.groupNumber);
-                            //jos vasemmalla oleva blokki ei vielä samassa ryhmässä, lisätään se samaan ryhmään
-                            leftSquare.SetGroupNumber(topSquare.groupNumber);
+                        if (leftSquare.group != topSquare.group) {
+                            //jos vasemmalla olevat blokit ei vielä samassa ryhmässä, lisätään ne samaan ryhmään
+                            foreach (BlockScript blockOnTheLeft in leftSquare.group) {
+                                if (blockOnTheLeft != leftSquare) {
+                                    topSquare.group.Add(blockOnTheLeft);
+                                    blockOnTheLeft.SetGroup(topSquare.group);
+                                }
+                            }
+                            topSquare.group.Add(leftSquare);
                             //ja tuhotaan sen ryhmä
+                            AllGroups.Remove(leftSquare.group);
+                            //asetetaan viittaus oikeaan ryhmään -- tämän saa tehdä vasta tuhoamisen jälkeen!!
+                            leftSquare.SetGroup(topSquare.group);
+
                             print("this block " + thisSquare.gridPos + " and the one(s) on the left added to the one on top");
                         }
                         else {
@@ -88,7 +97,7 @@ public class BlockManager : MonoBehaviour {
                     }
 
                     else {
-                        print("nyt ei ole tämä ja vasen ja yläkerta samat");
+                        print("nyt ei ole " + thisSquare + " ja vasen ja yläkerta samat");
                         //onko vasemmalla
                         CheckOtherSquare(leftSquare, thisSquare);
                         //onko ylhäällä
@@ -102,7 +111,7 @@ public class BlockManager : MonoBehaviour {
 
                     CheckOtherSquare(leftSquare, thisSquare);
 
-                    
+
                 }
 
                 else if (y != 0) {
@@ -118,11 +127,11 @@ public class BlockManager : MonoBehaviour {
                     AllGroups.Add(tempList);
                     print("moi");
                     //kerro blockscriptille missä ryhmässä se on
-                    int tempInt = AllGroups.FindIndex(l => l == tempList);
-                    thisSquare.SetGroupNumber(tempInt);
-                }
+                    //int tempInt = AllGroups.FindIndex(l => l == tempList);
+                    thisSquare.SetGroup(tempList);
                 }
             }
+        }
         foreach (List<BlockScript> group in AllGroups) {
             string juttu = "";
             foreach (BlockScript bs in group) {
@@ -130,45 +139,68 @@ public class BlockManager : MonoBehaviour {
             }
             print(AllGroups.IndexOf(group) + " : " + juttu);
         }
-        }
+
+        print(" täsä kaikki: " + AllGroups);
+    }
 
     // tee tästä semmonen että poistetaan ryhmä jossa ei oo enää ketää et jos checcaa vasemman ni sit ei tee heti omaa ryhmää
     //vaan vasta sitte jos ylhäälläkään ei oo :sob: void LeftCheck()
     void CheckOtherSquare(BlockScript otherSquare, BlockScript thisSquare) {
         if (thisSquare.bc == otherSquare.bc) {
-            print("samanväriset");
-            //samanvärisiä joten laitetaan samaan ryhmään
-            AllGroups[otherSquare.groupNumber].Add(thisSquare);
-            thisSquare.SetGroupNumber(otherSquare.groupNumber);
+            print("samanväriset " + thisSquare + " ja " + otherSquare);
+            //samanvärisiä joten laitetaan samaan ryhmään ja tuhotaan edellinen
+            otherSquare.group.Add(thisSquare);
+            AllGroups.Remove(thisSquare.group);
+
+            //tämän saa tehdä vasta tuhoamisen jälkeen!!
+            thisSquare.SetGroup(otherSquare.group);
 
         }
-        else if (thisSquare.groupNumber == -1) {
+        else if (thisSquare.group.Count == 0) {
             //tee uusi ryhmä
             List<BlockScript> tempList = new List<BlockScript> { thisSquare };
             AllGroups.Add(tempList);
-            int tempInt = AllGroups.FindIndex(l => l == tempList);
-            thisSquare.SetGroupNumber(tempInt);
+            // int tempInt = AllGroups.IndexOf(tempList);
+            thisSquare.SetGroup(tempList);
+            print("uusi ryhmä tehty blokille " + thisSquare + " ryhmä: " + AllGroups.IndexOf(tempList));
         }
         else {
-            print(thisSquare.gridPos + " on ryhmässä " + thisSquare.groupNumber);
+            print(thisSquare.gridPos + " on ryhmässä " + AllGroups.IndexOf(thisSquare.group));
         }
 
     }
 
-	
-	void Update () {
+    public BlockScript FindBlock(Vector3 place) {
+
+        if (-place.y < rows) {
+            //print(place);
+            return blockGrid[(int)place.x, -(int)place.y];
+        }
+        else {
+            //print("palautetaan palikka 0");
+            return blockGrid[0, 0];
+            //jos yritetään katsoa alimman rivin alapuolelta, palautetaan palikka 0
+        }
+    }
+
+    void Update() {
         //if (blockGrid[0, 0] != null) {
         //    testBlock = blockGrid[0, 0].GetComponent<Block>();
         //    testBlock.Pop();
         //}
 
-		//tsekataan mitkä blokit on yhdessä
+        //tsekataan mitkä blokit on yhdessä
         //(mitkä on staattisia ja mitkä liikkuvia?)
         //taulukko ja blokin transform vastaa toisiaan kun taulukon ruutu on 1 unity-yksikkö * 1 unity-yksikkö
-	}
+    }
 
-    public void PopBlocks(GameObject popped) {
+    public void PopBlocks(BlockScript popped) {
         print(popped);
+        foreach (BlockScript block in popped.group) {
+            block.Pop();
+        }
+        //toimiikohan tää??
         //pop (destroy, animation??) the adjacent blocks that are the same color as popped
     }
 }
+//apua
