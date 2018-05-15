@@ -68,13 +68,13 @@ public class BlockManager : MonoBehaviour {
 
                     if (thisSquare.bc == leftSquare.bc && thisSquare.bc == topSquare.bc) {
                         //jos on samanvärinen sekä vasemmalla että ylempänä lisätään ylempään
-                        AllGroups[AllGroups.IndexOf(topSquare.group)].Add(thisSquare);
+                        topSquare.group.Add(thisSquare);
                         //thegroupiwant.Add(thisSquare);
                         thisSquare.SetGroup(topSquare.group);
 
                         if (leftSquare.group != topSquare.group) {
-                            //jos vasemmalla oleva blokki ei vielä samassa ryhmässä, lisätään se samaan ryhmään
-                            AllGroups[AllGroups.IndexOf(topSquare.group)].Add(leftSquare);
+                            //jos vasemmalla olevat blokit ei vielä samassa ryhmässä, lisätään se samaan ryhmään
+                            topSquare.group.Add(leftSquare);
                             //ja tuhotaan sen ryhmä
                             AllGroups.RemoveAt(AllGroups.IndexOf(leftSquare.group));
                             //asetetaan viittaus oikeaan ryhmään -- tämän saa tehdä vasta tuhoamisen jälkeen!!
@@ -143,8 +143,9 @@ public class BlockManager : MonoBehaviour {
         if (thisSquare.bc == otherSquare.bc) {
             print("samanväriset " + thisSquare + " ja " + otherSquare);
             //samanvärisiä joten laitetaan samaan ryhmään ja tuhotaan edellinen
-            AllGroups.RemoveAt(AllGroups.IndexOf(thisSquare.group));
-            AllGroups[AllGroups.IndexOf(otherSquare.group)].Add(thisSquare);
+            otherSquare.group.Add(thisSquare);
+            AllGroups.Remove(thisSquare.group);
+
             //tämän saa tehdä vasta tuhoamisen jälkeen!!
             thisSquare.SetGroup(otherSquare.group);
 
@@ -163,6 +164,9 @@ public class BlockManager : MonoBehaviour {
 
     }
 
+    public BlockScript FindBlock(Vector3 place) {
+        return blockGrid[(int)place.x, (int)place.y];
+    }
 	
 	void Update () {
         //if (blockGrid[0, 0] != null) {
@@ -175,9 +179,12 @@ public class BlockManager : MonoBehaviour {
         //taulukko ja blokin transform vastaa toisiaan kun taulukon ruutu on 1 unity-yksikkö * 1 unity-yksikkö
 	}
 
-    public void PopBlocks(GameObject popped) {
+    public void PopBlocks(BlockScript popped) {
         print(popped);
-       // popped.
+        foreach (BlockScript block in popped.group) {
+            block.Pop();
+        }
+            //toimiikohan tää??
         //pop (destroy, animation??) the adjacent blocks that are the same color as popped
     }
 }

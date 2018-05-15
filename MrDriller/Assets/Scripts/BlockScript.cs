@@ -29,6 +29,7 @@ public class BlockScript : MonoBehaviour {
     BlockManager bm;
     public List<BlockScript> group;
     SpriteRenderer sr;
+    BlockScript blockBelow;
 
     private void Awake() {
         bm = FindObjectOfType<BlockManager>().GetComponent<BlockManager>();
@@ -40,7 +41,8 @@ public class BlockScript : MonoBehaviour {
 
     void Update () {
         // if block underneath destroyed, hold & wobble for 2 seconds, falling = true
-
+        Vector3 below = transform.position + new Vector3(0, 1, 0);
+        blockBelow = bm.FindBlock(below);
         //if (no block underneath) {
         //wobble
         //only blockmanager can change the blockstate to hold?
@@ -54,19 +56,17 @@ public class BlockScript : MonoBehaviour {
             holdTimer = 2f;
         }
 
-        if(bs == BlockState.Falling) {
+        if(!blockBelow) {
+            bs = BlockState.Falling;
             Fall();
             //if (block underneath) {bs = BlockState.Static}
             ///then stop on top of next block OR merge with a same color block
             ///
         }
 
+        
         ///when the block is falling:
-        /// check if block's center would pass (by unity yksikkö?? how??)
-        ///to the next ruutu where there already is a static block
-        ///if would, snap to the previous ruutu
-        ///if not, keep falling
-        ///
+
 
         ///check if there's a block of the same color on either side
         ///
@@ -81,6 +81,17 @@ public class BlockScript : MonoBehaviour {
     void Fall() {
         transform.Translate(0, -velocity * Time.deltaTime, 0);
 
+        if (blockBelow.bs == BlockState.Static) {
+            //check where we are an if we're going below some line then?
+            Vector3 placeToSnap = blockBelow.transform.position + new Vector3(0, -1, 0);
+            transform.position = placeToSnap;
+            bs = BlockState.Static;
+        }
+        //sit jos on niin stop falling ja transform = +1y
+        /// check if block's center would pass (by unity yksikkö?? how??)
+        ///to the next ruutu where there already is a static block
+        ///if would, snap to the previous ruutu
+        ///if not, keep falling
     }
 
     public void SetGridPos(int posX, int posY, int columns) {
@@ -93,7 +104,7 @@ public class BlockScript : MonoBehaviour {
     }
 
     public void Pop() {
-        bm.PopBlocks(gameObject);
+        bm.PopBlocks(this);
         //kerro block managerille että poksahti
         //animaatio tms?
         Destroy(gameObject);
