@@ -41,8 +41,8 @@ public class BlockScript : MonoBehaviour {
 
     void Update () {
         // if block underneath destroyed, hold & wobble for 2 seconds, falling = true
-        Vector3 below = transform.position + new Vector3(0, 1, 0);
-        blockBelow = bm.FindBlock(below);
+        //Vector3 below = transform.position + new Vector3(0, -1, 0);
+        //blockBelow = bm.FindBlock(below);
         //if (no block underneath) {
         //wobble
         //only blockmanager can change the blockstate to hold?
@@ -56,13 +56,14 @@ public class BlockScript : MonoBehaviour {
             holdTimer = 2f;
         }
 
-        if(!blockBelow) {
-            bs = BlockState.Falling;
-            Fall();
-            //if (block underneath) {bs = BlockState.Static}
-            ///then stop on top of next block OR merge with a same color block
-            ///
-        }
+        //if(!blockBelow) {
+        //    print("AAAAAAAA");
+        //    bs = BlockState.Falling;
+        //    Fall();
+        //    //if (block underneath) {bs = BlockState.Static}
+        //    ///then stop on top of next block OR merge with a same color block
+        //    ///
+        //}
 
         
         ///when the block is falling:

@@ -171,7 +171,16 @@ public class BlockManager : MonoBehaviour {
     }
 
     public BlockScript FindBlock(Vector3 place) {
-        return blockGrid[(int)place.x, (int)place.y];
+
+        if (-place.y < rows) {
+            //print(place);
+            return blockGrid[(int)place.x, -(int)place.y];
+        }
+        else {
+            //print("palautetaan palikka 0");
+            return blockGrid[0, 0];
+            //jos yritetään katsoa alimman rivin alapuolelta, palautetaan palikka 0
+        }
     }
 	
 	void Update () {
