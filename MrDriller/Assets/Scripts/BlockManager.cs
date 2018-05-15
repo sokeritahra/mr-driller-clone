@@ -34,7 +34,10 @@ public class BlockManager : MonoBehaviour {
         //    }
         //}
         FindGroups();
-    }
+        foreach (BlockScript block in blockArray) {
+            block.AtLevelStart();
+        }
+        }
 
     void FindGroups() {
 

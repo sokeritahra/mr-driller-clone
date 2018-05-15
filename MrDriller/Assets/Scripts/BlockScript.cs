@@ -31,19 +31,33 @@ public class BlockScript : MonoBehaviour {
     public List<BlockScript> group;
     SpriteRenderer sr;
     BlockScript blockBelow;
+    BlockScript blockAbove;
+    Vector3 below;
 
     private void Awake() {
         bm = FindObjectOfType<BlockManager>().GetComponent<BlockManager>();
+
         //int tempInt = Random.Range(0, 3); //TODO: generalize
         //bc = (BlockColor)tempInt;
         //sr = GetComponent<SpriteRenderer>();
         //sr.color = new Color(0, tempInt / 4f, 0);
     }
 
-    void Update() {
-        // if block underneath destroyed, hold & wobble for 2 seconds, falling = true
-        Vector3 below = transform.position + new Vector3(0, -1, 0);
+    public void AtLevelStart() {
+        //kun on static tarvii vaan kerran kattoo mikä palikka on alla
+        //sille täytyy kertoo mikä on sen yllä jotta se voi kutsua sitä
+        below = transform.position + new Vector3(0, -1, 0);
         blockBelow = bm.FindBlock(below);
+        blockBelow.SetBlockAbove(this);
+    }
+
+    public void SetBlockAbove(BlockScript above) {
+        blockAbove = above;
+    }
+
+    void FixedUpdate() {
+        // if block underneath destroyed, hold & wobble for 2 seconds, falling = true
+
         //if (no block underneath) {
         //wobble
         //only blockmanager can change the blockstate to hold?
@@ -57,24 +71,18 @@ public class BlockScript : MonoBehaviour {
             holdTimer = 2f;
         }
 
-        if (!blockBelow) {
-            print(gameObject + " falling!");
-            bs = BlockState.Falling;
-            Fall();
-            //if (block underneath) {bs = BlockState.Static}
-            ///then stop on top of next block OR merge with a same color block
-            ///
-        }
+        //if (block underneath) {bs = BlockState.Static}
+        ///then stop on top of next block OR merge with a same color block
+        ///
 
 
-        //if(!blockBelow) {
+
+        if(bs == BlockState.Falling) {
         //    print("AAAAAAAA");
-        //    bs = BlockState.Falling;
         //    Fall();
-        //    //if (block underneath) {bs = BlockState.Static}
         //    ///then stop on top of next block OR merge with a same color block
         //    ///
-        //}
+        }
 
         ///when the block is falling:
 
@@ -90,13 +98,19 @@ public class BlockScript : MonoBehaviour {
     }
 
     void Fall() {
-        transform.Translate(0, -velocity * Time.deltaTime, 0);
 
+        transform.Translate(0, -velocity * Time.deltaTime, 0);
+        below = transform.position + new Vector3(0, -1, 0);
+        blockBelow = bm.FindBlock(below);
         if (blockBelow.bs == BlockState.Static) {
             //check where we are an if we're going below some line then?
             Vector3 placeToSnap = blockBelow.transform.position + new Vector3(0, -1, 0);
             transform.position = placeToSnap;
             bs = BlockState.Static;
+        }
+        //tell the block above this one to fall as well
+        if (blockAbove) {
+            blockAbove.bs = BlockState.Falling;
         }
         //sit jos on niin stop falling ja transform = +1y
         /// check if block's center would pass (by unity yksikkö?? how??)
@@ -118,8 +132,11 @@ public class BlockScript : MonoBehaviour {
         bm.PopBlocks(this);
         //kerro block managerille että poksahti
         //animaatio tms?
+        if (blockAbove) {
+            blockAbove.bs = BlockState.Falling;
+        }
+
         Destroy(gameObject);
         print("Pop!");
     }
 }
-//apua
