@@ -16,7 +16,7 @@ public class BlockManager : MonoBehaviour {
     //Block testBlock;
     List<List<BlockScript>> AllGroups;
 
-    public void AtLevelStart () {
+    public void AtLevelStart() {
         //luodaan taulukko ja generoidaan blokit sinne
         blockGrid = new BlockScript[columns, rows];
 
@@ -42,7 +42,7 @@ public class BlockManager : MonoBehaviour {
         float posx = 0;
         float posy = 0;
 
-        foreach ( BlockScript block in blockArray) {
+        foreach (BlockScript block in blockArray) {
             posx = block.transform.position.x;
             posy = block.transform.position.y;
             blockGrid[(int)posx, -(int)posy] = block;
@@ -57,7 +57,7 @@ public class BlockManager : MonoBehaviour {
 
         AllGroups = new List<List<BlockScript>>();
         for (int y = 0; y < rows; y++) {
-             for (int x = 0; x < columns; x++) {
+            for (int x = 0; x < columns; x++) {
 
                 var thisSquare = blockGrid[x, y];
 
@@ -85,7 +85,7 @@ public class BlockManager : MonoBehaviour {
                             AllGroups.Remove(leftSquare.group);
                             //asetetaan viittaus oikeaan ryhmään -- tämän saa tehdä vasta tuhoamisen jälkeen!!
                             leftSquare.SetGroup(topSquare.group);
-                            
+
                             print("this block " + thisSquare.gridPos + " and the one(s) on the left added to the one on top");
                         }
                         else {
@@ -111,7 +111,7 @@ public class BlockManager : MonoBehaviour {
 
                     CheckOtherSquare(leftSquare, thisSquare);
 
-                    
+
                 }
 
                 else if (y != 0) {
@@ -130,8 +130,8 @@ public class BlockManager : MonoBehaviour {
                     //int tempInt = AllGroups.FindIndex(l => l == tempList);
                     thisSquare.SetGroup(tempList);
                 }
-                }
             }
+        }
         foreach (List<BlockScript> group in AllGroups) {
             string juttu = "";
             foreach (BlockScript bs in group) {
@@ -141,7 +141,7 @@ public class BlockManager : MonoBehaviour {
         }
 
         print(" täsä kaikki: " + AllGroups);
-        }
+    }
 
     // tee tästä semmonen että poistetaan ryhmä jossa ei oo enää ketää et jos checcaa vasemman ni sit ei tee heti omaa ryhmää
     //vaan vasta sitte jos ylhäälläkään ei oo :sob: void LeftCheck()
@@ -160,7 +160,7 @@ public class BlockManager : MonoBehaviour {
             //tee uusi ryhmä
             List<BlockScript> tempList = new List<BlockScript> { thisSquare };
             AllGroups.Add(tempList);
-           // int tempInt = AllGroups.IndexOf(tempList);
+            // int tempInt = AllGroups.IndexOf(tempList);
             thisSquare.SetGroup(tempList);
             print("uusi ryhmä tehty blokille " + thisSquare + " ryhmä: " + AllGroups.IndexOf(tempList));
         }
@@ -182,24 +182,25 @@ public class BlockManager : MonoBehaviour {
             //jos yritetään katsoa alimman rivin alapuolelta, palautetaan palikka 0
         }
     }
-	
-	void Update () {
+
+    void Update() {
         //if (blockGrid[0, 0] != null) {
         //    testBlock = blockGrid[0, 0].GetComponent<Block>();
         //    testBlock.Pop();
         //}
 
-		//tsekataan mitkä blokit on yhdessä
+        //tsekataan mitkä blokit on yhdessä
         //(mitkä on staattisia ja mitkä liikkuvia?)
         //taulukko ja blokin transform vastaa toisiaan kun taulukon ruutu on 1 unity-yksikkö * 1 unity-yksikkö
-	}
+    }
 
     public void PopBlocks(BlockScript popped) {
         print(popped);
         foreach (BlockScript block in popped.group) {
             block.Pop();
         }
-            //toimiikohan tää??
+        //toimiikohan tää??
         //pop (destroy, animation??) the adjacent blocks that are the same color as popped
     }
 }
+//apua
