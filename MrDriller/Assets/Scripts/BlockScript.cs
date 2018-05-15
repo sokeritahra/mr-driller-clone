@@ -6,9 +6,10 @@ public enum BlockColor {
     Red,
     Blue,
     Green,
-    Yellow
+    Yellow,
+    Grey
 }
-//väri: 4 eri väriä
+//väri: 5 eri väriä
 
 public enum BlockState {
     Static,
