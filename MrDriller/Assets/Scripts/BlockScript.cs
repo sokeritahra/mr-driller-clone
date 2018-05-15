@@ -58,6 +58,7 @@ public class BlockScript : MonoBehaviour {
         }
 
         if (!blockBelow) {
+            print(gameObject + " falling!");
             bs = BlockState.Falling;
             Fall();
             //if (block underneath) {bs = BlockState.Static}

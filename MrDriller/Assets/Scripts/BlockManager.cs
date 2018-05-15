@@ -174,9 +174,7 @@ public class BlockManager : MonoBehaviour {
     public BlockScript FindBlock(Vector3 place) {
 
         if (-place.y < rows) {
-            print(place);
-            print(-place.y);
-            print(rows);
+           
             return blockGrid[(int)place.x, -(int)place.y];
         }
         else {

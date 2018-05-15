@@ -105,6 +105,7 @@ public class PlayerCharacter : MonoBehaviour {
             return;
         }
 
+        print(Mathf.RoundToInt(x) + ", " + (Mathf.RoundToInt(y) - 1f) );
         bs = bm.blockGrid[Mathf.RoundToInt(x), Mathf.RoundToInt(y)];
 
         if (bs) {
