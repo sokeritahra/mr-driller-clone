@@ -73,10 +73,16 @@ public class BlockManager : MonoBehaviour {
                         thisSquare.SetGroup(topSquare.group);
 
                         if (leftSquare.group != topSquare.group) {
-                            //jos vasemmalla olevat blokit ei vielä samassa ryhmässä, lisätään se samaan ryhmään
+                            //jos vasemmalla olevat blokit ei vielä samassa ryhmässä, lisätään ne samaan ryhmään
+                            foreach (BlockScript blockOnTheLeft in leftSquare.group) {
+                                if (blockOnTheLeft != leftSquare) {
+                                    topSquare.group.Add(blockOnTheLeft);
+                                    blockOnTheLeft.SetGroup(topSquare.group);
+                                }
+                            }
                             topSquare.group.Add(leftSquare);
                             //ja tuhotaan sen ryhmä
-                            AllGroups.RemoveAt(AllGroups.IndexOf(leftSquare.group));
+                            AllGroups.Remove(leftSquare.group);
                             //asetetaan viittaus oikeaan ryhmään -- tämän saa tehdä vasta tuhoamisen jälkeen!!
                             leftSquare.SetGroup(topSquare.group);
                             
