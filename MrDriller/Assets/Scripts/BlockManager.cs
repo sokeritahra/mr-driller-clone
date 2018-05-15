@@ -15,6 +15,7 @@ public class BlockManager : MonoBehaviour {
     BlockScript blockScript;
     //Block testBlock;
     List<List<BlockScript>> AllGroups;
+    public BlockScript[] blockArray;
 
     public void AtLevelStart() {
         //luodaan taulukko ja generoidaan blokit sinne
@@ -37,7 +38,7 @@ public class BlockManager : MonoBehaviour {
 
     void FindGroups() {
 
-        var blockArray = FindObjectsOfType<BlockScript>();
+        blockArray = FindObjectsOfType<BlockScript>();
 
         float posx = 0;
         float posy = 0;
@@ -173,7 +174,9 @@ public class BlockManager : MonoBehaviour {
     public BlockScript FindBlock(Vector3 place) {
 
         if (-place.y < rows) {
-            //print(place);
+            print(place);
+            print(-place.y);
+            print(rows);
             return blockGrid[(int)place.x, -(int)place.y];
         }
         else {
