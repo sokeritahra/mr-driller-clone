@@ -54,12 +54,20 @@ public class BlockSpriteChanger : MonoBehaviour {
             // cornerOut cornerIn edge ? 
             if (sameAboveOrBelow && sameLeftOrRight) {
                 blockTiles[cornerID].sprite = cornerIn;
+
             } else if (sameAboveOrBelow && !sameLeftOrRight) {
                 blockTiles[cornerID].sprite = edge;
             } else if (!sameAboveOrBelow && sameLeftOrRight) {
                 blockTiles[cornerID].sprite = edge;
             } else {
                 blockTiles[cornerID].sprite = cornerOut;
+                if (cornerID == 0) {
+                    blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 180f);
+                } else if (cornerID == 1) {
+                    blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 270f);
+                } else if (cornerID == 2) {
+                    blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 90f);       
+                }
             }
 
         }
