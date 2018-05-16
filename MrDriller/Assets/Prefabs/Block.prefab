@@ -78,12 +78,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62a6fbfbc13c558458d818aba436d89b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocity: 0
+  velocity: 1
   gridPos: 0
   holdTimer: 2
   bs: 0
   bc: 0
-  groupNumber: -1
+  group: []
 --- !u!212 &212514258070351934
 SpriteRenderer:
   m_ObjectHideFlags: 1

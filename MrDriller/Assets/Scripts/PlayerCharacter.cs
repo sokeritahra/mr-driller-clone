@@ -81,6 +81,7 @@ public class PlayerCharacter : MonoBehaviour {
 
 
     void CheckBlock(PlayerMode mode) {
+        drillTimer = 0.5f;
         float x = transform.position.x;
         float y = transform.position.y * -1f;
         string animS = "";
@@ -105,12 +106,16 @@ public class PlayerCharacter : MonoBehaviour {
             return;
         }
 
-        print(Mathf.RoundToInt(x) + ", " + (Mathf.RoundToInt(y) - 1f) );
+        anim.Play(animS);
+
+        print(Mathf.RoundToInt(x) + ", " + Mathf.RoundToInt(y) );
         bs = bm.blockGrid[Mathf.RoundToInt(x), Mathf.RoundToInt(y)];
+
+        print(bs);
 
         if (bs) {
             DrillBlock(bs);
-            anim.Play(animS);
+
         }
 
         print("porattiin " + bs + " paikassa " + transform.position);
@@ -118,8 +123,8 @@ public class PlayerCharacter : MonoBehaviour {
     }
 
     void DrillBlock(BlockScript block) {
-        block.Pop();
-        drillTimer = 0.5f;
+        bm.PopBlocks(block);
+        print("joo oli");
         //tarviiks muuta
     }
 

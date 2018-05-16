@@ -16,6 +16,8 @@ public class BlockManager : MonoBehaviour {
     //Block testBlock;
     List<List<BlockScript>> AllGroups;
     public BlockScript[] blockArray;
+    float posx = 0;
+    float posy = 0;
 
     public void AtLevelStart() {
         //luodaan taulukko ja generoidaan blokit sinne
@@ -39,19 +41,19 @@ public class BlockManager : MonoBehaviour {
         }
         }
 
+    public void SetBlockInGrid (BlockScript block) {
+        posx = block.transform.position.x;
+        posy = block.transform.position.y;
+        blockGrid[(int)posx, -(int)posy] = block;
+        blockGrid[(int)posx, -(int)posy].SetGridPos((int)posx, -(int)posy, columns);
+    }
+
     void FindGroups() {
 
         blockArray = FindObjectsOfType<BlockScript>();
 
-        float posx = 0;
-        float posy = 0;
-
         foreach (BlockScript block in blockArray) {
-            posx = block.transform.position.x;
-            posy = block.transform.position.y;
-            blockGrid[(int)posx, -(int)posy] = block;
-            blockGrid[(int)posx, -(int)posy].SetGridPos((int)posx, -(int)posy, columns);
-
+            SetBlockInGrid(block);
         }
 
         //rows = -(int)posy;
@@ -182,7 +184,7 @@ public class BlockManager : MonoBehaviour {
         }
         else {
             //print("palautetaan palikka 0");
-            return blockGrid[0, 0];
+            return null;
             //jos yritetään katsoa alimman rivin alapuolelta, palautetaan palikka 0
         }
     }
@@ -201,10 +203,13 @@ public class BlockManager : MonoBehaviour {
     public void PopBlocks(BlockScript popped) {
         print(popped);
         foreach (BlockScript block in popped.group) {
-            block.Pop();
+            //print("hei minun nimi on " + block);
+
+                block.Pop();
+
         }
+        //}
         //toimiikohan tää??
         //pop (destroy, animation??) the adjacent blocks that are the same color as popped
     }
 }
-//apua

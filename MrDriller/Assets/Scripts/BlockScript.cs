@@ -33,10 +33,13 @@ public class BlockScript : MonoBehaviour {
     BlockScript blockBelow;
     BlockScript blockAbove;
     Vector3 below;
+    Collider2D col;
+    Collider2D[] stuffBelow;
+    ContactFilter2D cf = new ContactFilter2D();
 
     private void Awake() {
         bm = FindObjectOfType<BlockManager>().GetComponent<BlockManager>();
-
+        col = gameObject.GetComponent<Collider2D>();
         //int tempInt = Random.Range(0, 3); //TODO: generalize
         //bc = (BlockColor)tempInt;
         //sr = GetComponent<SpriteRenderer>();
@@ -48,7 +51,12 @@ public class BlockScript : MonoBehaviour {
         //sille täytyy kertoo mikä on sen yllä jotta se voi kutsua sitä
         below = transform.position + new Vector3(0, -1, 0);
         blockBelow = bm.FindBlock(below);
-        blockBelow.SetBlockAbove(this);
+        if (blockBelow) {
+            print("the block above " + blockBelow + " is " + this);
+            blockBelow.SetBlockAbove(this);
+            print("the block below " + blockBelow.blockAbove + " is " + blockBelow);
+        }
+
     }
 
     public void SetBlockAbove(BlockScript above) {
@@ -77,11 +85,11 @@ public class BlockScript : MonoBehaviour {
 
 
 
-        if(bs == BlockState.Falling) {
-        //    print("AAAAAAAA");
-        //    Fall();
-        //    ///then stop on top of next block OR merge with a same color block
-        //    ///
+        if (bs == BlockState.Falling) {
+            //print("AAAAAAAA " + this);
+            Fall();
+            //    ///then stop on top of next block OR merge with a same color block
+            //    ///
         }
 
         ///when the block is falling:
@@ -98,15 +106,40 @@ public class BlockScript : MonoBehaviour {
     }
 
     void Fall() {
-
         transform.Translate(0, -velocity * Time.deltaTime, 0);
-        below = transform.position + new Vector3(0, -1, 0);
-        blockBelow = bm.FindBlock(below);
-        if (blockBelow.bs == BlockState.Static) {
+        //luodaan overlap joka kattoo onko alapuolella blokki
+        //Get a list of all colliders that fall within a box area.
+        //Collider2D[] OverlapBoxAll(Vector2 point, Vector2 size, float angle, int layerMask = DefaultRaycastLayers, float minDepth = -Mathf.Infinity, float maxDepth = Mathf.Infinity); 
+        //cf.SetLayerMask(9);
+        Vector2 centerPoint = new Vector2(transform.position.x, transform.position.y - 0.25f);
+        stuffBelow = Physics2D.OverlapBoxAll(centerPoint, new Vector2(0.5f, 0.5f), 0);
+        //var oneBelow = col.OverlapCollider(cf, stuffBelow);
+        //below = transform.position + new Vector3(0, -1, 0);
+        if (stuffBelow.Length > 1) {
+            print("havaittiin " + stuffBelow.Length + " blokkia colliderissa");
+            }
+        foreach (Collider2D col in stuffBelow) {
+            if (col != gameObject.GetComponent<Collider2D>()) {
+                blockBelow = col.gameObject.GetComponent<BlockScript>();
+            }
+        }
+        
+        //print(blockBelow + " is below " + this);
+
+
+        if (blockBelow && blockBelow.bs == BlockState.Static) {
             //check where we are an if we're going below some line then?
-            Vector3 placeToSnap = blockBelow.transform.position + new Vector3(0, -1, 0);
+            Vector3 placeToSnap = blockBelow.transform.position + new Vector3(0, 1, 0);
+            print(this + " should snap on top of " + blockBelow + " at " + placeToSnap);
             transform.position = placeToSnap;
             bs = BlockState.Static;
+            if (blockAbove) {
+                blockAbove.transform.position = placeToSnap + new Vector3(0, 1, 0);
+                blockAbove.bs = BlockState.Static;
+            }
+            blockBelow.SetBlockAbove(this);
+            bm.SetBlockInGrid(this);
+            return;
         }
         //tell the block above this one to fall as well
         if (blockAbove) {
@@ -129,7 +162,6 @@ public class BlockScript : MonoBehaviour {
     }
 
     public void Pop() {
-        bm.PopBlocks(this);
         //kerro block managerille että poksahti
         //animaatio tms?
         if (blockAbove) {
