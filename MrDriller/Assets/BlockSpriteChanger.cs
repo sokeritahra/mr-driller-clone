@@ -30,8 +30,8 @@ public class BlockSpriteChanger : MonoBehaviour {
 
 
     void Start () {
-		
-	}
+        SpriteUpdate();
+    }
 	
 	void Update () {
         if (Input.GetKeyDown(KeyCode.Space)) {
