@@ -35,7 +35,6 @@ public class BlockScript : MonoBehaviour {
     Vector3 below;
     Collider2D col;
     Collider2D[] stuffBelow;
-    ContactFilter2D cf = new ContactFilter2D();
 
     private void Awake() {
         bm = FindObjectOfType<BlockManager>().GetComponent<BlockManager>();
@@ -64,11 +63,11 @@ public class BlockScript : MonoBehaviour {
     }
 
     void FixedUpdate() {
-        // if block underneath destroyed, hold & wobble for 2 seconds, falling = true
+        // if block underneath destroyed, hold & wobble for 2 seconds, fall
 
-        //if (no block underneath) {
+        //TODO: make hold work!
         //wobble
-        //only blockmanager can change the blockstate to hold?
+
         if (bs == BlockState.Hold) {
             holdTimer -= Time.deltaTime;
             //print(holdTimer);
@@ -79,11 +78,8 @@ public class BlockScript : MonoBehaviour {
             holdTimer = 2f;
         }
 
-        //if (block underneath) {bs = BlockState.Static}
         ///then stop on top of next block OR merge with a same color block
         ///
-
-
 
         if (bs == BlockState.Falling) {
             //print("AAAAAAAA " + this);
@@ -93,8 +89,6 @@ public class BlockScript : MonoBehaviour {
         }
 
         ///when the block is falling:
-
-
         ///check if there's a block of the same color on either side
         ///
         ///if (LeftBlock.BlockColor == gameObject.BlockColor) {
@@ -108,9 +102,6 @@ public class BlockScript : MonoBehaviour {
     void Fall() {
         transform.Translate(0, -velocity * Time.deltaTime, 0);
         //luodaan overlap joka kattoo onko alapuolella blokki
-        //Get a list of all colliders that fall within a box area.
-        //Collider2D[] OverlapBoxAll(Vector2 point, Vector2 size, float angle, int layerMask = DefaultRaycastLayers, float minDepth = -Mathf.Infinity, float maxDepth = Mathf.Infinity); 
-        //cf.SetLayerMask(9);
         Vector2 centerPoint = new Vector2(transform.position.x, transform.position.y - 0.25f);
         stuffBelow = Physics2D.OverlapBoxAll(centerPoint, new Vector2(0.5f, 0.5f), 0);
         //var oneBelow = col.OverlapCollider(cf, stuffBelow);
@@ -165,7 +156,7 @@ public class BlockScript : MonoBehaviour {
         //kerro block managerille että poksahti
         //animaatio tms?
         if (blockAbove) {
-            blockAbove.bs = BlockState.Falling;
+            blockAbove.bs = BlockState.Hold;
         }
 
         Destroy(gameObject);

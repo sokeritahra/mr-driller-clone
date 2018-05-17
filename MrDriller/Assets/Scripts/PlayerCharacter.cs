@@ -72,20 +72,24 @@ public class PlayerCharacter : MonoBehaviour {
             if (Mathf.Abs(horizontal) < Mathf.Abs(vertical)) { // Set player (drilling) mode
                 if (vertical < 0) {
                     pm = PlayerMode.Down;
+                    previousPm = pm;
                     anim.Play("Aim_Down");
                 }
                 if (vertical > 0) {
                     pm = PlayerMode.Up;
+                    previousPm = pm;
                     anim.Play("Aim_Up");
                 }
             }
             else {
                 if (horizontal > 0) {
                     pm = PlayerMode.Right;
+                    previousPm = pm;
                     anim.Play("Aim_Right");
                 }
                 if (horizontal < 0) {
                     pm = PlayerMode.Left;
+                    previousPm = pm;
                     anim.Play("Aim_Left");
                 }
             }
