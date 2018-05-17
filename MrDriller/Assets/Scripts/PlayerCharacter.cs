@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-enum PlayerMode { Up, Down, Left, Right, Falling }; // Modes for the sprites and drill directions
+public enum PlayerMode { Up, Down, Left, Right, Falling }; // Modes for the sprites and drill directions
 
 public class PlayerCharacter : MonoBehaviour {
     Rigidbody2D rb;
-    PlayerMode pm;
+    public PlayerMode pm;
+    public PlayerMode previousPm;
     Animator anim;
     public float speed; // Player horizontal speed
     float horizontal; 
@@ -16,40 +17,79 @@ public class PlayerCharacter : MonoBehaviour {
     BlockScript bs;
     BlockManager bm;
     public float drillDepth = 0.75f;
+    float rayLength = 0.1f;
+    RaycastHit2D hit;
+    RaycastHit2D hitLeft;
+    Vector2 directionDown = (Vector2)Vector3.down;
 
     void Start() {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         pm = PlayerMode.Down;
         bm = FindObjectOfType<BlockManager>();
-
     }
 
+    bool IsGrounded() {
+        Vector2 tempLeft = new Vector2(transform.position.x, transform.position.y) + new Vector2(-0.25f, -0.6f);
+        hitLeft = Physics2D.Raycast(tempLeft, directionDown, rayLength);
+        if (hitLeft.collider != null) {
+            Debug.DrawRay(tempLeft, directionDown * hitLeft.distance, Color.yellow);
+        }
+        else {
+            Debug.DrawRay(tempLeft, directionDown * 1000, Color.white);
+        }
 
+        Vector2 tempVector = new Vector2(transform.position.x, transform.position.y) + new Vector2(0.25f, -0.6f);
+        hit = Physics2D.Raycast(tempVector, directionDown, rayLength);
+        if (hit.collider != null) {
+            Debug.DrawRay(tempVector, directionDown * hit.distance, Color.yellow);
+        }
+        else {
+            Debug.DrawRay(tempVector, directionDown * 1000, Color.white);
+        }
+        return (Physics2D.Raycast(tempVector, directionDown, rayLength) || Physics2D.Raycast(tempLeft, directionDown, rayLength));
+     }
+    
     void FixedUpdate() {
 
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");  // Read input from controller/keyboard
-        rb.velocity = new Vector2(horizontal * speed, rb.velocity.y); // Move player horizontally
+        if (pm != PlayerMode.Falling) { //Shouldn't move when falling
+            rb.velocity = new Vector2(horizontal * speed, rb.velocity.y); // Move player horizontally
+        }
+        else {
+            rb.velocity = new Vector2(0, rb.velocity.y);
+        }
 
-        if (Mathf.Abs(horizontal) < Mathf.Abs(vertical)) { // Set player (drilling) mode
-            if (vertical < 0) {
-                pm = PlayerMode.Down;
-                anim.Play("Aim_Down");
+        if (!IsGrounded()) {
+            if (pm != PlayerMode.Falling) {
+                previousPm = pm;
             }
-            if (vertical > 0) {
-                pm = PlayerMode.Up;
-                anim.Play("Aim_Up");
+            pm = PlayerMode.Falling;
+        }
+        else {
+            pm = previousPm;
+            if (Mathf.Abs(horizontal) < Mathf.Abs(vertical)) { // Set player (drilling) mode
+                if (vertical < 0) {
+                    pm = PlayerMode.Down;
+                    anim.Play("Aim_Down");
+                }
+                if (vertical > 0) {
+                    pm = PlayerMode.Up;
+                    anim.Play("Aim_Up");
+                }
             }
-        } else {
-            if (horizontal > 0) {
-                pm = PlayerMode.Right;
-                anim.Play("Aim_Right");
+            else {
+                if (horizontal > 0) {
+                    pm = PlayerMode.Right;
+                    anim.Play("Aim_Right");
+                }
+                if (horizontal < 0) {
+                    pm = PlayerMode.Left;
+                    anim.Play("Aim_Left");
+                }
             }
-            if (horizontal < 0) {
-                pm = PlayerMode.Left;
-                anim.Play("Aim_Left");
-            }
+        
         }
 
         if (drillTimer > 0) { // Drill cooldown timer
