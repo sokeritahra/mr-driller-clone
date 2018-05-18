@@ -10,15 +10,25 @@ public class BlockSpriteChanger : MonoBehaviour {
     public Sprite cornerOut;
     public Sprite cornerIn;
     public Sprite edge;
+    public float posx;
+    public float posy;
+    public BlockManager bm;
 
     public bool sameAbove;
     public bool sameLeft;
     public bool sameBelow;
     public bool sameRight;
 
+    BlockScript thisBlock;
+    BlockScript leftBlock;
+    BlockScript rightBlock;
+    BlockScript upBlock;
+    BlockScript downBlock;
+
     List <SpriteRenderer> blockTiles;
 
     void Awake() {
+        bm = FindObjectOfType<BlockManager>();
 
         topLeft = transform.Find("TopLeft").GetComponent<SpriteRenderer>();
         topRight = transform.Find("TopRight").GetComponent<SpriteRenderer>();
@@ -28,8 +38,7 @@ public class BlockSpriteChanger : MonoBehaviour {
         blockTiles = new List<SpriteRenderer> {bottomRight, topRight, bottomLeft, topLeft};
     }
 
-
-    void Start () {
+    public void AtLevelStart () {
         SpriteUpdate();
     }
 	
@@ -39,10 +48,53 @@ public class BlockSpriteChanger : MonoBehaviour {
         }
 	}
 
+    void FindAdjacentBlocks() {
+        posx = transform.parent.position.x;
+        posy = transform.parent.position.y;
+        thisBlock = transform.parent.gameObject.GetComponent<BlockScript>();
+        print(posx + " " + posy);
+
+        //if(thisblock ei oo vasemmassa reunassa eli 
+        if ((int)posx != 0) {
+            leftBlock = bm.blockGrid[((int)posx - 1), -(int)posy];
+            print("left " + leftBlock);
+        }
+        //if(thisblock ei oo oikeessa reunassa eli 
+        if ((int)posx != bm.columns - 1) {
+            rightBlock = bm.blockGrid[((int)posx + 1), -(int)posy];
+            print("right " + rightBlock);
+        }
+        //if(thisblock ei oo yläreunassa eli 
+        if ((int)posy != 0) {
+            upBlock = bm.blockGrid[(int)posx, (-(int)posy - 1)];
+            print("up " + upBlock);
+        }
+        if ((int)posy != bm.rows - 1) {
+            downBlock = bm.blockGrid[(int)posx, (-(int)posy + 1)];
+            print("down " + downBlock);
+        }
+
+    }
+
     public void SpriteUpdate() {
+        FindAdjacentBlocks();
+
+        if (upBlock) {
+            sameAbove = thisBlock.bc == upBlock.bc;
+        }
+        if (downBlock) {
+            sameBelow = thisBlock.bc == downBlock.bc;
+        }
+        if (leftBlock) {
+            sameLeft = thisBlock.bc == leftBlock.bc;
+        }
+        if (rightBlock) {
+            sameRight = thisBlock.bc == rightBlock.bc;
+        }
+
         for (int cornerID = 0; cornerID < 4; cornerID++) {
-            bool checkUp = (cornerID & 1) != 0;
-            bool checkLeft = (cornerID & 2) != 0;
+            bool checkUp = (cornerID == 1) || (cornerID == 3); // (cornerID & 1) != 0;
+            bool checkLeft = (cornerID == 2) || (cornerID == 3); // (cornerID & 2) != 0;
             bool sameAboveOrBelow = checkUp ? sameAbove : sameBelow;
             bool sameLeftOrRight = checkLeft ? sameLeft : sameRight;
             //int index = cornerID + (sameAboveOrBelow ? 4 : 0) + (sameLeftOrRight ? 8 : 0);

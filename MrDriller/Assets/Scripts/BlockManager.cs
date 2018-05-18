@@ -75,7 +75,7 @@ public class BlockManager : MonoBehaviour {
                     if (thisSquare.bc == leftSquare.bc && thisSquare.bc == topSquare.bc) {
                         //jos on samanvärinen sekä vasemmalla että ylempänä lisätään ylempään
                         topSquare.group.Add(thisSquare);
-                        //thegroupiwant.Add(thisSquare);
+                        //kutsu spritefunktiota
                         thisSquare.SetGroup(topSquare.group);
 
                         if (leftSquare.group != topSquare.group) {
@@ -212,4 +212,5 @@ public class BlockManager : MonoBehaviour {
         //toimiikohan tää??
         //pop (destroy, animation??) the adjacent blocks that are the same color as popped
     }
+
 }

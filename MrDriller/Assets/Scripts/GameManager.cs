@@ -10,9 +10,9 @@ public class GameManager : MonoBehaviour {
     BlockManager bm;
     float score;
     float highScore;
+    BlockSpriteChanger[] bscArray;
 
     private void Start() {
-
         highScore = PlayerPrefs.GetFloat("highScore", 0);
         AtGameStart();
         //different levels?
@@ -24,6 +24,10 @@ public class GameManager : MonoBehaviour {
         // Load level, generate blocks, drop player in scene
         bm = FindObjectOfType<BlockManager>();
         bm.AtLevelStart();
+        bscArray = FindObjectsOfType<BlockSpriteChanger>();
+        foreach (BlockSpriteChanger bsc in bscArray) {
+            bsc.AtLevelStart();
+        }
     }
 
     void Update() {
