@@ -107,7 +107,7 @@ public class BlockScript : MonoBehaviour {
         //var oneBelow = col.OverlapCollider(cf, stuffBelow);
         //below = transform.position + new Vector3(0, -1, 0);
         if (stuffBelow.Length > 1) {
-            print("havaittiin " + stuffBelow.Length + " blokkia colliderissa");
+            //print("havaittiin " + stuffBelow.Length + " blokkia colliderissa");
             }
         foreach (Collider2D col in stuffBelow) {
             if (col != gameObject.GetComponent<Collider2D>()) {

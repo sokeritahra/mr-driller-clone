@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-public enum PlayerMode { Up, Down, Left, Right, Falling }; // Modes for the sprites and drill directions
+public enum PlayerMode { Up, Down, Left, Right, Falling, Bellied, Assed, Squashed, Resurrection }; // Modes for the sprites and drill directions
 
 public class PlayerCharacter : MonoBehaviour {
     Rigidbody2D rb;
+    Collider2D c;
     public PlayerMode pm;
     public PlayerMode previousPm;
     Animator anim;
@@ -22,11 +23,12 @@ public class PlayerCharacter : MonoBehaviour {
     RaycastHit2D hitLeft;
     Vector2 directionDown = (Vector2)Vector3.down;
 
-    void Start() {
+    void Awake() {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         pm = PlayerMode.Down;
         bm = FindObjectOfType<BlockManager>();
+        c = GetComponent<Collider2D>();
     }
 
     bool IsGrounded() {
@@ -39,21 +41,22 @@ public class PlayerCharacter : MonoBehaviour {
             Debug.DrawRay(tempLeft, directionDown * 1000, Color.white);
         }
 
-        Vector2 tempVector = new Vector2(transform.position.x, transform.position.y) + new Vector2(0.25f, -0.6f);
-        hit = Physics2D.Raycast(tempVector, directionDown, rayLength);
+        Vector2 tempRight = new Vector2(transform.position.x, transform.position.y) + new Vector2(0.25f, -0.6f);
+        hit = Physics2D.Raycast(tempRight, directionDown, rayLength);
         if (hit.collider != null) {
-            Debug.DrawRay(tempVector, directionDown * hit.distance, Color.yellow);
+            Debug.DrawRay(tempRight, directionDown * hit.distance, Color.yellow);
         }
         else {
-            Debug.DrawRay(tempVector, directionDown * 1000, Color.white);
+            Debug.DrawRay(tempRight, directionDown * 1000, Color.white);
         }
-        return (Physics2D.Raycast(tempVector, directionDown, rayLength) || Physics2D.Raycast(tempLeft, directionDown, rayLength));
+        return (Physics2D.Raycast(tempRight, directionDown, rayLength) || Physics2D.Raycast(tempLeft, directionDown, rayLength));
      }
     
     void FixedUpdate() {
 
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");  // Read input from controller/keyboard
+
         if (pm != PlayerMode.Falling) { //Shouldn't move when falling
             rb.velocity = new Vector2(horizontal * speed, rb.velocity.y); // Move player horizontally
         }
@@ -96,6 +99,22 @@ public class PlayerCharacter : MonoBehaviour {
         
         }
 
+        int layerMask = 1 << 9;
+        if (Physics2D.OverlapBox(c.bounds.center, new Vector2(0.1f,0.2f),0,layerMask)||
+            Physics2D.OverlapBox(c.bounds.center - (c.bounds.size.x / 2 * Vector3.right), new Vector2(0.1f, 0.2f),0,layerMask)||
+            Physics2D.OverlapBox(c.bounds.center + (c.bounds.size.x / 2 * Vector3.right), new Vector2(0.1f, 0.2f),0,layerMask) !=null) {
+            if (Physics2D.OverlapBox(c.bounds.center, new Vector2(0.1f, 0.2f), 0,layerMask)) {
+                //Pelaajalyttyyyn
+                print("Lyttyyn meni");
+            } else if (Physics2D.OverlapBox(c.bounds.center - (c.bounds.size.x / 2 * Vector3.right), new Vector2(0.1f, 0.2f), 0,layerMask)) {
+                //Pyllähdä tai mahastu oikealle
+                print("Pitäs pyllähtää oikealle");
+            } else {
+                //Pyllähdy tai mahastu vasemmalle
+                print("Pitäs pyllähtää vasemmalle");
+            }
+        }
+
         if (drillTimer > 0) { // Drill cooldown timer
             drillTimer -= Time.deltaTime;
         }
@@ -105,66 +124,51 @@ public class PlayerCharacter : MonoBehaviour {
 
             print("poranäppäintä painettu!");
 
-            }
-            //if (pm == PlayerMode.Up) {
-            //    print("Jos minulla olisi porattavaa, niin poraisin yllä olevan blokin!");
-            //    drillTimer = 0.5f;
-            //    anim.Play("Drill_Up");
-            //}
-            //if (pm == PlayerMode.Left) {
-            //    print("Jos minulla olisi porattavaa, niin saattaisin porata vasemmalle!");
-            //    drillTimer = 0.5f;
-            //    anim.Play("Drill_Left");
-            //}
-            //if (pm == PlayerMode.Right) {
-            //    print("Jos minulla olisi porattavaa, niin kaikki olisi hyvin!");
-            //    drillTimer = 0.5f;
-            //    anim.Play("Drill_Right");
-            //}
         }
-
-
-    void CheckBlock(PlayerMode mode) {
-        drillTimer = 0.5f;
-        float x = transform.position.x;
-        float y = transform.position.y * -1f;
-        string animS = "";
-
-        if (mode == PlayerMode.Down) {
-            y += drillDepth;
-            animS = "Drill_Down";
-        }
-        else if (mode == PlayerMode.Left) {
-            x -= drillDepth;
-            animS = "Drill_Left";
-        }
-        else if (mode == PlayerMode.Right) {
-            x += drillDepth;
-            animS = "Drill_Right";
-        }
-        else if (mode == PlayerMode.Up) {
-            y -= drillDepth;
-            animS = "Drill_Up";
-        }
-        else {
-            return;
-        }
-
-        anim.Play(animS);
-
-        print(Mathf.RoundToInt(x) + ", " + Mathf.RoundToInt(y) );
-        bs = bm.blockGrid[Mathf.RoundToInt(x), Mathf.RoundToInt(y)];
-
-        print(bs);
-
-        if (bs) {
-            DrillBlock(bs);
-
-        }
-
-        print("porattiin " + bs + " paikassa " + transform.position);
-
     }
+
+
+        void CheckBlock(PlayerMode mode) {
+            drillTimer = 0.5f;
+            float x = transform.position.x;
+            float y = transform.position.y * -1f;
+            string animS = "";
+
+            if (mode == PlayerMode.Down) {
+                y += drillDepth;
+                animS = "Drill_Down";
+            }
+            else if (mode == PlayerMode.Left) {
+                x -= drillDepth;
+                animS = "Drill_Left";
+            }
+            else if (mode == PlayerMode.Right) {
+                x += drillDepth;
+                animS = "Drill_Right";
+            }
+            else if (mode == PlayerMode.Up) {
+                y -= drillDepth;
+                animS = "Drill_Up";
+            }
+            else {
+                return;
+            }
+
+            anim.Play(animS);
+
+            print(Mathf.RoundToInt(x) + ", " + Mathf.RoundToInt(y) );
+            bs = bm.blockGrid[Mathf.RoundToInt(x), Mathf.RoundToInt(y)];
+
+            print(bs);
+
+            if (bs) {
+                DrillBlock(bs);
+
+            }
+
+            print("porattiin " + bs + " paikassa " + transform.position);
+
+        }
 
     void DrillBlock(BlockScript block) {
         bm.PopBlocks(block);
