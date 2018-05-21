@@ -18,10 +18,17 @@ public class PlayerCharacter : MonoBehaviour {
     BlockScript bs;
     BlockManager bm;
     public float drillDepth = 0.75f;
-    float rayLength = 0.1f;
-    RaycastHit2D hit;
+    float rayLength = 0.6f;
+    int layerMask = 1 << 9;
+    Vector2 indent = new Vector2(0.1f,0);
+    RaycastHit2D hitRight;
     RaycastHit2D hitLeft;
-    Vector2 directionDown = (Vector2)Vector3.down;
+    RaycastHit2D middleAntenna;
+    RaycastHit2D leftAntenna;
+    RaycastHit2D rightAntenna;
+    Vector2 playerCenter;
+    Vector2 playerLeft;
+    Vector2 playerRight;
 
     void Awake() {
         rb = GetComponent<Rigidbody2D>();
@@ -32,27 +39,32 @@ public class PlayerCharacter : MonoBehaviour {
     }
 
     bool IsGrounded() {
-        Vector2 tempLeft = new Vector2(transform.position.x, transform.position.y) + new Vector2(-0.25f, -0.6f);
-        hitLeft = Physics2D.Raycast(tempLeft, directionDown, rayLength);
-        if (hitLeft.collider != null) {
-            Debug.DrawRay(tempLeft, directionDown * hitLeft.distance, Color.yellow);
-        }
-        else {
-            Debug.DrawRay(tempLeft, directionDown * 1000, Color.white);
-        }
+        hitLeft = Physics2D.Raycast(playerLeft, Vector2.down, rayLength, layerMask);
+        hitRight = Physics2D.Raycast(playerRight, Vector2.down, rayLength, layerMask);
+        return (hitLeft || hitRight);
+    }
 
-        Vector2 tempRight = new Vector2(transform.position.x, transform.position.y) + new Vector2(0.25f, -0.6f);
-        hit = Physics2D.Raycast(tempRight, directionDown, rayLength);
-        if (hit.collider != null) {
-            Debug.DrawRay(tempRight, directionDown * hit.distance, Color.yellow);
+    private void Update() {
+        Debug.DrawRay(playerCenter, Vector2.up * (rayLength * 0.75f), Color.red);
+        Debug.DrawRay(playerLeft + indent, Vector2.up * (rayLength * 0.75f), Color.green);
+        Debug.DrawRay(playerRight - indent, Vector2.up * (rayLength * 0.75f), Color.blue);
+        if (hitLeft.collider != null) {
+            Debug.DrawRay(playerLeft, Vector2.down * hitLeft.distance, Color.yellow);
+        } else {
+            Debug.DrawRay(playerLeft, Vector2.down * 1000, Color.white);
         }
-        else {
-            Debug.DrawRay(tempRight, directionDown * 1000, Color.white);
+        if (hitRight.collider != null) {
+            Debug.DrawRay(playerRight, Vector2.down * hitRight.distance, Color.yellow);
+        } else {
+            Debug.DrawRay(playerRight, Vector2.down * 1000, Color.white);
         }
-        return (Physics2D.Raycast(tempRight, directionDown, rayLength) || Physics2D.Raycast(tempLeft, directionDown, rayLength));
-     }
-    
+    }
+
     void FixedUpdate() {
+        
+        playerCenter = c.bounds.center;
+        playerLeft = c.bounds.center - (c.bounds.size.x / 2 * Vector3.right);
+        playerRight = c.bounds.center + (c.bounds.size.x / 2 * Vector3.right);
 
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");  // Read input from controller/keyboard
@@ -99,14 +111,18 @@ public class PlayerCharacter : MonoBehaviour {
         
         }
 
-        int layerMask = 1 << 9;
-        if (Physics2D.OverlapBox(c.bounds.center, new Vector2(0.1f,0.2f),0,layerMask)||
-            Physics2D.OverlapBox(c.bounds.center - (c.bounds.size.x / 2 * Vector3.right), new Vector2(0.1f, 0.2f),0,layerMask)||
-            Physics2D.OverlapBox(c.bounds.center + (c.bounds.size.x / 2 * Vector3.right), new Vector2(0.1f, 0.2f),0,layerMask) !=null) {
-            if (Physics2D.OverlapBox(c.bounds.center, new Vector2(0.1f, 0.2f), 0,layerMask)) {
+        
+
+        middleAntenna = Physics2D.Raycast(playerCenter, Vector2.up, rayLength * 0.75f, layerMask);
+        leftAntenna = Physics2D.Raycast(playerLeft + indent, Vector2.up, rayLength * 0.75f, layerMask);
+        rightAntenna = Physics2D.Raycast(playerRight - indent, Vector2.up, rayLength * 0.75f, layerMask);
+
+
+        if (middleAntenna||leftAntenna||rightAntenna) {
+            if (middleAntenna) {
                 //Pelaajalyttyyyn
                 print("Lyttyyn meni");
-            } else if (Physics2D.OverlapBox(c.bounds.center - (c.bounds.size.x / 2 * Vector3.right), new Vector2(0.1f, 0.2f), 0,layerMask)) {
+            } else if (leftAntenna) {
                 //Pyllähdä tai mahastu oikealle
                 print("Pitäs pyllähtää oikealle");
             } else {

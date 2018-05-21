@@ -1,15 +1,15 @@
 fileFormatVersion: 2
-guid: 879414389899acf4299b9b6383bc3932
+guid: be773efa9d1705f4480bc176fac7b369
 TextureImporter:
   fileIDToRecycleName:
-    21300000: MrDriller2_0
-    21300002: MrDriller2_1
-    21300004: MrDriller2_2
-    21300006: MrDriller2_3
-    21300008: MrDriller2_4
-    21300010: MrDriller2_5
-    21300012: MrDriller2_6
-    21300014: MrDriller2_7
+    21300000: MrDriller_0
+    21300002: MrDriller_1
+    21300004: MrDriller_2
+    21300006: MrDriller_3
+    21300008: MrDriller_4
+    21300010: MrDriller_5
+    21300012: MrDriller_6
+    21300014: MrDriller_7
   externalObjects: {}
   serializedVersion: 5
   mipmaps:
@@ -134,7 +134,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: MrDriller2_0
+      name: MrDriller_0
       rect:
         serializedVersion: 2
         x: 0
@@ -148,13 +148,13 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 49007ba93cb6d1c44bf9ddbb918175da
+      spriteID: 45586a89509ee0f40af1a34ab4ececa2
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: MrDriller2_1
+      name: MrDriller_1
       rect:
         serializedVersion: 2
         x: 32
@@ -168,13 +168,13 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 29ddfa03da5c7d04886d7b2880e6d670
+      spriteID: 44c5676ebc5656f4aaeb0f4bc91c926b
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: MrDriller2_2
+      name: MrDriller_2
       rect:
         serializedVersion: 2
         x: 0
@@ -188,13 +188,13 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 26bcbb4afe5bfe44691c50eb231002a5
+      spriteID: fc662fb8e2ba13244b4b5bf77d4203dc
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: MrDriller2_3
+      name: MrDriller_3
       rect:
         serializedVersion: 2
         x: 32
@@ -208,13 +208,13 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 68d01fb767e30554fb449f94985ae106
+      spriteID: 7dc6a1e78c1788544b2a478b8b2c23cc
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: MrDriller2_4
+      name: MrDriller_4
       rect:
         serializedVersion: 2
         x: 0
@@ -228,13 +228,13 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 766995f80f9742342b7677e28ef013f1
+      spriteID: 48d1175807e7f83459bad5a6e3b91ac8
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: MrDriller2_5
+      name: MrDriller_5
       rect:
         serializedVersion: 2
         x: 32
@@ -248,13 +248,13 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4dad1e13fef40a54fa7a1150b8d7d8e4
+      spriteID: 2bf0949d595a6f3478272ff1f453956b
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: MrDriller2_6
+      name: MrDriller_6
       rect:
         serializedVersion: 2
         x: 0
@@ -268,13 +268,13 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4d35210b14cf0e745931e34b9415e7b2
+      spriteID: 5b115e4a99f1af241b7193d9ecda7b26
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: MrDriller2_7
+      name: MrDriller_7
       rect:
         serializedVersion: 2
         x: 32
@@ -288,7 +288,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 180577d41a4990f4e8cf1461b0b06f1e
+      spriteID: ded4517bb42203b4485a7c090546e648
       vertices: []
       indices: 
       edges: []
@@ -296,7 +296,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 3cf325a2fc25b1f4697bb464a2d2fbdd
+    spriteID: 
     vertices: []
     indices: 
     edges: []
