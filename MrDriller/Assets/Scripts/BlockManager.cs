@@ -18,6 +18,7 @@ public class BlockManager : MonoBehaviour {
     public BlockScript[] blockArray;
     float posx = 0;
     float posy = 0;
+    public Color[] colorList;
 
     public void AtLevelStart() {
         //luodaan taulukko ja generoidaan blokit sinne

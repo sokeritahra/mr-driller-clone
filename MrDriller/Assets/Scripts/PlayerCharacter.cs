@@ -23,7 +23,7 @@ public class PlayerCharacter : MonoBehaviour {
     Vector2 indent = new Vector2(0.1f,0);
     RaycastHit2D hitRight;
     RaycastHit2D hitLeft;
-    RaycastHit2D middleAntenna;
+    RaycastHit2D centerAntenna;
     RaycastHit2D leftAntenna;
     RaycastHit2D rightAntenna;
     Vector2 playerCenter;
@@ -45,6 +45,7 @@ public class PlayerCharacter : MonoBehaviour {
     }
 
     private void Update() {
+        // Debug drawings of playercharacter head antennas and falling sensors
         Debug.DrawRay(playerCenter, Vector2.up * (rayLength * 0.75f), Color.red);
         Debug.DrawRay(playerLeft + indent, Vector2.up * (rayLength * 0.75f), Color.green);
         Debug.DrawRay(playerRight - indent, Vector2.up * (rayLength * 0.75f), Color.blue);
@@ -61,13 +62,14 @@ public class PlayerCharacter : MonoBehaviour {
     }
 
     void FixedUpdate() {
-        
+        // Player collider points (Left, right, center)
         playerCenter = c.bounds.center;
         playerLeft = c.bounds.center - (c.bounds.size.x / 2 * Vector3.right);
         playerRight = c.bounds.center + (c.bounds.size.x / 2 * Vector3.right);
 
+        // Read input from controller/keyboard
         horizontal = Input.GetAxis("Horizontal");
-        vertical = Input.GetAxis("Vertical");  // Read input from controller/keyboard
+        vertical = Input.GetAxis("Vertical"); 
 
         if (pm != PlayerMode.Falling) { //Shouldn't move when falling
             rb.velocity = new Vector2(horizontal * speed, rb.velocity.y); // Move player horizontally
@@ -112,14 +114,14 @@ public class PlayerCharacter : MonoBehaviour {
         }
 
         
-
-        middleAntenna = Physics2D.Raycast(playerCenter, Vector2.up, rayLength * 0.75f, layerMask);
+        // Head antennas
+        centerAntenna = Physics2D.Raycast(playerCenter, Vector2.up, rayLength * 0.75f, layerMask);
         leftAntenna = Physics2D.Raycast(playerLeft + indent, Vector2.up, rayLength * 0.75f, layerMask);
         rightAntenna = Physics2D.Raycast(playerRight - indent, Vector2.up, rayLength * 0.75f, layerMask);
 
-
-        if (middleAntenna||leftAntenna||rightAntenna) {
-            if (middleAntenna) {
+        // What happens when head antennas collide with a block
+        if (centerAntenna||leftAntenna||rightAntenna) {
+            if (centerAntenna) {
                 //Pelaajalyttyyyn
                 print("Lyttyyn meni");
             } else if (leftAntenna) {

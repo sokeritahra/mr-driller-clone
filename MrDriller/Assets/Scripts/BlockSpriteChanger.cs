@@ -34,7 +34,6 @@ public class BlockSpriteChanger : MonoBehaviour {
         topRight = transform.Find("TopRight").GetComponent<SpriteRenderer>();
         bottomLeft = transform.Find("BottomLeft").GetComponent<SpriteRenderer>();
         bottomRight = transform.Find("BottomRight").GetComponent<SpriteRenderer>();
-
         blockTiles = new List<SpriteRenderer> {bottomRight, topRight, bottomLeft, topLeft};
     }
 
@@ -70,13 +69,18 @@ public class BlockSpriteChanger : MonoBehaviour {
             print("up " + upBlock);
         }
         if ((int)posy != bm.rows - 1) {
-            downBlock = bm.blockGrid[(int)posx, (-(int)posy + 1)];
+            try {
+                downBlock = bm.blockGrid[(int)posx, (-(int)posy + 1)];
+            } catch (System.Exception e) {
+                print("XXX" + (int)posx + " " + (-(int)posy + 1));
+            }
             print("down " + downBlock);
         }
 
     }
 
     public void SpriteUpdate() {
+
         FindAdjacentBlocks();
 
         if (upBlock) {
@@ -97,8 +101,7 @@ public class BlockSpriteChanger : MonoBehaviour {
             bool checkLeft = (cornerID == 2) || (cornerID == 3); // (cornerID & 2) != 0;
             bool sameAboveOrBelow = checkUp ? sameAbove : sameBelow;
             bool sameLeftOrRight = checkLeft ? sameLeft : sameRight;
-            //int index = cornerID + (sameAboveOrBelow ? 4 : 0) + (sameLeftOrRight ? 8 : 0);
-
+            blockTiles[cornerID].color = bm.colorList[(int)thisBlock.bc];
             if (sameAboveOrBelow && sameLeftOrRight) {
                 blockTiles[cornerID].sprite = cornerIn;
                 if (cornerID == 0)
