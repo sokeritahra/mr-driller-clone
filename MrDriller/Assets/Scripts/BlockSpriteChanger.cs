@@ -46,11 +46,11 @@ public class BlockSpriteChanger : MonoBehaviour {
 	
 	void Update () {
         FindAdjacentBlocks();
-        foreach (BlockScript script in adjacentBlocks) {
-            if (script.bs != BlockState.Static) {
+        //foreach (BlockScript script in adjacentBlocks) {
+        //    if (script.bs != BlockState.Static) {
                 SpriteUpdate();
-            }
-        }
+        //    }
+        //} //voisko tän tehä sillee että ei kutsuta täällä updatessa vaan kutsutaan muista aina ku tarvii?
 	}
 
     void FindAdjacentBlocks() {
@@ -72,7 +72,7 @@ public class BlockSpriteChanger : MonoBehaviour {
                 adjacentBlocks.Add(rightBlock);
         }
         //if(thisblock ei oo yläreunassa eli 
-        if (-(int)posy != 0) {
+        if (-(int)posy != 0 && bm.blockGrid[(int)posx, (-(int)posy - 1)] != thisBlock && bm.blockGrid[(int)posx, (-(int)posy - 1)] != downBlock) {
                 upBlock = bm.blockGrid[(int)posx, (-(int)posy - 1)];
                 //print("up " + upBlock);
                 adjacentBlocks.Add(upBlock);
@@ -92,7 +92,7 @@ public class BlockSpriteChanger : MonoBehaviour {
             sameAbove = thisBlock.bs == upBlock.bs && thisBlock.bc == upBlock.bc;
         }
         if (downBlock) {
-            sameBelow = thisBlock.bs ==  downBlock.bs && thisBlock.bc == downBlock.bc;
+            sameBelow = thisBlock.bs == downBlock.bs && thisBlock.bc == downBlock.bc;
         }
         if (leftBlock) {
             sameLeft = thisBlock.bs == leftBlock.bs && thisBlock.bc == leftBlock.bc;
