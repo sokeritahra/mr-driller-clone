@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-public enum PlayerMode { Up, Down, Left, Right, Falling, Bellied, Assed, Squashed, Resurrection }; // Modes for the sprites and drill directions
+public enum PlayerMode { Up, Down, Left, Right, Falling}; // Modes for the sprites and drill directions
 
 public class PlayerCharacter : MonoBehaviour {
     Rigidbody2D rb;
@@ -17,6 +17,7 @@ public class PlayerCharacter : MonoBehaviour {
     //float depth = 0; // Drilling depth counter
     BlockScript bs;
     BlockManager bm;
+    string animS = "";
     public float drillDepth = 0.75f;
     float rayLength = 0.6f;
     int layerMask = 1 << 9;
@@ -83,8 +84,7 @@ public class PlayerCharacter : MonoBehaviour {
                 previousPm = pm;
             }
             pm = PlayerMode.Falling;
-        }
-        else {
+        }else {
             pm = previousPm;
             if (Mathf.Abs(horizontal) < Mathf.Abs(vertical)) { // Set player (drilling) mode
                 if (vertical < 0) {
@@ -110,6 +110,7 @@ public class PlayerCharacter : MonoBehaviour {
                     anim.Play("Aim_Left");
                 }
             }
+            //anim.Play(animS);
         
         }
 
@@ -123,14 +124,34 @@ public class PlayerCharacter : MonoBehaviour {
         if (centerAntenna||leftAntenna||rightAntenna) {
             if (centerAntenna) {
                 //Pelaajalyttyyyn
+                animS = "Squashed";
                 print("Lyttyyn meni");
+                
             } else if (leftAntenna) {
                 //Pyllähdä tai mahastu oikealle
+                if (pm == PlayerMode.Right) {
+                    animS = "Bellied_Right";
+                    
+                    print("Pitäs mahastua oikealle");
+                } else {
+                    animS = "Assed_Right";
+                    
+                    print("Pitäs pyllähtää oikealle");
+                }
                 print("Pitäs pyllähtää oikealle");
             } else {
                 //Pyllähdy tai mahastu vasemmalle
-                print("Pitäs pyllähtää vasemmalle");
+                if (pm == PlayerMode.Left) {
+                    animS = "Bellied_Left";
+                    
+                    print("Pitäs mahastua vasemmalle");
+                } else {
+                    animS = "Assed_Left";
+                   
+                    print("Pitäs pyllähtää vasemmalle");
+                }
             }
+            anim.Play(animS);
         }
 
         if (drillTimer > 0) { // Drill cooldown timer
@@ -150,7 +171,6 @@ public class PlayerCharacter : MonoBehaviour {
             drillTimer = 0.5f;
             float x = transform.position.x;
             float y = transform.position.y * -1f;
-            string animS = "";
 
             if (mode == PlayerMode.Down) {
                 y += drillDepth;
