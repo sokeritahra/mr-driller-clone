@@ -20,15 +20,17 @@ public class BlockSpriteChanger : MonoBehaviour {
     public bool sameRight;
 
     BlockScript thisBlock;
-    BlockScript leftBlock;
-    BlockScript rightBlock;
-    BlockScript upBlock;
-    BlockScript downBlock;
+    public BlockScript leftBlock;
+    public BlockScript rightBlock;
+    public BlockScript upBlock;
+    public BlockScript downBlock;
 
     List <SpriteRenderer> blockTiles;
+    List<BlockScript> adjacentBlocks;
 
     void Awake() {
         bm = FindObjectOfType<BlockManager>();
+        thisBlock = transform.parent.gameObject.GetComponent<BlockScript>();
 
         topLeft = transform.Find("TopLeft").GetComponent<SpriteRenderer>();
         topRight = transform.Find("TopRight").GetComponent<SpriteRenderer>();
@@ -38,62 +40,65 @@ public class BlockSpriteChanger : MonoBehaviour {
     }
 
     public void AtLevelStart () {
+        FindAdjacentBlocks();
         SpriteUpdate();
     }
 	
 	void Update () {
-        if (Input.GetKeyDown(KeyCode.Space)) {
-            SpriteUpdate();
+        FindAdjacentBlocks();
+        foreach (BlockScript script in adjacentBlocks) {
+            if (script.bs != BlockState.Static) {
+                SpriteUpdate();
+            }
         }
 	}
 
     void FindAdjacentBlocks() {
         posx = transform.parent.position.x;
         posy = transform.parent.position.y;
-        thisBlock = transform.parent.gameObject.GetComponent<BlockScript>();
-        print(posx + " " + posy);
+        //print(posx + " " + posy);
+        adjacentBlocks = new List<BlockScript>();
 
         //if(thisblock ei oo vasemmassa reunassa eli 
         if ((int)posx != 0) {
-            leftBlock = bm.blockGrid[((int)posx - 1), -(int)posy];
-            print("left " + leftBlock);
+                leftBlock = bm.blockGrid[((int)posx - 1), -(int)posy];
+                //print("left " + leftBlock);
+                adjacentBlocks.Add(leftBlock);
         }
         //if(thisblock ei oo oikeessa reunassa eli 
         if ((int)posx != bm.columns - 1) {
-            rightBlock = bm.blockGrid[((int)posx + 1), -(int)posy];
-            print("right " + rightBlock);
+                rightBlock = bm.blockGrid[((int)posx + 1), -(int)posy];
+                //print("right " + rightBlock);
+                adjacentBlocks.Add(rightBlock);
         }
         //if(thisblock ei oo yläreunassa eli 
-        if ((int)posy != 0) {
-            upBlock = bm.blockGrid[(int)posx, (-(int)posy - 1)];
-            print("up " + upBlock);
+        if (-(int)posy != 0) {
+                upBlock = bm.blockGrid[(int)posx, (-(int)posy - 1)];
+                //print("up " + upBlock);
+                adjacentBlocks.Add(upBlock);
         }
-        if ((int)posy != bm.rows - 1) {
-            try {
+        if (-(int)posy != bm.rows - 1) { //jos y ei ole viimeinen rivi
                 downBlock = bm.blockGrid[(int)posx, (-(int)posy + 1)];
-            } catch (System.Exception e) {
-                print("XXX" + (int)posx + " " + (-(int)posy + 1));
-            }
-            print("down " + downBlock);
+                //print("down " + downBlock);
+                adjacentBlocks.Add(downBlock); 
         }
-
     }
 
     public void SpriteUpdate() {
 
-        FindAdjacentBlocks();
+        //FindAdjacentBlocks();
 
         if (upBlock) {
-            sameAbove = thisBlock.bc == upBlock.bc;
+            sameAbove = thisBlock.bs == upBlock.bs && thisBlock.bc == upBlock.bc;
         }
         if (downBlock) {
-            sameBelow = thisBlock.bc == downBlock.bc;
+            sameBelow = thisBlock.bs ==  downBlock.bs && thisBlock.bc == downBlock.bc;
         }
         if (leftBlock) {
-            sameLeft = thisBlock.bc == leftBlock.bc;
+            sameLeft = thisBlock.bs == leftBlock.bs && thisBlock.bc == leftBlock.bc;
         }
         if (rightBlock) {
-            sameRight = thisBlock.bc == rightBlock.bc;
+            sameRight = thisBlock.bs == rightBlock.bs && thisBlock.bc == rightBlock.bc;
         }
 
         for (int cornerID = 0; cornerID < 4; cornerID++) {

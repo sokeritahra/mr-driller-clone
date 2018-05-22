@@ -24,18 +24,6 @@ public class BlockManager : MonoBehaviour {
         //luodaan taulukko ja generoidaan blokit sinne
         blockGrid = new BlockScript[columns, rows];
 
-        //for (int x = 0; x < columns; x++) {
-        //    for (int y = 0; y < rows; y++) {
-        //        Vector3 pos = new Vector3(x, -y, 0);
-        //        //TODO: pos so that blocks are in the right place in the scene
-        //        //also where is the first row?
-        //        GameObject tempObj = Instantiate(blockPrefab, pos, Quaternion.identity);
-
-        //        blockGrid[x,y] = tempObj.GetComponent<BlockScript>();
-        //        blockGrid[x, y].SetGridPos(x, y, columns);
-
-        //    }
-        //}
         FindGroups();
         foreach (BlockScript block in blockArray) {
             block.AtLevelStart();
@@ -93,18 +81,18 @@ public class BlockManager : MonoBehaviour {
                             //asetetaan viittaus oikeaan ryhmään -- tämän saa tehdä vasta tuhoamisen jälkeen!!
                             leftSquare.SetGroup(topSquare.group);
 
-                            print("this block " + thisSquare.gridPos + " and the one(s) on the left added to the one on top");
+                            //print("this block " + thisSquare.gridPos + " and the one(s) on the left added to the one on top");
                         }
                         else {
                             //jos vasemmalla ja ylhäällä olevat blokit on samassa ryhmässä, mitään ei tuhota 
                             //TODO: vaihda blokin ryhmänumero: thisSquare.SetGroupNumber(
-                            print("this block " + thisSquare.gridPos + " and the blocks on the top and left added to the same group!");
+                            //print("this block " + thisSquare.gridPos + " and the blocks on the top and left added to the same group!");
 
                         }
                     }
 
                     else {
-                        print("nyt ei ole " + thisSquare + " ja vasen ja yläkerta samat");
+                        //print("nyt ei ole " + thisSquare + " ja vasen ja yläkerta samat");
                         //onko vasemmalla
                         CheckOtherSquare(leftSquare, thisSquare);
                         //onko ylhäällä
@@ -132,7 +120,7 @@ public class BlockManager : MonoBehaviour {
                 else {
                     List<BlockScript> tempList = new List<BlockScript> { thisSquare };
                     AllGroups.Add(tempList);
-                    print("moi");
+                    //print("moi");
                     //kerro blockscriptille missä ryhmässä se on
                     //int tempInt = AllGroups.FindIndex(l => l == tempList);
                     thisSquare.SetGroup(tempList);
@@ -147,14 +135,14 @@ public class BlockManager : MonoBehaviour {
             print(AllGroups.IndexOf(group) + " : " + juttu);
         }
 
-        print(" täsä kaikki: " + AllGroups);
+        //print(" täsä kaikki: " + AllGroups);
     }
 
     // tee tästä semmonen että poistetaan ryhmä jossa ei oo enää ketää et jos checcaa vasemman ni sit ei tee heti omaa ryhmää
     //vaan vasta sitte jos ylhäälläkään ei oo :sob: void LeftCheck()
     void CheckOtherSquare(BlockScript otherSquare, BlockScript thisSquare) {
         if (thisSquare.bc == otherSquare.bc) {
-            print("samanväriset " + thisSquare + " ja " + otherSquare);
+            //print("samanväriset " + thisSquare + " ja " + otherSquare);
             //samanvärisiä joten laitetaan samaan ryhmään ja tuhotaan edellinen
             otherSquare.group.Add(thisSquare);
             AllGroups.Remove(thisSquare.group);
@@ -169,7 +157,7 @@ public class BlockManager : MonoBehaviour {
             AllGroups.Add(tempList);
             // int tempInt = AllGroups.IndexOf(tempList);
             thisSquare.SetGroup(tempList);
-            print("uusi ryhmä tehty blokille " + thisSquare + " ryhmä: " + AllGroups.IndexOf(tempList));
+            //print("uusi ryhmä tehty blokille " + thisSquare + " ryhmä: " + AllGroups.IndexOf(tempList));
         }
         else {
             print(thisSquare.gridPos + " on ryhmässä " + AllGroups.IndexOf(thisSquare.group));

@@ -33,16 +33,12 @@ public class BlockScript : MonoBehaviour {
     BlockScript blockBelow;
     BlockScript blockAbove;
     Vector3 below;
-    Collider2D col;
     Collider2D[] stuffBelow;
+    BlockSpriteChanger bsc;
 
     private void Awake() {
         bm = FindObjectOfType<BlockManager>().GetComponent<BlockManager>();
-        col = gameObject.GetComponent<Collider2D>();
-        //int tempInt = Random.Range(0, 3); //TODO: generalize
-        //bc = (BlockColor)tempInt;
-        //sr = GetComponent<SpriteRenderer>();
-        //sr.color = new Color(0, tempInt / 4f, 0);
+        bsc = gameObject.GetComponentInChildren<BlockSpriteChanger>();
     }
 
     public void AtLevelStart() {
@@ -70,6 +66,20 @@ public class BlockScript : MonoBehaviour {
 
         if (bs == BlockState.Hold) {
             holdTimer -= Time.deltaTime;
+
+            if (bsc.leftBlock.bc == bc) {
+                print("same color on the left");
+                bs = BlockState.Static;
+                //Vector3 placeToSnap = blockBelow.transform.position + new Vector3(0, 1, 0);
+                return;
+
+            }
+            if (bsc.rightBlock.bc == bc) {
+                print("same color on the right");
+                bs = BlockState.Static;
+                //Vector3 placeToSnap = blockBelow.transform.position + new Vector3(0, 1, 0);
+                return;
+            }
             //print(holdTimer);
         }
 
@@ -91,8 +101,7 @@ public class BlockScript : MonoBehaviour {
         ///when the block is falling:
         ///check if there's a block of the same color on either side
         ///
-        ///if (LeftBlock.BlockColor == gameObject.BlockColor) {
-        /// do something }
+        //
         /// 
         ///if (yes and) the block's center would pass the same colored block's center,
         ///snap the centers on the same hrzntl level
@@ -100,24 +109,33 @@ public class BlockScript : MonoBehaviour {
     }
 
     void Fall() {
+
+        if (bsc.leftBlock.bc == bc) {
+            print("same color on the left");
+            bs = BlockState.Static;
+            //Vector3 placeToSnap = blockBelow.transform.position + new Vector3(0, 1, 0);
+            return;
+
+        }
+        if (bsc.rightBlock.bc == bc) {
+            print("same color on the right");
+            bs = BlockState.Static;
+            //Vector3 placeToSnap = blockBelow.transform.position + new Vector3(0, 1, 0);
+            return;
+        }
+
         transform.Translate(0, -velocity * Time.deltaTime, 0);
         //luodaan overlap joka kattoo onko alapuolella blokki
         Vector2 centerPoint = new Vector2(transform.position.x, transform.position.y - 0.25f);
         stuffBelow = Physics2D.OverlapBoxAll(centerPoint, new Vector2(0.5f, 0.5f), 0);
-        //var oneBelow = col.OverlapCollider(cf, stuffBelow);
-        //below = transform.position + new Vector3(0, -1, 0);
-        if (stuffBelow.Length > 1) {
-            //print("havaittiin " + stuffBelow.Length + " blokkia colliderissa");
-            }
+
+
         foreach (Collider2D col in stuffBelow) {
             if (col != gameObject.GetComponent<Collider2D>()) {
                 blockBelow = col.gameObject.GetComponent<BlockScript>();
             }
         }
-        
         //print(blockBelow + " is below " + this);
-
-
         if (blockBelow && blockBelow.bs == BlockState.Static) {
             //check where we are an if we're going below some line then?
             Vector3 placeToSnap = blockBelow.transform.position + new Vector3(0, 1, 0);
@@ -130,6 +148,7 @@ public class BlockScript : MonoBehaviour {
             }
             blockBelow.SetBlockAbove(this);
             bm.SetBlockInGrid(this);
+            print("the block has moved in the grid to " + gridPos);
             return;
         }
         //tell the block above this one to fall as well
