@@ -1812,7 +1812,7 @@ Prefab:
     - target: {fileID: 114464863593741806, guid: 180add0e4b470a643ad11b009a43c238,
         type: 2}
       propertyPath: bc
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 114343942264481848, guid: 180add0e4b470a643ad11b009a43c238,
         type: 2}
@@ -2513,6 +2513,21 @@ Prefab:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114329222385110008, guid: 180add0e4b470a643ad11b009a43c238,
+        type: 2}
+      propertyPath: bc
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114896280544588702, guid: 180add0e4b470a643ad11b009a43c238,
+        type: 2}
+      propertyPath: bc
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114994808051349258, guid: 180add0e4b470a643ad11b009a43c238,
+        type: 2}
+      propertyPath: bc
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 180add0e4b470a643ad11b009a43c238, type: 2}
   m_IsPrefabParent: 0
@@ -3091,17 +3106,17 @@ Prefab:
     - target: {fileID: 114120865569208976, guid: 4636224aed4306d418337f0907cbcc77,
         type: 2}
       propertyPath: colorList.Array.data[1].r
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114120865569208976, guid: 4636224aed4306d418337f0907cbcc77,
         type: 2}
       propertyPath: colorList.Array.data[1].g
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114120865569208976, guid: 4636224aed4306d418337f0907cbcc77,
         type: 2}
       propertyPath: colorList.Array.data[1].b
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114120865569208976, guid: 4636224aed4306d418337f0907cbcc77,
         type: 2}
@@ -3131,17 +3146,17 @@ Prefab:
     - target: {fileID: 114120865569208976, guid: 4636224aed4306d418337f0907cbcc77,
         type: 2}
       propertyPath: colorList.Array.data[3].r
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114120865569208976, guid: 4636224aed4306d418337f0907cbcc77,
         type: 2}
       propertyPath: colorList.Array.data[3].g
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114120865569208976, guid: 4636224aed4306d418337f0907cbcc77,
         type: 2}
       propertyPath: colorList.Array.data[3].b
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114120865569208976, guid: 4636224aed4306d418337f0907cbcc77,
         type: 2}

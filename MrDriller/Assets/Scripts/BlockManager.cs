@@ -202,4 +202,17 @@ public class BlockManager : MonoBehaviour {
         //pop (destroy, animation??) the adjacent blocks that are the same color as popped
     }
 
+    public void HoldBlocks(BlockScript toFall) {
+        foreach (BlockScript block in toFall.group) {
+            block.bs = BlockState.Hold;
+        }
+    }
+
+    public void MergeGroups(BlockScript first, BlockScript second) {
+        foreach (BlockScript block in first.group) {
+            block.SetGroup(second.group);
+            second.group.Add(block);
+        }
+    }
+
 }

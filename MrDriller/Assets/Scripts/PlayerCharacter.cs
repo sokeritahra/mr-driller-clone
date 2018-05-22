@@ -210,7 +210,6 @@ public class PlayerCharacter : MonoBehaviour {
 
     void DrillBlock(BlockScript block) {
         bm.PopBlocks(block);
-        print("joo oli");
         //tarviiks muuta
     }
 

@@ -65,20 +65,15 @@ public class BlockScript : MonoBehaviour {
         //wobble
 
         if (bs == BlockState.Hold) {
-            holdTimer -= Time.deltaTime;
-
-            if (bsc.leftBlock.bc == bc) {
-                print("same color on the left");
+            CheckBelow();
+            if (bsc.leftBlock && bsc.leftBlock.bs == BlockState.Static && bsc.leftBlock.bc == bc) {
                 bs = BlockState.Static;
-                //Vector3 placeToSnap = blockBelow.transform.position + new Vector3(0, 1, 0);
-                return;
-
             }
-            if (bsc.rightBlock.bc == bc) {
-                print("same color on the right");
+            else if (bsc.rightBlock && bsc.rightBlock.bs == BlockState.Static && bsc.rightBlock.bc == bc) {
                 bs = BlockState.Static;
-                //Vector3 placeToSnap = blockBelow.transform.position + new Vector3(0, 1, 0);
-                return;
+            }
+            else {
+                holdTimer -= Time.deltaTime;
             }
             //print(holdTimer);
         }
@@ -98,37 +93,58 @@ public class BlockScript : MonoBehaviour {
             //    ///
         }
 
-        ///when the block is falling:
-        ///check if there's a block of the same color on either side
-        ///
-        //
-        /// 
-        ///if (yes and) the block's center would pass the same colored block's center,
-        ///snap the centers on the same hrzntl level
-        /// if there are more than 3 blocks of the same color, Pop();
+
     }
+
+    void Merge(BlockScript blockInDir) {        
+        int direction = blockInDir == bsc.leftBlock ? 1 : -1;
+        Vector3 placeToSnap = blockInDir.transform.position + new Vector3(direction, 0, 0);
+        transform.position = placeToSnap;
+        bm.SetBlockInGrid(this);
+        bs = BlockState.Static;
+        bsc.SpriteUpdate();
+        if (this.group != blockInDir.group) {
+            bm.MergeGroups(this, blockInDir);
+        }
+        //change group
+
+    }
+
+    //void MergeRight() {  bool sameAboveOrBelow = checkUp ? sameAbove : sameBelow;
+    //    print("same color on the right");
+    //    Vector3 placeToSnap = bsc.rightBlock.transform.position + new Vector3(-1, 0, 0);
+    //    transform.position = placeToSnap;
+    //    bm.SetBlockInGrid(this);
+    //    bs = BlockState.Static;
+    //    bsc.SpriteUpdate();
+    //    //change group?
+
+    //}
 
     void Fall() {
 
-        if (bsc.leftBlock.bc == bc) {
-            print("same color on the left");
-            bs = BlockState.Static;
-            //Vector3 placeToSnap = blockBelow.transform.position + new Vector3(0, 1, 0);
-            return;
-
+        if (bsc.leftBlock && bsc.leftBlock.bs == BlockState.Static && bsc.leftBlock.bc == bc) {
+            Merge(bsc.leftBlock);
+            if (bsc.rightBlock && bsc.rightBlock.bs == BlockState.Static && bsc.rightBlock.bc == bc) {
+                Merge(bsc.rightBlock);
+            }
+            /// if there are more than 3 blocks of the same color, Pop();
         }
-        if (bsc.rightBlock.bc == bc) {
-            print("same color on the right");
-            bs = BlockState.Static;
-            //Vector3 placeToSnap = blockBelow.transform.position + new Vector3(0, 1, 0);
-            return;
+        else if (bsc.rightBlock && bsc.rightBlock.bs == BlockState.Static && bsc.rightBlock.bc == bc) {
+            Merge(bsc.rightBlock);
+            /// if there are more than 3 blocks of the same color, Pop();
         }
+        else {
+            transform.Translate(0, -velocity * Time.deltaTime, 0);
+            bm.SetBlockInGrid(this);
+            CheckBelow();
+        }
+    }
 
-        transform.Translate(0, -velocity * Time.deltaTime, 0);
+    void CheckBelow() {
         //luodaan overlap joka kattoo onko alapuolella blokki
         Vector2 centerPoint = new Vector2(transform.position.x, transform.position.y - 0.25f);
         stuffBelow = Physics2D.OverlapBoxAll(centerPoint, new Vector2(0.5f, 0.5f), 0);
-
 
         foreach (Collider2D col in stuffBelow) {
             if (col != gameObject.GetComponent<Collider2D>()) {
@@ -148,18 +164,13 @@ public class BlockScript : MonoBehaviour {
             }
             blockBelow.SetBlockAbove(this);
             bm.SetBlockInGrid(this);
+            if (blockBelow.bc == bc) {
+                if (this.group != blockBelow.group) {
+                    bm.MergeGroups(this, blockBelow);
+                }
+            }
             print("the block has moved in the grid to " + gridPos);
-            return;
         }
-        //tell the block above this one to fall as well
-        if (blockAbove) {
-            blockAbove.bs = BlockState.Falling;
-        }
-        //sit jos on niin stop falling ja transform = +1y
-        /// check if block's center would pass (by unity yksikkö?? how??)
-        ///to the next ruutu where there already is a static block
-        ///if would, snap to the previous ruutu
-        ///if not, keep falling
     }
 
     public void SetGridPos(int posX, int posY, int columns) {
@@ -175,7 +186,7 @@ public class BlockScript : MonoBehaviour {
         //kerro block managerille että poksahti
         //animaatio tms?
         if (blockAbove) {
-            blockAbove.bs = BlockState.Hold;
+            bm.HoldBlocks(blockAbove); 
         }
 
         Destroy(gameObject);
