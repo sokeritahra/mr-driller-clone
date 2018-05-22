@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-public enum PlayerMode { Up, Down, Left, Right, Falling}; // Modes for the sprites and drill directions
+public enum PlayerMode { Up, Down, Left, Right, Falling, Prone}; // Modes for the sprites and drill directions
 
 public class PlayerCharacter : MonoBehaviour {
     Rigidbody2D rb;
@@ -9,6 +9,7 @@ public class PlayerCharacter : MonoBehaviour {
     public PlayerMode pm;
     public PlayerMode previousPm;
     Animator anim;
+    float climbTimer = 0.5f;
     public float speed; // Player horizontal speed
     float horizontal; 
     float vertical;
@@ -20,13 +21,17 @@ public class PlayerCharacter : MonoBehaviour {
     string animS = "";
     public float drillDepth = 0.75f;
     float rayLength = 0.6f;
-    int layerMask = 1 << 9;
+    public LayerMask blockLayerMask = 1 << 9;
     Vector2 indent = new Vector2(0.1f,0);
     RaycastHit2D hitRight;
     RaycastHit2D hitLeft;
     RaycastHit2D centerAntenna;
     RaycastHit2D leftAntenna;
     RaycastHit2D rightAntenna;
+    RaycastHit2D leftHandAntenna;
+    RaycastHit2D rightHandAntenna;
+    RaycastHit2D upperLeftAntenna;
+    RaycastHit2D upperRightAntenna;
     Vector2 playerCenter;
     Vector2 playerLeft;
     Vector2 playerRight;
@@ -40,8 +45,8 @@ public class PlayerCharacter : MonoBehaviour {
     }
 
     bool IsGrounded() {
-        hitLeft = Physics2D.Raycast(playerLeft, Vector2.down, rayLength, layerMask);
-        hitRight = Physics2D.Raycast(playerRight, Vector2.down, rayLength, layerMask);
+        hitLeft = Physics2D.Raycast(playerLeft, Vector2.down, rayLength, blockLayerMask);
+        hitRight = Physics2D.Raycast(playerRight, Vector2.down, rayLength, blockLayerMask);
         return (hitLeft || hitRight);
     }
 
@@ -50,6 +55,10 @@ public class PlayerCharacter : MonoBehaviour {
         Debug.DrawRay(playerCenter, Vector2.up * (rayLength * 0.75f), Color.red);
         Debug.DrawRay(playerLeft + indent, Vector2.up * (rayLength * 0.75f), Color.green);
         Debug.DrawRay(playerRight - indent, Vector2.up * (rayLength * 0.75f), Color.blue);
+        Debug.DrawRay(playerCenter, Vector2.left / 2, Color.red);
+        Debug.DrawRay(playerCenter, Vector2.right / 2, Color.red);
+        Debug.DrawRay(playerCenter + Vector2.up, Vector2.left, Color.red);
+        Debug.DrawRay(playerCenter + Vector2.up, Vector2.right, Color.red);
         if (hitLeft.collider != null) {
             Debug.DrawRay(playerLeft, Vector2.down * hitLeft.distance, Color.yellow);
         } else {
@@ -103,23 +112,42 @@ public class PlayerCharacter : MonoBehaviour {
                     pm = PlayerMode.Right;
                     previousPm = pm;
                     anim.Play("Aim_Right");
-                }
-                if (horizontal < 0) {
+                    climbTimer -= Time.deltaTime;
+                } else if (horizontal < 0) {
                     pm = PlayerMode.Left;
                     previousPm = pm;
                     anim.Play("Aim_Left");
+                    climbTimer -= Time.deltaTime;
+                } else {
+                    climbTimer = 0.5f;
                 }
             }
-            //anim.Play(animS);
-        
         }
 
         
         // Head antennas
-        centerAntenna = Physics2D.Raycast(playerCenter, Vector2.up, rayLength * 0.75f, layerMask);
-        leftAntenna = Physics2D.Raycast(playerLeft + indent, Vector2.up, rayLength * 0.75f, layerMask);
-        rightAntenna = Physics2D.Raycast(playerRight - indent, Vector2.up, rayLength * 0.75f, layerMask);
+        centerAntenna = Physics2D.Raycast(playerCenter, Vector2.up, rayLength * 0.75f, blockLayerMask);
+        leftAntenna = Physics2D.Raycast(playerLeft + indent, Vector2.up, rayLength * 0.75f, blockLayerMask);
+        rightAntenna = Physics2D.Raycast(playerRight - indent, Vector2.up, rayLength * 0.75f, blockLayerMask);
 
+        leftHandAntenna = Physics2D.Raycast(playerCenter, Vector2.left, 0.5f, blockLayerMask);
+        rightHandAntenna = Physics2D.Raycast(playerCenter, Vector2.right, 0.5f, blockLayerMask);
+        upperLeftAntenna = Physics2D.Raycast(playerCenter + Vector2.up, Vector2.left, 1f, blockLayerMask);
+        upperRightAntenna = Physics2D.Raycast(playerCenter + Vector2.up, Vector2.right, 1f, blockLayerMask);
+
+        if (leftHandAntenna && !upperLeftAntenna && climbTimer < 0) {
+            transform.position = (Vector2)transform.position + (Vector2.up + Vector2.left);
+            climbTimer = 0.5f;
+        } 
+        if (rightHandAntenna && !upperRightAntenna &&  climbTimer < 0) {
+            transform.position = (Vector2)transform.position + (Vector2.up + Vector2.right);
+            climbTimer = 0.5f;
+        }
+
+        print("leftHandAntenna " + leftHandAntenna.collider);
+        print("UpperLeftHandAntenna " + upperLeftAntenna.collider);
+        print(upperLeftAntenna.collider);
+        print(upperRightAntenna.collider);
         // What happens when head antennas collide with a block
         if (centerAntenna||leftAntenna||rightAntenna) {
             if (centerAntenna) {
