@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-public enum PlayerMode { Up, Down, Left, Right, Falling, Prone}; // Modes for the sprites and drill directions
+public enum PlayerMode {Up, Down, Left, Right, Falling, Static}; // Modes for the sprites and drill directions
 
 public class PlayerCharacter : MonoBehaviour {
     Rigidbody2D rb;
@@ -9,19 +9,22 @@ public class PlayerCharacter : MonoBehaviour {
     public PlayerMode pm;
     public PlayerMode previousPm;
     Animator anim;
-    float climbTimer = 0.5f;
+    
     public float speed; // Player horizontal speed
     float horizontal; 
     float vertical;
-    float drillTimer = 0f; // Drill cooldown timer
+    public float drillTimer = 0f; // Drill cooldown timer
+    float climbTimer = 0.5f; // Time to wait before climbing
+    public float animationTimer = 0f; // Time to recover after near death experience
     //float level = 1; // Level counter
     //float depth = 0; // Drilling depth counter
     BlockScript bs;
     BlockManager bm;
     string animS = "";
+    string animDefault = "Down";
     public float drillDepth = 0.75f;
     float rayLength = 0.6f;
-    public LayerMask blockLayerMask = 1 << 9;
+    public LayerMask blockLayerMask = 1 << 9; // Layermask of blocks
     Vector2 indent = new Vector2(0.1f,0);
     RaycastHit2D hitRight;
     RaycastHit2D hitLeft;
@@ -50,6 +53,7 @@ public class PlayerCharacter : MonoBehaviour {
         return (hitLeft || hitRight);
     }
 
+
     private void Update() {
         // Debug drawings of playercharacter head antennas and falling sensors
         Debug.DrawRay(playerCenter, Vector2.up * (rayLength * 0.75f), Color.red);
@@ -59,6 +63,7 @@ public class PlayerCharacter : MonoBehaviour {
         Debug.DrawRay(playerCenter, Vector2.right / 2, Color.red);
         Debug.DrawRay(playerCenter + Vector2.up, Vector2.left, Color.red);
         Debug.DrawRay(playerCenter + Vector2.up, Vector2.right, Color.red);
+
         if (hitLeft.collider != null) {
             Debug.DrawRay(playerLeft, Vector2.down * hitLeft.distance, Color.yellow);
         } else {
@@ -69,6 +74,7 @@ public class PlayerCharacter : MonoBehaviour {
         } else {
             Debug.DrawRay(playerRight, Vector2.down * 1000, Color.white);
         }
+
     }
 
     void FixedUpdate() {
@@ -79,51 +85,52 @@ public class PlayerCharacter : MonoBehaviour {
 
         // Read input from controller/keyboard
         horizontal = Input.GetAxis("Horizontal");
-        vertical = Input.GetAxis("Vertical"); 
+        vertical = Input.GetAxis("Vertical");
 
-        if (pm != PlayerMode.Falling) { //Shouldn't move when falling
-            rb.velocity = new Vector2(horizontal * speed, rb.velocity.y); // Move player horizontally
-        }
-        else {
-            rb.velocity = new Vector2(0, rb.velocity.y);
-        }
-
-        if (!IsGrounded()) {
-            if (pm != PlayerMode.Falling) {
-                previousPm = pm;
+        if (!IsGrounded() || animationTimer > 0) {
+            if (!IsGrounded()) {
+                pm = PlayerMode.Falling;
+            } else if (animationTimer > 0) {
+                pm = PlayerMode.Static;
             }
-            pm = PlayerMode.Falling;
-        }else {
+        } else {
             pm = previousPm;
+            anim.Play(animDefault);
+        }
+
+        if (pm == PlayerMode.Falling || pm == PlayerMode.Static) { // Shouldn't move when falling or static
+            rb.velocity = new Vector2(0, rb.velocity.y);
+        } else {
+            rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
+
             if (Mathf.Abs(horizontal) < Mathf.Abs(vertical)) { // Set player (drilling) mode
                 if (vertical < 0) {
                     pm = PlayerMode.Down;
                     previousPm = pm;
-                    anim.Play("Aim_Down");
+                    animDefault = "Aim_Down";
                 }
                 if (vertical > 0) {
                     pm = PlayerMode.Up;
                     previousPm = pm;
-                    anim.Play("Aim_Up");
+                    animDefault = "Aim_Up";
                 }
-            }
-            else {
+            } else {
                 if (horizontal > 0) {
                     pm = PlayerMode.Right;
                     previousPm = pm;
-                    anim.Play("Aim_Right");
+                    animDefault = "Aim_Right";
                     climbTimer -= Time.deltaTime;
                 } else if (horizontal < 0) {
                     pm = PlayerMode.Left;
                     previousPm = pm;
-                    anim.Play("Aim_Left");
+                    animDefault = "Aim_Left";
                     climbTimer -= Time.deltaTime;
                 } else {
                     climbTimer = 0.5f;
                 }
             }
         }
-
+        
         
         // Head antennas
         centerAntenna = Physics2D.Raycast(playerCenter, Vector2.up, rayLength * 0.75f, blockLayerMask);
@@ -136,50 +143,47 @@ public class PlayerCharacter : MonoBehaviour {
         upperRightAntenna = Physics2D.Raycast(playerCenter + Vector2.up, Vector2.right, 1f, blockLayerMask);
 
         if (leftHandAntenna && !upperLeftAntenna && climbTimer < 0) {
-            transform.position = (Vector2)transform.position + (Vector2.up + Vector2.left);
+            transform.position = (Vector2)transform.position + (Vector2.up);
             climbTimer = 0.5f;
         } 
         if (rightHandAntenna && !upperRightAntenna &&  climbTimer < 0) {
-            transform.position = (Vector2)transform.position + (Vector2.up + Vector2.right);
+            transform.position = (Vector2)transform.position + (Vector2.up);
             climbTimer = 0.5f;
         }
 
-        print("leftHandAntenna " + leftHandAntenna.collider);
-        print("UpperLeftHandAntenna " + upperLeftAntenna.collider);
-        print(upperLeftAntenna.collider);
-        print(upperRightAntenna.collider);
-        // What happens when head antennas collide with a block
+
         if (centerAntenna||leftAntenna||rightAntenna) {
             if (centerAntenna) {
                 //Pelaajalyttyyyn
-                animS = "Squashed";
-                print("Lyttyyn meni");
-                
+                animS = "Squashed";               
             } else if (leftAntenna) {
                 //Pyllähdä tai mahastu oikealle
                 if (pm == PlayerMode.Right) {
                     animS = "Bellied_Right";
-                    
-                    print("Pitäs mahastua oikealle");
+                    transform.position = (Vector2)transform.position + (Vector2.right / 2);               
+                    animationTimer = 1.5f;
                 } else {
                     animS = "Assed_Right";
-                    
-                    print("Pitäs pyllähtää oikealle");
+                    transform.position = (Vector2)transform.position + (Vector2.right / 2);         
+                    animationTimer = 1.5f;
                 }
-                print("Pitäs pyllähtää oikealle");
             } else {
                 //Pyllähdy tai mahastu vasemmalle
                 if (pm == PlayerMode.Left) {
                     animS = "Bellied_Left";
-                    
-                    print("Pitäs mahastua vasemmalle");
+                    transform.position = (Vector2)transform.position + (Vector2.left / 2);        
+                    animationTimer = 1.5f;
                 } else {
                     animS = "Assed_Left";
-                   
-                    print("Pitäs pyllähtää vasemmalle");
+                    transform.position = (Vector2)transform.position + (Vector2.left / 2);                
+                    animationTimer = 1.5f;
                 }
             }
             anim.Play(animS);
+        }
+
+        if (animationTimer > 0) { // Animation / Player static timer
+            animationTimer -= Time.deltaTime;
         }
 
         if (drillTimer > 0) { // Drill cooldown timer
@@ -188,15 +192,14 @@ public class PlayerCharacter : MonoBehaviour {
 
         if (Input.GetButton("Fire1") && drillTimer <= 0) { 
             CheckBlock(pm);
-
             print("poranäppäintä painettu!");
-
         }
     }
 
 
         void CheckBlock(PlayerMode mode) {
-            drillTimer = 0.5f;
+            drillTimer = 0.2f;
+        animationTimer = 0.2f;
             float x = transform.position.x;
             float y = transform.position.y * -1f;
 
@@ -229,7 +232,6 @@ public class PlayerCharacter : MonoBehaviour {
 
             if (bs) {
                 DrillBlock(bs);
-
             }
 
             print("porattiin " + bs + " paikassa " + transform.position);
