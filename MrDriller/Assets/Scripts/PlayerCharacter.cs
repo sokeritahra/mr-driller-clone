@@ -14,7 +14,7 @@ public class PlayerCharacter : MonoBehaviour {
     float horizontal; 
     float vertical;
     public float drillTimer = 0f; // Drill cooldown timer
-    float climbTimer = 0.5f; // Time to wait before climbing
+    public float climbTimer = 0.5f; // Time to wait before climbing
     public float animationTimer = 0f; // Time to recover after near death experience
     //float level = 1; // Level counter
     //float depth = 0; // Drilling depth counter
@@ -53,7 +53,6 @@ public class PlayerCharacter : MonoBehaviour {
         return (hitLeft || hitRight);
     }
 
-
     private void Update() {
         // Debug drawings of playercharacter head antennas and falling sensors
         Debug.DrawRay(playerCenter, Vector2.up * (rayLength * 0.75f), Color.red);
@@ -78,6 +77,46 @@ public class PlayerCharacter : MonoBehaviour {
     }
 
     void FixedUpdate() {
+        // Antennas
+        centerAntenna = Physics2D.Raycast(playerCenter, Vector2.up, rayLength * 0.75f, blockLayerMask);
+        leftAntenna = Physics2D.Raycast(playerLeft + indent, Vector2.up, rayLength * 0.75f, blockLayerMask);
+        rightAntenna = Physics2D.Raycast(playerRight - indent, Vector2.up, rayLength * 0.75f, blockLayerMask);
+
+        leftHandAntenna = Physics2D.Raycast(playerCenter, Vector2.left, 0.3f, blockLayerMask);
+        rightHandAntenna = Physics2D.Raycast(playerCenter, Vector2.right, 0.3f, blockLayerMask);
+        upperLeftAntenna = Physics2D.Raycast(playerCenter + Vector2.up, Vector2.left, 1f, blockLayerMask);
+        upperRightAntenna = Physics2D.Raycast(playerCenter + Vector2.up, Vector2.right, 1f, blockLayerMask);
+
+        if (centerAntenna || leftAntenna || rightAntenna) {
+            if (centerAntenna) {
+                // Pelaajalyttyyyn
+                animS = "Squashed";
+            } else if (leftAntenna) {
+                // Pyllähdä tai mahastu oikealle
+                if (pm == PlayerMode.Right) {
+                    animS = "Bellied_Right";
+                    transform.position = (Vector2)transform.position + (Vector2.right / 2);
+                    animationTimer = 1.5f;
+                } else {
+                    animS = "Assed_Right";
+                    transform.position = (Vector2)transform.position + (Vector2.right / 2);
+                    animationTimer = 1.5f;
+                }
+            } else {
+                // Pyllähdy tai mahastu vasemmalle
+                if (pm == PlayerMode.Left) {
+                    animS = "Bellied_Left";
+                    transform.position = (Vector2)transform.position + (Vector2.left / 2);
+                    animationTimer = 1.5f;
+                } else {
+                    animS = "Assed_Left";
+                    transform.position = (Vector2)transform.position + (Vector2.left / 2);
+                    animationTimer = 1.5f;
+                }
+            }
+            anim.Play(animS);
+        }
+
         // Player collider points (Left, right, center)
         playerCenter = c.bounds.center;
         playerLeft = c.bounds.center - (c.bounds.size.x / 2 * Vector3.right);
@@ -102,7 +141,6 @@ public class PlayerCharacter : MonoBehaviour {
             rb.velocity = new Vector2(0, rb.velocity.y);
         } else {
             rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
-
             if (Mathf.Abs(horizontal) < Mathf.Abs(vertical)) { // Set player (drilling) mode
                 if (vertical < 0) {
                     pm = PlayerMode.Down;
@@ -119,69 +157,31 @@ public class PlayerCharacter : MonoBehaviour {
                     pm = PlayerMode.Right;
                     previousPm = pm;
                     animDefault = "Aim_Right";
-                    climbTimer -= Time.deltaTime;
+                    if (rightHandAntenna) { 
+                        climbTimer -= Time.deltaTime;
+                    }
+
                 } else if (horizontal < 0) {
                     pm = PlayerMode.Left;
                     previousPm = pm;
                     animDefault = "Aim_Left";
-                    climbTimer -= Time.deltaTime;
+                    if (leftHandAntenna) {
+                        climbTimer -= Time.deltaTime;
+                    }
                 } else {
                     climbTimer = 0.5f;
                 }
             }
         }
-        
-        
-        // Head antennas
-        centerAntenna = Physics2D.Raycast(playerCenter, Vector2.up, rayLength * 0.75f, blockLayerMask);
-        leftAntenna = Physics2D.Raycast(playerLeft + indent, Vector2.up, rayLength * 0.75f, blockLayerMask);
-        rightAntenna = Physics2D.Raycast(playerRight - indent, Vector2.up, rayLength * 0.75f, blockLayerMask);
-
-        leftHandAntenna = Physics2D.Raycast(playerCenter, Vector2.left, 0.3f, blockLayerMask);
-        rightHandAntenna = Physics2D.Raycast(playerCenter, Vector2.right, 0.3f, blockLayerMask);
-        upperLeftAntenna = Physics2D.Raycast(playerCenter + Vector2.up, Vector2.left, 1f, blockLayerMask);
-        upperRightAntenna = Physics2D.Raycast(playerCenter + Vector2.up, Vector2.right, 1f, blockLayerMask);
 
         if (leftHandAntenna && !upperLeftAntenna && climbTimer < 0) {
             transform.position = (Vector2)transform.position + (Vector2.up);
             climbTimer = 0.5f;
-        } 
-        if (rightHandAntenna && !upperRightAntenna &&  climbTimer < 0) {
+        }
+        if (rightHandAntenna && !upperRightAntenna && climbTimer < 0) {
             transform.position = (Vector2)transform.position + (Vector2.up);
             climbTimer = 0.5f;
         }
-
-
-        if (centerAntenna||leftAntenna||rightAntenna) {
-            if (centerAntenna) {
-                //Pelaajalyttyyyn
-                animS = "Squashed";               
-            } else if (leftAntenna) {
-                //Pyllähdä tai mahastu oikealle
-                if (pm == PlayerMode.Right) {
-                    animS = "Bellied_Right";
-                    transform.position = (Vector2)transform.position + (Vector2.right / 2);               
-                    animationTimer = 1.5f;
-                } else {
-                    animS = "Assed_Right";
-                    transform.position = (Vector2)transform.position + (Vector2.right / 2);         
-                    animationTimer = 1.5f;
-                }
-            } else {
-                //Pyllähdy tai mahastu vasemmalle
-                if (pm == PlayerMode.Left) {
-                    animS = "Bellied_Left";
-                    transform.position = (Vector2)transform.position + (Vector2.left / 2);        
-                    animationTimer = 1.5f;
-                } else {
-                    animS = "Assed_Left";
-                    transform.position = (Vector2)transform.position + (Vector2.left / 2);                
-                    animationTimer = 1.5f;
-                }
-            }
-            anim.Play(animS);
-        }
-
         if (animationTimer > 0) { // Animation / Player static timer
             animationTimer -= Time.deltaTime;
         }
