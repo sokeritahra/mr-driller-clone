@@ -5,7 +5,7 @@ public enum PlayerMode {Up, Down, Left, Right, Falling, Static}; // Modes for th
 
 public class PlayerCharacter : MonoBehaviour {
     Rigidbody2D rb;
-    Collider2D c;
+    CapsuleCollider2D c;
     public PlayerMode pm;
     public PlayerMode previousPm;
     Animator anim;
@@ -21,11 +21,11 @@ public class PlayerCharacter : MonoBehaviour {
     BlockScript bs;
     BlockManager bm;
     string animS = "";
-    string animDefault = "Down";
+    string animDefault = "Aim_Down";
     public float drillDepth = 0.75f;
     float rayLength = 0.6f;
     public LayerMask blockLayerMask = 1 << 9; // Layermask of blocks
-    Vector2 indent = new Vector2(0.1f,0);
+    Vector2 indent = new Vector2(0.01f,0);
     RaycastHit2D hitRight;
     RaycastHit2D hitLeft;
     RaycastHit2D centerAntenna;
@@ -44,7 +44,7 @@ public class PlayerCharacter : MonoBehaviour {
         anim = GetComponent<Animator>();
         pm = PlayerMode.Down;
         bm = FindObjectOfType<BlockManager>();
-        c = GetComponent<Collider2D>();
+        c = GetComponent<CapsuleCollider2D>();
     }
 
     bool IsGrounded() {
@@ -59,8 +59,8 @@ public class PlayerCharacter : MonoBehaviour {
         Debug.DrawRay(playerCenter, Vector2.up * (rayLength * 0.75f), Color.red);
         Debug.DrawRay(playerLeft + indent, Vector2.up * (rayLength * 0.75f), Color.green);
         Debug.DrawRay(playerRight - indent, Vector2.up * (rayLength * 0.75f), Color.blue);
-        Debug.DrawRay(playerCenter, Vector2.left / 2, Color.red);
-        Debug.DrawRay(playerCenter, Vector2.right / 2, Color.red);
+        Debug.DrawRay(playerCenter, Vector2.left *.3f, Color.red);
+        Debug.DrawRay(playerCenter, Vector2.right *.3f, Color.red);
         Debug.DrawRay(playerCenter + Vector2.up, Vector2.left, Color.red);
         Debug.DrawRay(playerCenter + Vector2.up, Vector2.right, Color.red);
 
@@ -137,8 +137,8 @@ public class PlayerCharacter : MonoBehaviour {
         leftAntenna = Physics2D.Raycast(playerLeft + indent, Vector2.up, rayLength * 0.75f, blockLayerMask);
         rightAntenna = Physics2D.Raycast(playerRight - indent, Vector2.up, rayLength * 0.75f, blockLayerMask);
 
-        leftHandAntenna = Physics2D.Raycast(playerCenter, Vector2.left, 0.5f, blockLayerMask);
-        rightHandAntenna = Physics2D.Raycast(playerCenter, Vector2.right, 0.5f, blockLayerMask);
+        leftHandAntenna = Physics2D.Raycast(playerCenter, Vector2.left, 0.3f, blockLayerMask);
+        rightHandAntenna = Physics2D.Raycast(playerCenter, Vector2.right, 0.3f, blockLayerMask);
         upperLeftAntenna = Physics2D.Raycast(playerCenter + Vector2.up, Vector2.left, 1f, blockLayerMask);
         upperRightAntenna = Physics2D.Raycast(playerCenter + Vector2.up, Vector2.right, 1f, blockLayerMask);
 
