@@ -168,6 +168,11 @@ public class PlayerCharacter : MonoBehaviour {
                     if (rightHandAntenna && !upperRightAntenna) {
                         animS = "Push_Right";
                         climbTimer -= Time.deltaTime;
+                    } else if (!rightHandAntenna && !upperRightAntenna){
+                        pm = PlayerMode.Right;
+                        previousPm = pm;
+                        animS = "Walk_Right";
+                        animDefault = "Aim_Right";
                     } else {
                         pm = PlayerMode.Right;
                         previousPm = pm;
@@ -178,12 +183,18 @@ public class PlayerCharacter : MonoBehaviour {
                     if (leftHandAntenna && !upperLeftAntenna) {
                         animS = "Push_Left";
                         climbTimer -= Time.deltaTime;
+                    } else if (!leftHandAntenna && !upperLeftAntenna) {
+                        pm = PlayerMode.Left;
+                        previousPm = pm;
+                        animS = "Walk_Left";
+                        animDefault = "Aim_Left";
                     } else {
                         pm = PlayerMode.Left;
                         previousPm = pm;
                         animDefault = "Aim_Left";
                     }
                 } else {
+
                     climbTimer = 0.5f;
                 }
             }
