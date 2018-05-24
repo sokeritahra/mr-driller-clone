@@ -9,6 +9,5 @@ public class CameraFollow : MonoBehaviour {
         var p = transform.position;
         p.y = player.transform.position.y;
         transform.position = Vector3.MoveTowards(transform.position, p, Time.deltaTime * cameraSpeed);
-        
     }
 }

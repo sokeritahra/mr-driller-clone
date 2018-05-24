@@ -14,7 +14,7 @@ public class PlayerCharacter : MonoBehaviour {
     float horizontal; 
     float vertical;
     public float drillTimer = 0f; // Drill cooldown timer
-    public float climbTimer = 0.5f; // Time to wait before climbing
+    public float climbTimer = 0.75f; // Time to wait before climbing
     public float animationTimer = 0f; // Time to recover after near death experience
     //float level = 1; // Level counter
     //float depth = 0; // Drilling depth counter
@@ -201,19 +201,16 @@ public class PlayerCharacter : MonoBehaviour {
                     }
                 } else {
 
-                    climbTimer = 0.5f;
+                    climbTimer = 0.75f;
                 }
             }
         }
 
-        if (leftHandAntenna && !upperLeftAntenna && climbTimer < 0) {
-            transform.position = (Vector2)transform.position + (Vector2.up);
-            climbTimer = 0.5f;
+        if (leftHandAntenna && !upperLeftAntenna && climbTimer < 0 || rightHandAntenna && !upperRightAntenna && climbTimer < 0) {
+            transform.position = Vector3.MoveTowards(transform.position, (Vector2)transform.position + (Vector2.up * 0.8f), Time.deltaTime * speed * 10);
+            climbTimer = 0.75f;
         }
-        if (rightHandAntenna && !upperRightAntenna && climbTimer < 0) {
-            transform.position = (Vector2)transform.position + (Vector2.up);
-            climbTimer = 0.5f;
-        }
+
         if (animationTimer > 0) { // Animation / Player static timer
             animationTimer -= Time.deltaTime;
         }
