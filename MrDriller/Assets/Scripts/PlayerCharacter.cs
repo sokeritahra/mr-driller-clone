@@ -9,7 +9,7 @@ public class PlayerCharacter : MonoBehaviour {
     public PlayerMode pm;
     public PlayerMode previousPm;
     Animator anim;
-    
+    bool alive = true;
     public float speed; // Player horizontal speed
     float horizontal; 
     float vertical;
@@ -54,6 +54,8 @@ public class PlayerCharacter : MonoBehaviour {
     }
 
     private void Update() {
+
+
         // Debug drawings of playercharacter head antennas and falling sensors
         Debug.DrawRay(playerCenter, Vector2.up * (rayLength * 0.75f), Color.red);
         Debug.DrawRay(playerLeft + indent, Vector2.up * (rayLength * 0.75f), Color.green);
@@ -73,10 +75,15 @@ public class PlayerCharacter : MonoBehaviour {
         } else {
             Debug.DrawRay(playerRight, Vector2.down * 1000, Color.white);
         }
-
+        anim.Play(animS);
     }
 
     void FixedUpdate() {
+        // Player collider points (Left, right, center)
+        playerCenter = c.bounds.center;
+        playerLeft = c.bounds.center - (c.bounds.size.x / 2 * Vector3.right);
+        playerRight = c.bounds.center + (c.bounds.size.x / 2 * Vector3.right);
+
         // Antennas
         centerAntenna = Physics2D.Raycast(playerCenter, Vector2.up, rayLength * 0.75f, blockLayerMask);
         leftAntenna = Physics2D.Raycast(playerLeft + indent, Vector2.up, rayLength * 0.75f, blockLayerMask);
@@ -88,9 +95,14 @@ public class PlayerCharacter : MonoBehaviour {
         upperRightAntenna = Physics2D.Raycast(playerCenter + Vector2.up, Vector2.right, 1f, blockLayerMask);
 
         if (centerAntenna || leftAntenna || rightAntenna) {
-            if (centerAntenna) {
+            if (leftAntenna && rightAntenna) {
                 // Pelaajalyttyyyn
-                animS = "Squashed";
+                animS = "Death_Squashed";
+                pm = PlayerMode.Static;
+                anim.Play(animS);
+                alive = false;
+                ColdAndLonelyDeath();
+                Time.timeScale = 0;
             } else if (leftAntenna) {
                 // Pyllähdä tai mahastu oikealle
                 if (pm == PlayerMode.Right) {
@@ -114,13 +126,9 @@ public class PlayerCharacter : MonoBehaviour {
                     animationTimer = 1.5f;
                 }
             }
-            anim.Play(animS);
         }
 
-        // Player collider points (Left, right, center)
-        playerCenter = c.bounds.center;
-        playerLeft = c.bounds.center - (c.bounds.size.x / 2 * Vector3.right);
-        playerRight = c.bounds.center + (c.bounds.size.x / 2 * Vector3.right);
+
 
         // Read input from controller/keyboard
         horizontal = Input.GetAxis("Horizontal");
@@ -129,12 +137,15 @@ public class PlayerCharacter : MonoBehaviour {
         if (!IsGrounded() || animationTimer > 0) {
             if (!IsGrounded()) {
                 pm = PlayerMode.Falling;
+                animS = "Falling";
             } else if (animationTimer > 0) {
                 pm = PlayerMode.Static;
             }
         } else {
+            if (alive) { 
             pm = previousPm;
-            anim.Play(animDefault);
+            animS = animDefault;
+            }
         }
 
         if (pm == PlayerMode.Falling || pm == PlayerMode.Static) { // Shouldn't move when falling or static
@@ -154,19 +165,23 @@ public class PlayerCharacter : MonoBehaviour {
                 }
             } else {
                 if (horizontal > 0) {
-                    pm = PlayerMode.Right;
-                    previousPm = pm;
-                    animDefault = "Aim_Right";
-                    if (rightHandAntenna) { 
+                    if (rightHandAntenna && !upperRightAntenna) {
+                        animS = "Push_Right";
                         climbTimer -= Time.deltaTime;
+                    } else {
+                        pm = PlayerMode.Right;
+                        previousPm = pm;
+                        animDefault = "Aim_Right";
                     }
 
                 } else if (horizontal < 0) {
-                    pm = PlayerMode.Left;
-                    previousPm = pm;
-                    animDefault = "Aim_Left";
-                    if (leftHandAntenna) {
+                    if (leftHandAntenna && !upperLeftAntenna) {
+                        animS = "Push_Left";
                         climbTimer -= Time.deltaTime;
+                    } else {
+                        pm = PlayerMode.Left;
+                        previousPm = pm;
+                        animDefault = "Aim_Left";
                     }
                 } else {
                     climbTimer = 0.5f;
@@ -223,8 +238,6 @@ public class PlayerCharacter : MonoBehaviour {
                 return;
             }
 
-            anim.Play(animS);
-
             print(Mathf.RoundToInt(x) + ", " + Mathf.RoundToInt(y) );
             bs = bm.blockGrid[Mathf.RoundToInt(x), Mathf.RoundToInt(y)];
 
@@ -235,7 +248,6 @@ public class PlayerCharacter : MonoBehaviour {
             }
 
             print("porattiin " + bs + " paikassa " + transform.position);
-
         }
 
     void DrillBlock(BlockScript block) {
