@@ -23,7 +23,7 @@ public class PlayerCharacter : MonoBehaviour {
     string animS = "";
     string animDefault = "Aim_Down";
     public float drillDepth = 0.75f;
-    float rayLength = 0.6f;
+    float rayLength = 0.4f;
     public LayerMask blockLayerMask = 1 << 9; // Layermask of blocks
     Vector2 indent = new Vector2(0.01f,0);
     RaycastHit2D hitRight;
@@ -60,8 +60,8 @@ public class PlayerCharacter : MonoBehaviour {
         Debug.DrawRay(playerCenter, Vector2.up * (rayLength * 0.75f), Color.red);
         Debug.DrawRay(playerLeft + indent, Vector2.up * (rayLength * 0.75f), Color.green);
         Debug.DrawRay(playerRight - indent, Vector2.up * (rayLength * 0.75f), Color.blue);
-        Debug.DrawRay(playerCenter, Vector2.left *.3f, Color.red);
-        Debug.DrawRay(playerCenter, Vector2.right *.3f, Color.red);
+        Debug.DrawRay(playerCenter, Vector2.left *.4f, Color.red);
+        Debug.DrawRay(playerCenter, Vector2.right *.4f, Color.red);
         Debug.DrawRay(playerCenter + Vector2.up, Vector2.left, Color.red);
         Debug.DrawRay(playerCenter + Vector2.up, Vector2.right, Color.red);
 
@@ -89,8 +89,8 @@ public class PlayerCharacter : MonoBehaviour {
         leftAntenna = Physics2D.Raycast(playerLeft + indent, Vector2.up, rayLength * 0.75f, blockLayerMask);
         rightAntenna = Physics2D.Raycast(playerRight - indent, Vector2.up, rayLength * 0.75f, blockLayerMask);
 
-        leftHandAntenna = Physics2D.Raycast(playerCenter, Vector2.left, 0.3f, blockLayerMask);
-        rightHandAntenna = Physics2D.Raycast(playerCenter, Vector2.right, 0.3f, blockLayerMask);
+        leftHandAntenna = Physics2D.Raycast(playerCenter, Vector2.left, 0.4f, blockLayerMask);
+        rightHandAntenna = Physics2D.Raycast(playerCenter, Vector2.right, 0.4f, blockLayerMask);
         upperLeftAntenna = Physics2D.Raycast(playerCenter + Vector2.up, Vector2.left, 1f, blockLayerMask);
         upperRightAntenna = Physics2D.Raycast(playerCenter + Vector2.up, Vector2.right, 1f, blockLayerMask);
 
@@ -138,12 +138,14 @@ public class PlayerCharacter : MonoBehaviour {
             if (!IsGrounded()) {
                 pm = PlayerMode.Falling;
                 animS = "Falling";
+                rb.AddForce(new Vector2(0, -5), ForceMode2D.Force);
             } else if (animationTimer > 0) {
                 pm = PlayerMode.Static;
             }
         } else {
-            if (alive) { 
-            pm = previousPm;
+            if (alive) {
+                rb.velocity = new Vector2(0, 0);
+                pm = previousPm;
             animS = animDefault;
             }
         }
@@ -166,7 +168,9 @@ public class PlayerCharacter : MonoBehaviour {
             } else {
                 if (horizontal > 0) {
                     if (rightHandAntenna && !upperRightAntenna) {
+                        pm = PlayerMode.Right;
                         animS = "Push_Right";
+                        animDefault = "Aim_Right";
                         climbTimer -= Time.deltaTime;
                     } else if (!rightHandAntenna && !upperRightAntenna){
                         pm = PlayerMode.Right;
@@ -181,7 +185,9 @@ public class PlayerCharacter : MonoBehaviour {
 
                 } else if (horizontal < 0) {
                     if (leftHandAntenna && !upperLeftAntenna) {
+                        pm = PlayerMode.Left;
                         animS = "Push_Left";
+                        animDefault = "Aim_Left";
                         climbTimer -= Time.deltaTime;
                     } else if (!leftHandAntenna && !upperLeftAntenna) {
                         pm = PlayerMode.Left;
