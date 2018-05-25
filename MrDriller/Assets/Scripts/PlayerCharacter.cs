@@ -11,12 +11,13 @@ public class PlayerCharacter : MonoBehaviour {
     Animator anim;
     bool alive = true;
     float speed = 5; // Player movement speed
-    float climbSpeed = 1f;
+    float climbSpeed = 5f;
     float horizontal; 
     float vertical;
     float drillTimer = 0f; // Drill cooldown timer
     public float climbTimer = 0.5f; // Time to wait before climbing
     float staticTimer = 0f; // Time to recover after near death experience
+    float fallTimer;
     //float level = 1; // Level counter
     //float depth = 0; // Drilling depth counter
     BlockScript bs;
@@ -101,39 +102,7 @@ public class PlayerCharacter : MonoBehaviour {
         groundCheckLeft = Physics2D.Raycast(playerLeft + indent, Vector2.down, groundRayLength, blockLayerMask);
         groundCheckRight = Physics2D.Raycast(playerRight - indent, Vector2.down, groundRayLength, blockLayerMask);
 
-        if (centerHeadAntenna || leftHeadAntenna || rightHeadAntenna) {
-            if (leftHeadAntenna && rightHeadAntenna) {
-                // Squash player
-                animS = "Death_Squashed";
-                pm = PlayerMode.Static;
-                anim.Play(animS);
-                alive = false;
-                ColdAndLonelyDeath();
-                Time.timeScale = 0;
-            } else if (leftHeadAntenna) {
-                // NDE bellied or assed towards right
-                if (pm == PlayerMode.Right) {
-                    animS = "Bellied_Right";
-                    transform.position = (Vector2)transform.position + (Vector2.right / 2);
-                    staticTimer = 1.5f;
-                } else {
-                    animS = "Assed_Right";
-                    transform.position = (Vector2)transform.position + (Vector2.right / 2);
-                    staticTimer = 1.5f;
-                }
-            } else {
-                // NDE bellied or assed towards left
-                if (pm == PlayerMode.Left) {
-                    animS = "Bellied_Left";
-                    transform.position = (Vector2)transform.position + (Vector2.left / 2);
-                    staticTimer = 1.5f;
-                } else {
-                    animS = "Assed_Left";
-                    transform.position = (Vector2)transform.position + (Vector2.left / 2);
-                    staticTimer = 1.5f;
-                }
-            }
-        }
+
 
 
         // Read input from controller/keyboard
@@ -151,9 +120,12 @@ public class PlayerCharacter : MonoBehaviour {
 
             } else if (!IsGrounded()) {
                 pm = PlayerMode.Falling;
-                animS = "Falling";
-                rb.AddForce(new Vector2(0, -5), ForceMode2D.Force);
 
+                rb.AddForce(new Vector2(0, -5), ForceMode2D.Force);
+                fallTimer -= Time.deltaTime;
+                if (fallTimer < 0) {
+                    animS = "Falling";
+                }
             } else {
                 pm = PlayerMode.Static;
 
@@ -164,42 +136,38 @@ public class PlayerCharacter : MonoBehaviour {
                 rb.velocity = new Vector2(0, 0);
                 pm = previousPm;
             animS = animDefault;
+                fallTimer = .1f;
             }
         }
 
         if (pm == PlayerMode.Falling || pm == PlayerMode.Static) { // Shouldn't move when falling or static
             rb.velocity = new Vector2(0, rb.velocity.y);
+
         }
         else if (pm == PlayerMode.Climbing) {
-
-            if (transform.position.y < climbUpTarget.y) {
-                rb.velocity = new Vector2(0, climbSpeed);
-            }
-            if (transform.position.y > climbUpTarget.y) {
-                if (previousPm == PlayerMode.Right) {
+            if (previousPm == PlayerMode.Right) {
+                if (transform.position.y < climbUpTarget.y) {
+                    rb.velocity = new Vector2(0, climbSpeed);
+                }
+                if (transform.position.y > climbUpTarget.y) {
+                    animS = animDefault;
                     rb.velocity = new Vector2(speed, 0);
-                } else {
+                }
+                if (transform.position.x > climbRightTarget.x) {
+                    pm = previousPm;
+                }
+            } else {
+                if (transform.position.y < climbUpTarget.y) {
+                    rb.velocity = new Vector2(0, climbSpeed);
+                }
+                if (transform.position.y > climbUpTarget.y) {
+                    animS = animDefault;
                     rb.velocity = new Vector2(-speed, 0);
                 }
+                if (transform.position.x < climbLeftTarget.x) {
+                    pm = previousPm;
+                }
             }
-
-            // Todo: Fix below
-            //if (previousPm == PlayerMode.Right) {
-            //    if (transform.position.x > climbRightTarget.x) {
-            //        rb.velocity = new Vector2(0, 0);
-            //        pm = previousPm;
-            //        animS = animDefault;
-            //    } else {
-            //        if (transform.position.x < climbLeftTarget.x) {
-
-            //            rb.velocity = new Vector2(0, 0);
-            //            pm = previousPm;
-            //            animS = animDefault;
-            //        }
-            //    }
-            //}
-
-            // Todo: First climb up, then climb to side. After reset PlayerMode
         } else {
             rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
             if (Mathf.Abs(horizontal) < Mathf.Abs(vertical)) { // Set player (drilling) mode
@@ -256,31 +224,26 @@ public class PlayerCharacter : MonoBehaviour {
             if (!groundCheckCenter && !groundCheckLeft && !groundCheckRight) {
 
             } else if (!groundCheckLeft) {
-                rb.velocity = new Vector2(-speed * 2, 0);
+                rb.velocity = new Vector2(-speed, 0);
             } else {
-                rb.velocity = new Vector2(speed * 2, 0);
+                rb.velocity = new Vector2(speed, 0);
             }
         }
         //*********************************************************************************************************
 
         // Climbing
         if (leftHandAntenna && !upperLeftAntenna && climbTimer < 0 && pm != PlayerMode.Climbing) {
-            climbUpTarget = (transform.position + Vector3.up);
-            climbRightTarget = (transform.position + Vector3.left);
+            climbUpTarget = (transform.position + Vector3.up * 1.1f);
+            climbLeftTarget = (transform.position + Vector3.left * 0.75f);
             pm = PlayerMode.Climbing;
         }
 
         if (rightHandAntenna && !upperRightAntenna && climbTimer < 0 && pm != PlayerMode.Climbing) {
-            climbUpTarget = (transform.position + Vector3.up);
-            climbLeftTarget = (transform.position + Vector3.right);
+            climbUpTarget = (transform.position + Vector3.up * 1.1f);
+            climbRightTarget = (transform.position + Vector3.right * 0.75f);
             pm = PlayerMode.Climbing;
         }
         
-        // Climb timer reset
-        //if ((upperLeftAntenna || !leftHandAntenna) && (upperRightAntenna || !rightHandAntenna)) {
-        //    climbTimer = 0.5f;
-        //}
-        // Static timer deduction
         if (staticTimer > 0) { // Animation / Player static timer
             staticTimer -= Time.deltaTime;
         }
@@ -292,6 +255,39 @@ public class PlayerCharacter : MonoBehaviour {
         if (Input.GetButton("Fire1") && drillTimer <= 0) { 
             CheckBlock(pm);
             print("poranäppäintä painettu!");
+        }
+        if (centerHeadAntenna || leftHeadAntenna || rightHeadAntenna) {
+            if (leftHeadAntenna && rightHeadAntenna) {
+                // Squash player
+                animS = "Death_Squashed";
+                pm = PlayerMode.Static;
+                anim.Play(animS);
+                alive = false;
+                ColdAndLonelyDeath();
+                Time.timeScale = 0;
+            } else if (leftHeadAntenna) {
+                // NDE bellied or assed towards right
+                if (pm == PlayerMode.Right) {
+                    animS = "Bellied_Right";
+                    transform.position = (Vector2)transform.position + (Vector2.right / 2);
+                    staticTimer = 1.5f;
+                } else {
+                    animS = "Assed_Right";
+                    transform.position = (Vector2)transform.position + (Vector2.right / 2);
+                    staticTimer = 1.5f;
+                }
+            } else {
+                // NDE bellied or assed towards left
+                if (pm == PlayerMode.Left) {
+                    animS = "Bellied_Left";
+                    transform.position = (Vector2)transform.position + (Vector2.left / 2);
+                    staticTimer = 1.5f;
+                } else {
+                    animS = "Assed_Left";
+                    transform.position = (Vector2)transform.position + (Vector2.left / 2);
+                    staticTimer = 1.5f;
+                }
+            }
         }
     }
 
