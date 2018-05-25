@@ -120,10 +120,12 @@ public class PlayerCharacter : MonoBehaviour {
 
             } else if (!IsGrounded()) {
                 pm = PlayerMode.Falling;
-
-                rb.AddForce(new Vector2(0, -5), ForceMode2D.Force);
+                // rb.AddForce(new Vector2(rb.velocity.x, -5), ForceMode2D.Force);
+                rb.velocity = new Vector2(rb.velocity.x, -2.5f);
+                animS = animDefault;
                 fallTimer -= Time.deltaTime;
                 if (fallTimer < 0) {
+                    rb.AddForce(new Vector2(0, -5), ForceMode2D.Force);
                     animS = "Falling";
                 }
             } else {
@@ -136,7 +138,7 @@ public class PlayerCharacter : MonoBehaviour {
                 rb.velocity = new Vector2(0, 0);
                 pm = previousPm;
             animS = animDefault;
-                fallTimer = .1f;
+                fallTimer = .5f;
             }
         }
 
@@ -169,7 +171,12 @@ public class PlayerCharacter : MonoBehaviour {
                 }
             }
         } else {
-            rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
+            if (horizontal > 0 && !rightHandAntenna) {
+                rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
+            }
+            if (horizontal < 0 && !leftHandAntenna) {
+                rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
+            }
             if (Mathf.Abs(horizontal) < Mathf.Abs(vertical)) { // Set player (drilling) mode
                 if (vertical < 0) {
                     pm = PlayerMode.Down;
@@ -233,15 +240,17 @@ public class PlayerCharacter : MonoBehaviour {
 
         // Climbing
         if (leftHandAntenna && !upperLeftAntenna && climbTimer < 0 && pm != PlayerMode.Climbing) {
-            climbUpTarget = (transform.position + Vector3.up * 1.1f);
+            climbUpTarget = (transform.position + Vector3.up * 1.01f);
             climbLeftTarget = (transform.position + Vector3.left * 0.75f);
             pm = PlayerMode.Climbing;
+            climbTimer = 0.25f;
         }
 
         if (rightHandAntenna && !upperRightAntenna && climbTimer < 0 && pm != PlayerMode.Climbing) {
-            climbUpTarget = (transform.position + Vector3.up * 1.1f);
+            climbUpTarget = (transform.position + Vector3.up * 1.01f);
             climbRightTarget = (transform.position + Vector3.right * 0.75f);
             pm = PlayerMode.Climbing;
+            climbTimer = 0.25f;
         }
         
         if (staticTimer > 0) { // Animation / Player static timer
@@ -270,7 +279,7 @@ public class PlayerCharacter : MonoBehaviour {
                 if (pm == PlayerMode.Right) {
                     animS = "Bellied_Right";
                     transform.position = (Vector2)transform.position + (Vector2.right / 2);
-                    staticTimer = 1.5f;
+                    staticTimer = 1.0f;
                 } else {
                     animS = "Assed_Right";
                     transform.position = (Vector2)transform.position + (Vector2.right / 2);
@@ -281,11 +290,11 @@ public class PlayerCharacter : MonoBehaviour {
                 if (pm == PlayerMode.Left) {
                     animS = "Bellied_Left";
                     transform.position = (Vector2)transform.position + (Vector2.left / 2);
-                    staticTimer = 1.5f;
+                    staticTimer = 1.0f;
                 } else {
                     animS = "Assed_Left";
                     transform.position = (Vector2)transform.position + (Vector2.left / 2);
-                    staticTimer = 1.5f;
+                    staticTimer = 1.0f;
                 }
             }
         }
@@ -294,7 +303,7 @@ public class PlayerCharacter : MonoBehaviour {
     // Check playermode and if there is a block to drill in that direction 
     void CheckBlock(PlayerMode mode) {
         drillTimer = 0.2f;
-    staticTimer = 0.2f;
+        staticTimer = 0.2f;
         float x = transform.position.x;
         float y = transform.position.y * -1f;
 
