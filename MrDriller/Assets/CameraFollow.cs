@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraFollow : MonoBehaviour {
-    public float cameraSpeed = 10f;
+    float cameraSpeed = 5f;
     public GameObject player;
 	void Update () {
         var p = transform.position;

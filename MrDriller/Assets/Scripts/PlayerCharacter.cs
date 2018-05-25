@@ -11,11 +11,11 @@ public class PlayerCharacter : MonoBehaviour {
     Animator anim;
     bool alive = true;
     float speed = 5; // Player movement speed
-    float climbSpeed = 5f;
     float horizontal; 
     float vertical;
+    float climbSpeed = 10f;
+    public float climbTimer = 0.25f; // Time to wait before climbing
     float drillTimer = 0f; // Drill cooldown timer
-    public float climbTimer = 0.5f; // Time to wait before climbing
     float staticTimer = 0f; // Time to recover after near death experience
     float fallTimer;
     //float level = 1; // Level counter
@@ -121,7 +121,7 @@ public class PlayerCharacter : MonoBehaviour {
             } else if (!IsGrounded()) {
                 pm = PlayerMode.Falling;
                 // rb.AddForce(new Vector2(rb.velocity.x, -5), ForceMode2D.Force);
-                rb.velocity = new Vector2(rb.velocity.x, -2.5f);
+                rb.velocity = new Vector2(rb.velocity.x, -5f);
                 animS = animDefault;
                 fallTimer -= Time.deltaTime;
                 if (fallTimer < 0) {
@@ -143,8 +143,7 @@ public class PlayerCharacter : MonoBehaviour {
         }
 
         if (pm == PlayerMode.Falling || pm == PlayerMode.Static) { // Shouldn't move when falling or static
-            rb.velocity = new Vector2(0, rb.velocity.y);
-
+           rb.velocity = new Vector2(0, rb.velocity.y);
         }
         else if (pm == PlayerMode.Climbing) {
             if (previousPm == PlayerMode.Right) {
@@ -218,7 +217,7 @@ public class PlayerCharacter : MonoBehaviour {
                     }
                 } else {
 
-                    climbTimer = 0.5f;
+                    climbTimer = 0.25f;
                 }
             }
             previousPm = pm;
@@ -302,7 +301,7 @@ public class PlayerCharacter : MonoBehaviour {
 
     // Check playermode and if there is a block to drill in that direction 
     void CheckBlock(PlayerMode mode) {
-        drillTimer = 0.2f;
+        drillTimer = 0.5f;
         staticTimer = 0.2f;
         float x = transform.position.x;
         float y = transform.position.y * -1f;
