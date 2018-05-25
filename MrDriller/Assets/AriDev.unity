@@ -612,14 +612,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pm: 1
   previousPm: 1
-  speed: 5
-  drillTimer: 0
   climbTimer: 0.5
-  animationTimer: 0
-  drillDepth: 0.75
-  blockLayerMask:
-    serializedVersion: 2
-    m_Bits: 512
 --- !u!212 &1692495880
 SpriteRenderer:
   m_ObjectHideFlags: 0
