@@ -8,8 +8,9 @@ public class BlockSpriteChanger : MonoBehaviour {
     public SpriteRenderer bottomLeft;
     public SpriteRenderer bottomRight;
     public Sprite cornerOut;
-    public Sprite cornerIn;
     public Sprite edge;
+    public Sprite cornerIn;
+
     public float posx;
     public float posy;
     public BlockManager bm;
