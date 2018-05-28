@@ -1,24 +1,38 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class GameManager : MonoBehaviour {
+    public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI sugarText;
+    public TextMeshProUGUI levelText;
+    public TextMeshProUGUI livesText;
     int lifeLeft = 100;
     int livesLeft = 3;
     float lifeDeductionTick = 0.9f;
     float lifeDeductionCounter = 0;
+    BlockSpriteChanger[] bscArray;
     BlockManager bm;
+    int level = 1;
     float score;
     float highScore;
-    BlockSpriteChanger[] bscArray;
+
 
     private void Start() {
         highScore = PlayerPrefs.GetFloat("highScore", 0);
+        scoreText = scoreText.GetComponent<TextMeshProUGUI>();
+        sugarText = sugarText.GetComponent<TextMeshProUGUI>();
+        levelText = levelText.GetComponent<TextMeshProUGUI>();
+        livesText = livesText.GetComponent<TextMeshProUGUI>();
+
         AtGameStart();
+        scoreText.text = ("Score: " + score);
+        sugarText.text = ("Sugar level: " + lifeLeft);
+        levelText.text = ("Level: " + level);
+        livesText.text = ("Lives left: " + livesLeft);
         //different levels?
     }
-
-
 
     void AtGameStart() {
         // Load level, generate blocks, drop player in scene
@@ -30,27 +44,41 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    void Update() {
+    private void FixedUpdate() {
         lifeDeductionCounter += Time.deltaTime;
         while (lifeDeductionCounter > lifeDeductionTick) {
             lifeLeft -= 1;
             lifeDeductionCounter -= lifeDeductionTick;
-            // print(lifeLeft + "% To Death");
+            sugarText.text = ("Sugar level: " + lifeLeft);
         }
 
         if (lifeLeft <= 0) { // Life amount deducter
-            if (livesLeft > 0) {
-                livesLeft--;
-                lifeLeft = 100;
-            } else {
-                GameOver();
-            }
+            DeadOnArrival();
+        }
+    }
+
+    public void AddScore() {
+        score += 100;
+        scoreText.text = ("Score: " + score);
+    }
+
+    public void DeadOnArrival() {
+        if (livesLeft > 1) {
+            livesLeft--;
+            livesText.text = ("Lives left: " + livesLeft);
+            lifeLeft = 100;
+        } else {
+            GameOver();
         }
     }
 
     void GameOver() {
-        print("GameOver!");
+        scoreText.text = ("Game");
+        sugarText.text = ("Over");
+        levelText.text = ("Mutha");
+        livesText.text = ("Fukka");
         PlayerPrefs.SetFloat("highScore", highScore);
+        Time.timeScale = 0;
     }
 
     //create level & level end blocks

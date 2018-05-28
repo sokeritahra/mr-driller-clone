@@ -22,6 +22,7 @@ public class PlayerCharacter : MonoBehaviour {
     //float depth = 0; // Drilling depth counter
     BlockScript bs;
     BlockManager bm;
+    GameManager gm;
     string animS = "";
     string animDefault = "Aim_Down";
     float drillDepth = 0.75f;
@@ -53,6 +54,7 @@ public class PlayerCharacter : MonoBehaviour {
         anim = GetComponent<Animator>();
         pm = PlayerMode.Down;
         bm = FindObjectOfType<BlockManager>();
+        gm = FindObjectOfType<GameManager>().GetComponent<GameManager>();
         c = GetComponent<CapsuleCollider2D>();
     }
 
@@ -273,7 +275,7 @@ public class PlayerCharacter : MonoBehaviour {
                 anim.Play(animS);
                 alive = false;
                 ColdAndLonelyDeath();
-                Time.timeScale = 0;
+                
             } else if (leftHeadAntenna) {
                 // NDE bellied or assed towards right
                 if (pm == PlayerMode.Right) {
@@ -350,6 +352,7 @@ public class PlayerCharacter : MonoBehaviour {
     }
     // Death on arrival
     void ColdAndLonelyDeath() { // Name probably says it all
+        gm.DeadOnArrival();
         print("Aarghh!");
     }
 }

@@ -29,6 +29,7 @@ public class BlockScript : MonoBehaviour {
     public BlockState bs;
     public BlockColor bc;
     BlockManager bm;
+    GameManager gm;
     public List<BlockScript> group;
     SpriteRenderer sr;
     public BlockScript blockBelow;
@@ -45,6 +46,7 @@ public class BlockScript : MonoBehaviour {
 
     private void Awake() {
         bm = FindObjectOfType<BlockManager>().GetComponent<BlockManager>();
+        gm = FindObjectOfType<GameManager>().GetComponent<GameManager>();
         bsc = gameObject.GetComponentInChildren<BlockSpriteChanger>();
         player = FindObjectOfType<PlayerCharacter>();
     }
@@ -275,7 +277,9 @@ public class BlockScript : MonoBehaviour {
     public void Pop() {
         //kerro block managerille että poksahti
         //animaatio tms?
+
         Destroy(gameObject);
+        gm.AddScore();
         toBeDestroyed = true;
 
         if (blockAbove && bm.CheckIfGroupOnAir(blockAbove.group)) {
