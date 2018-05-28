@@ -1,219 +1,351 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-public enum PlayerMode { Up, Down, Left, Right, Falling}; // Modes for the sprites and drill directions
+public enum PlayerMode {Up, Down, Left, Right, Falling, Static, Climbing}; // Modes for the sprites and drill directions
 
 public class PlayerCharacter : MonoBehaviour {
     Rigidbody2D rb;
-    Collider2D c;
+    CapsuleCollider2D c;
     public PlayerMode pm;
     public PlayerMode previousPm;
     Animator anim;
-    public float speed; // Player horizontal speed
+    bool alive = true;
+    float speed = 5; // Player movement speed
     float horizontal; 
     float vertical;
+    float climbSpeed = 10f;
+    public float climbTimer = 0.25f; // Time to wait before climbing
     float drillTimer = 0f; // Drill cooldown timer
+    float staticTimer = 0f; // Time to recover after near death experience
+    float fallTimer;
     //float level = 1; // Level counter
     //float depth = 0; // Drilling depth counter
     BlockScript bs;
     BlockManager bm;
     string animS = "";
-    public float drillDepth = 0.75f;
-    float rayLength = 0.6f;
-    int layerMask = 1 << 9;
-    Vector2 indent = new Vector2(0.1f,0);
-    RaycastHit2D hitRight;
-    RaycastHit2D hitLeft;
-    RaycastHit2D centerAntenna;
-    RaycastHit2D leftAntenna;
-    RaycastHit2D rightAntenna;
+    string animDefault = "Aim_Down";
+    float drillDepth = 0.75f;
+    float upperRayLength = 1f;
+    float headRayLength = 0.4f;
+    float handRayLength = 0.4f;
+    float groundRayLength = 0.4f;
+    LayerMask blockLayerMask = 1 << 9; // Layermask of blocks
+    RaycastHit2D groundCheckRight;
+    RaycastHit2D groundCheckLeft;
+    RaycastHit2D groundCheckCenter;
+    RaycastHit2D centerHeadAntenna;
+    RaycastHit2D leftHeadAntenna;
+    RaycastHit2D rightHeadAntenna;
+    RaycastHit2D leftHandAntenna;
+    RaycastHit2D rightHandAntenna;
+    RaycastHit2D upperLeftAntenna;
+    RaycastHit2D upperRightAntenna;
+    Vector2 indent = new Vector2(0.05f, 0);
     Vector2 playerCenter;
     Vector2 playerLeft;
     Vector2 playerRight;
+    Vector3 climbUpTarget;
+    Vector3 climbLeftTarget;
+    Vector3 climbRightTarget;
 
     void Awake() {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         pm = PlayerMode.Down;
         bm = FindObjectOfType<BlockManager>();
-        c = GetComponent<Collider2D>();
-    }
-
-    bool IsGrounded() {
-        hitLeft = Physics2D.Raycast(playerLeft, Vector2.down, rayLength, layerMask);
-        hitRight = Physics2D.Raycast(playerRight, Vector2.down, rayLength, layerMask);
-        return (hitLeft || hitRight);
+        c = GetComponent<CapsuleCollider2D>();
     }
 
     private void Update() {
+
+
         // Debug drawings of playercharacter head antennas and falling sensors
-        Debug.DrawRay(playerCenter, Vector2.up * (rayLength * 0.75f), Color.red);
-        Debug.DrawRay(playerLeft + indent, Vector2.up * (rayLength * 0.75f), Color.green);
-        Debug.DrawRay(playerRight - indent, Vector2.up * (rayLength * 0.75f), Color.blue);
-        if (hitLeft.collider != null) {
-            Debug.DrawRay(playerLeft, Vector2.down * hitLeft.distance, Color.yellow);
-        } else {
-            Debug.DrawRay(playerLeft, Vector2.down * 1000, Color.white);
-        }
-        if (hitRight.collider != null) {
-            Debug.DrawRay(playerRight, Vector2.down * hitRight.distance, Color.yellow);
-        } else {
-            Debug.DrawRay(playerRight, Vector2.down * 1000, Color.white);
-        }
+
+        // Upper antennas
+        Debug.DrawRay(playerCenter + Vector2.up, Vector2.left * upperRayLength,  Color.red);
+        Debug.DrawRay(playerCenter + Vector2.up, Vector2.right * upperRayLength, Color.red);
+        // Head Antennas
+        Debug.DrawRay(playerCenter, Vector2.up * headRayLength, Color.green);
+        Debug.DrawRay(playerLeft + indent, Vector2.up * headRayLength, Color.green);
+        Debug.DrawRay(playerRight - indent, Vector2.up * headRayLength, Color.green);
+        // Hand Antennas
+        Debug.DrawRay(playerCenter, Vector2.left * handRayLength, Color.blue);
+        Debug.DrawRay(playerCenter, Vector2.right * handRayLength, Color.blue);
+        // Ground Antennas
+        Debug.DrawRay(playerCenter, Vector2.down * groundRayLength, Color.yellow);
+        Debug.DrawRay(playerLeft + indent * 2, Vector2.down * groundRayLength, Color.yellow);
+        Debug.DrawRay(playerRight - indent * 2, Vector2.down * groundRayLength, Color.yellow);
+
+        anim.Play(animS);
     }
 
     void FixedUpdate() {
-        // Player collider points (Left, right, center)
+        // Player Left, right and center collider points (in relation to collider)
         playerCenter = c.bounds.center;
         playerLeft = c.bounds.center - (c.bounds.size.x / 2 * Vector3.right);
         playerRight = c.bounds.center + (c.bounds.size.x / 2 * Vector3.right);
 
+        // Playercharacter head antennas and falling sensors
+
+        // Upper Antennas
+        upperLeftAntenna = Physics2D.Raycast(playerCenter + Vector2.up, Vector2.left, upperRayLength, blockLayerMask);
+        upperRightAntenna = Physics2D.Raycast(playerCenter + Vector2.up, Vector2.right, upperRayLength, blockLayerMask);
+        // Head Antennas
+        centerHeadAntenna = Physics2D.Raycast(playerCenter, Vector2.up, headRayLength, blockLayerMask);
+        leftHeadAntenna = Physics2D.Raycast(playerLeft + indent, Vector2.up, headRayLength, blockLayerMask);
+        rightHeadAntenna = Physics2D.Raycast(playerRight - indent, Vector2.up, headRayLength, blockLayerMask);
+        // Hand Antennas
+        leftHandAntenna = Physics2D.Raycast(playerCenter, Vector2.left, handRayLength, blockLayerMask);
+        rightHandAntenna = Physics2D.Raycast(playerCenter, Vector2.right, handRayLength, blockLayerMask);
+        // Ground Antennas
+        groundCheckCenter = Physics2D.Raycast(playerCenter, Vector2.down, groundRayLength, blockLayerMask);
+        groundCheckLeft = Physics2D.Raycast(playerLeft + indent, Vector2.down, groundRayLength, blockLayerMask);
+        groundCheckRight = Physics2D.Raycast(playerRight - indent, Vector2.down, groundRayLength, blockLayerMask);
+
+
+
+
         // Read input from controller/keyboard
         horizontal = Input.GetAxis("Horizontal");
-        vertical = Input.GetAxis("Vertical"); 
+        vertical = Input.GetAxis("Vertical");
 
-        if (pm != PlayerMode.Falling) { //Shouldn't move when falling
-            rb.velocity = new Vector2(horizontal * speed, rb.velocity.y); // Move player horizontally
-        }
-        else {
-            rb.velocity = new Vector2(0, rb.velocity.y);
-        }
+        // What to do if player is not grounded or set staticMode
+        if (!IsGrounded() || staticTimer > 0 || pm == PlayerMode.Climbing) {
+            if (pm == PlayerMode.Climbing) {
+                if (previousPm == PlayerMode.Right) {
+                    animS = "Climb_Right";
+                } else {
+                    animS = "Climb_Left";
+                }
 
-        if (!IsGrounded()) {
-            if (pm != PlayerMode.Falling) {
-                previousPm = pm;
+            } else if (!IsGrounded()) {
+                pm = PlayerMode.Falling;
+                // rb.AddForce(new Vector2(rb.velocity.x, -5), ForceMode2D.Force);
+                rb.velocity = new Vector2(rb.velocity.x, -5f);
+                animS = animDefault;
+                fallTimer -= Time.deltaTime;
+                if (fallTimer < 0) {
+                    rb.AddForce(new Vector2(0, -5), ForceMode2D.Force);
+                    animS = "Falling";
+                }
+            } else {
+                pm = PlayerMode.Static;
+
             }
-            pm = PlayerMode.Falling;
-        }else {
-            pm = previousPm;
+
+        } else {
+            if (alive) {
+                rb.velocity = new Vector2(0, 0);
+                pm = previousPm;
+            animS = animDefault;
+                fallTimer = .5f;
+            }
+        }
+
+        if (pm == PlayerMode.Falling || pm == PlayerMode.Static) { // Shouldn't move when falling or static
+           rb.velocity = new Vector2(0, rb.velocity.y);
+        }
+        else if (pm == PlayerMode.Climbing) {
+            if (previousPm == PlayerMode.Right) {
+                if (transform.position.y < climbUpTarget.y) {
+                    rb.velocity = new Vector2(0, climbSpeed);
+                }
+                if (transform.position.y > climbUpTarget.y) {
+                    animS = animDefault;
+                    rb.velocity = new Vector2(speed, 0);
+                }
+                if (transform.position.x > climbRightTarget.x) {
+                    pm = previousPm;
+                }
+            } else {
+                if (transform.position.y < climbUpTarget.y) {
+                    rb.velocity = new Vector2(0, climbSpeed);
+                }
+                if (transform.position.y > climbUpTarget.y) {
+                    animS = animDefault;
+                    rb.velocity = new Vector2(-speed, 0);
+                }
+                if (transform.position.x < climbLeftTarget.x) {
+                    pm = previousPm;
+                }
+            }
+        } else {
+            if (horizontal > 0 && !rightHandAntenna) {
+                rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
+            }
+            if (horizontal < 0 && !leftHandAntenna) {
+                rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
+            }
             if (Mathf.Abs(horizontal) < Mathf.Abs(vertical)) { // Set player (drilling) mode
                 if (vertical < 0) {
                     pm = PlayerMode.Down;
-                    previousPm = pm;
-                    anim.Play("Aim_Down");
+                    animDefault = "Aim_Down";
                 }
                 if (vertical > 0) {
                     pm = PlayerMode.Up;
-                    previousPm = pm;
-                    anim.Play("Aim_Up");
+                    animDefault = "Aim_Up";
                 }
-            }
-            else {
-                if (horizontal > 0) {
-                    pm = PlayerMode.Right;
-                    previousPm = pm;
-                    anim.Play("Aim_Right");
-                }
-                if (horizontal < 0) {
-                    pm = PlayerMode.Left;
-                    previousPm = pm;
-                    anim.Play("Aim_Left");
-                }
-            }
-            //anim.Play(animS);
-        
-        }
-
-        
-        // Head antennas
-        centerAntenna = Physics2D.Raycast(playerCenter, Vector2.up, rayLength * 0.75f, layerMask);
-        leftAntenna = Physics2D.Raycast(playerLeft + indent, Vector2.up, rayLength * 0.75f, layerMask);
-        rightAntenna = Physics2D.Raycast(playerRight - indent, Vector2.up, rayLength * 0.75f, layerMask);
-
-        // What happens when head antennas collide with a block
-        if (centerAntenna||leftAntenna||rightAntenna) {
-            if (centerAntenna) {
-                //Pelaajalyttyyyn
-                animS = "Squashed";
-                print("Lyttyyn meni");
-                
-            } else if (leftAntenna) {
-                //Pyllähdä tai mahastu oikealle
-                if (pm == PlayerMode.Right) {
-                    animS = "Bellied_Right";
-                    
-                    print("Pitäs mahastua oikealle");
-                } else {
-                    animS = "Assed_Right";
-                    
-                    print("Pitäs pyllähtää oikealle");
-                }
-                print("Pitäs pyllähtää oikealle");
             } else {
-                //Pyllähdy tai mahastu vasemmalle
-                if (pm == PlayerMode.Left) {
-                    animS = "Bellied_Left";
-                    
-                    print("Pitäs mahastua vasemmalle");
+                if (horizontal > 0) {
+                    if (rightHandAntenna && !upperRightAntenna) {
+                        pm = PlayerMode.Right;
+                        animS = "Push_Right";
+                        animDefault = "Aim_Right";
+                        climbTimer -= Time.deltaTime;
+                    } else if (!rightHandAntenna && !upperRightAntenna){
+                        pm = PlayerMode.Right;
+                        animS = "Walk_Right";
+                        animDefault = "Aim_Right";
+                    } else {
+                        pm = PlayerMode.Right;
+                        animDefault = "Aim_Right";
+                    }
+
+                } else if (horizontal < 0) {
+                    if (leftHandAntenna && !upperLeftAntenna) {
+                        pm = PlayerMode.Left;
+                        animS = "Push_Left";
+                        animDefault = "Aim_Left";
+                        climbTimer -= Time.deltaTime;
+                    } else if (!leftHandAntenna && !upperLeftAntenna) {
+                        pm = PlayerMode.Left;
+                        animS = "Walk_Left";
+                        animDefault = "Aim_Left";
+                    } else {
+                        pm = PlayerMode.Left;
+                        animDefault = "Aim_Left";
+                    }
                 } else {
-                    animS = "Assed_Left";
-                   
-                    print("Pitäs pyllähtää vasemmalle");
+
+                    climbTimer = 0.25f;
                 }
             }
-            anim.Play(animS);
+            previousPm = pm;
         }
 
+
+        // Slipping
+        //**************** If You remove the following part from comments, CHECK GROUNDED BOOL*********************
+        if (!groundCheckCenter && !groundCheckLeft || !groundCheckRight) {
+            if (!groundCheckCenter && !groundCheckLeft && !groundCheckRight) {
+
+            } else if (!groundCheckLeft) {
+                rb.velocity = new Vector2(-speed, 0);
+            } else {
+                rb.velocity = new Vector2(speed, 0);
+            }
+        }
+        //*********************************************************************************************************
+
+        // Climbing
+        if (leftHandAntenna && !upperLeftAntenna && climbTimer < 0 && pm != PlayerMode.Climbing) {
+            climbUpTarget = (transform.position + Vector3.up * 1.01f);
+            climbLeftTarget = (transform.position + Vector3.left * 0.75f);
+            pm = PlayerMode.Climbing;
+            climbTimer = 0.25f;
+        }
+
+        if (rightHandAntenna && !upperRightAntenna && climbTimer < 0 && pm != PlayerMode.Climbing) {
+            climbUpTarget = (transform.position + Vector3.up * 1.01f);
+            climbRightTarget = (transform.position + Vector3.right * 0.75f);
+            pm = PlayerMode.Climbing;
+            climbTimer = 0.25f;
+        }
+        
+        if (staticTimer > 0) { // Animation / Player static timer
+            staticTimer -= Time.deltaTime;
+        }
+        // Drill timer deduction
         if (drillTimer > 0) { // Drill cooldown timer
             drillTimer -= Time.deltaTime;
         }
-
+        // Drilling
         if (Input.GetButton("Fire1") && drillTimer <= 0) { 
             CheckBlock(pm);
-
+            print("poranäppäintä painettu!");
+        }
+        if (centerHeadAntenna || leftHeadAntenna || rightHeadAntenna) {
+            if (leftHeadAntenna && rightHeadAntenna) {
+                // Squash player
+                animS = "Death_Squashed";
+                pm = PlayerMode.Static;
+                anim.Play(animS);
+                alive = false;
+                ColdAndLonelyDeath();
+                Time.timeScale = 0;
+            } else if (leftHeadAntenna) {
+                // NDE bellied or assed towards right
+                if (pm == PlayerMode.Right) {
+                    animS = "Bellied_Right";
+                    transform.position = (Vector2)transform.position + (Vector2.right / 2);
+                    staticTimer = 1.0f;
+                } else {
+                    animS = "Assed_Right";
+                    transform.position = (Vector2)transform.position + (Vector2.right / 2);
+                    staticTimer = 1.5f;
+                }
+            } else {
+                // NDE bellied or assed towards left
+                if (pm == PlayerMode.Left) {
+                    animS = "Bellied_Left";
+                    transform.position = (Vector2)transform.position + (Vector2.left / 2);
+                    staticTimer = 1.0f;
+                } else {
+                    animS = "Assed_Left";
+                    transform.position = (Vector2)transform.position + (Vector2.left / 2);
+                    staticTimer = 1.0f;
+                }
+            }
         }
     }
 
+    // Check playermode and if there is a block to drill in that direction 
+    void CheckBlock(PlayerMode mode) {
+        drillTimer = 0.5f;
+        staticTimer = 0.2f;
+        float x = transform.position.x;
+        float y = transform.position.y * -1f;
 
-        void CheckBlock(PlayerMode mode) {
-            drillTimer = 0.5f;
-            float x = transform.position.x;
-            float y = transform.position.y * -1f;
-
-            if (mode == PlayerMode.Down) {
-                y += drillDepth;
-                animS = "Drill_Down";
-            }
-            else if (mode == PlayerMode.Left) {
-                x -= drillDepth;
-                animS = "Drill_Left";
-            }
-            else if (mode == PlayerMode.Right) {
-                x += drillDepth;
-                animS = "Drill_Right";
-            }
-            else if (mode == PlayerMode.Up) {
-                y -= drillDepth;
-                animS = "Drill_Up";
-            }
-            else {
-                return;
-            }
-
-            anim.Play(animS);
-
-            print(Mathf.RoundToInt(x) + ", " + Mathf.RoundToInt(y) );
-            bs = bm.blockGrid[Mathf.RoundToInt(x), Mathf.RoundToInt(y)];
-
-            print(bs);
-
-            if (bs) {
-                DrillBlock(bs);
-
-            }
-
-            print("porattiin " + bs + " paikassa " + transform.position);
-
+        if (mode == PlayerMode.Down) {
+            y += drillDepth;
+            animS = "Drill_Down";
+        }
+        else if (mode == PlayerMode.Left) {
+            x -= drillDepth;
+            animS = "Drill_Left";
+        }
+        else if (mode == PlayerMode.Right) {
+            x += drillDepth;
+            animS = "Drill_Right";
+        }
+        else if (mode == PlayerMode.Up) {
+            y -= drillDepth;
+            animS = "Drill_Up";
+        }
+        else {
+            return;
         }
 
+        print("Poraus koordinaatit: " + Mathf.RoundToInt(x) + ", " + Mathf.RoundToInt(y) );
+        bs = bm.blockGrid[Mathf.RoundToInt(x), Mathf.RoundToInt(y)];
+            
+        print(bs);
+            
+        if (bs) {
+            DrillBlock(bs);
+        }
+
+        print("porattiin " + bs + " paikassa " + transform.position);
+    }
+    // Check if grounded
+    bool IsGrounded() {
+        return (groundCheckCenter || groundCheckLeft || groundCheckRight);
+    }
+    // Pop the block (from BlockManager)
     void DrillBlock(BlockScript block) {
-        if ( block.bs == BlockState.Static) {
-            bm.PopBlocks(block);
-        }
-
-        //tarviiks muuta
+        bm.PopBlocks(block);
     }
-
+    // Death on arrival
     void ColdAndLonelyDeath() { // Name probably says it all
         print("Aarghh!");
     }
