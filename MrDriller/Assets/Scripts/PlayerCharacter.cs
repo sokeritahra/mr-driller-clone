@@ -343,7 +343,9 @@ public class PlayerCharacter : MonoBehaviour {
     }
     // Pop the block (from BlockManager)
     void DrillBlock(BlockScript block) {
-        bm.PopBlocks(block);
+        if(block.bs == BlockState.Static || block.bs == BlockState.Hold) {
+            bm.PopBlocks(block);
+        }
     }
     // Death on arrival
     void ColdAndLonelyDeath() { // Name probably says it all

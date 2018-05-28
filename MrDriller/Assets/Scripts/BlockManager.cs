@@ -232,7 +232,6 @@ public class BlockManager : MonoBehaviour {
     public void DropBlocks(List<BlockScript> group) {
         foreach (BlockScript block in group) {
             block.transform.Translate(0, -block.velocity * Time.deltaTime / group.Count, 0);
-            print(-block.velocity * Time.deltaTime / group.Count);
         }
     }
 

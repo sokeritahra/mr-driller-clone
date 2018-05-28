@@ -49,11 +49,14 @@ public class BlockSpriteChanger : MonoBehaviour {
         //foreach (BlockScript script in adjacentBlocks) {
         //    if (script.bs != BlockState.Static) {
                 SpriteUpdate();
+
+        
         //    }
         //} //voisko tän tehä sillee että ei kutsuta täällä updatessa vaan kutsutaan muista aina ku tarvii?
 	}
 
     public void FindAdjacentBlocks() {
+
         posx = transform.parent.position.x;
         posy = transform.parent.position.y;
         //print(posx + " " + posy);
@@ -88,102 +91,88 @@ public class BlockSpriteChanger : MonoBehaviour {
 
         //FindAdjacentBlocks();
 
-        if (upBlock) {
-            sameAbove = thisBlock.bc == upBlock.bc; //thisBlock.bs == upBlock.bs && 
-        }
-        if (downBlock) {
-            sameBelow = thisBlock.bc == downBlock.bc;
-        }
-        if (leftBlock) {
-            sameLeft = thisBlock.bc == leftBlock.bc;
-        }
-        if (rightBlock) {
-            sameRight = thisBlock.bc == rightBlock.bc;
-        }
-
-        for (int cornerID = 0; cornerID < 4; cornerID++) {
-            bool checkUp = (cornerID == 1) || (cornerID == 3); // (cornerID & 1) != 0;
-            bool checkLeft = (cornerID == 2) || (cornerID == 3); // (cornerID & 2) != 0;
-            bool sameAboveOrBelow = checkUp ? sameAbove : sameBelow;
-            bool sameLeftOrRight = checkLeft ? sameLeft : sameRight;
-            blockTiles[cornerID].color = bm.colorList[(int)thisBlock.bc];
-            if (sameAboveOrBelow && sameLeftOrRight) {
-                blockTiles[cornerID].sprite = cornerIn;
-                if (cornerID == 0)
-                {
-                    blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 180f);
-                }
-                else if (cornerID == 1)
-                {
-                    blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 270f);
-                }
-                else if (cornerID == 2)
-                {
-                    blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 90f);
-                }
-                else
-                {
-                    blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 0);
-                }
-            } else if (sameAboveOrBelow && !sameLeftOrRight) {
-                blockTiles[cornerID].sprite = edge;
-                if (cornerID == 0)
-                {
-                    blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 270f);
-                }
-                else if (cornerID == 1)
-                {
-                    blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 270f);
-                }
-                else if (cornerID == 2)
-                {
-                    blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 90f);
-                }
-                else
-                {
-                    blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 90f);
-                }
+            if (upBlock) {
+                sameAbove = thisBlock.bc == upBlock.bc; //thisBlock.bs == upBlock.bs && 
             }
-            else if (!sameAboveOrBelow && sameLeftOrRight)
-            {
-                blockTiles[cornerID].sprite = edge;
-                if (cornerID == 0)
-                {
-                    blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 180f);
-                }
-                else if (cornerID == 1)
-                {
-                    blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 0);
-                }
-                else if (cornerID == 2)
-                {
-                    blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 180f);
-                }
-                else
-                {
-                    blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 0);
-                }
-            } else {
-                blockTiles[cornerID].sprite = cornerOut;
-                if (cornerID == 0)
-                {
-                    blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 180f);
-                }
-                else if (cornerID == 1)
-                {
-                    blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 270f);
-                }
-                else if (cornerID == 2)
-                {
-                    blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 90f);
-                }
-                else
-                {
-                    blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 0);
-                }
+            if (downBlock) {
+                sameBelow = thisBlock.bc == downBlock.bc;
+            }
+            if (leftBlock) {
+                sameLeft = thisBlock.bc == leftBlock.bc;
+            }
+            if (rightBlock) {
+                sameRight = thisBlock.bc == rightBlock.bc;
             }
 
+            for (int cornerID = 0; cornerID < 4; cornerID++) {
+                bool checkUp = (cornerID == 1) || (cornerID == 3); // (cornerID & 1) != 0;
+                bool checkLeft = (cornerID == 2) || (cornerID == 3); // (cornerID & 2) != 0;
+                bool sameAboveOrBelow = checkUp ? sameAbove : sameBelow;
+                bool sameLeftOrRight = checkLeft ? sameLeft : sameRight;
+                blockTiles[cornerID].color = bm.colorList[(int)thisBlock.bc];
+                if (sameAboveOrBelow && sameLeftOrRight) {
+                    blockTiles[cornerID].sprite = cornerIn;
+                    if (cornerID == 0) {
+                        blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 180f);
+                    }
+                    else if (cornerID == 1) {
+                        blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 270f);
+                    }
+                    else if (cornerID == 2) {
+                        blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 90f);
+                    }
+                    else {
+                        blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 0);
+                    }
+                }
+                else if (sameAboveOrBelow && !sameLeftOrRight) {
+                    blockTiles[cornerID].sprite = edge;
+                    if (cornerID == 0) {
+                        blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 270f);
+                    }
+                    else if (cornerID == 1) {
+                        blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 270f);
+                    }
+                    else if (cornerID == 2) {
+                        blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 90f);
+                    }
+                    else {
+                        blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 90f);
+                    }
+                }
+                else if (!sameAboveOrBelow && sameLeftOrRight) {
+                    blockTiles[cornerID].sprite = edge;
+                    if (cornerID == 0) {
+                        blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 180f);
+                    }
+                    else if (cornerID == 1) {
+                        blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 0);
+                    }
+                    else if (cornerID == 2) {
+                        blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 180f);
+                    }
+                    else {
+                        blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 0);
+                    }
+                }
+                else {
+                    blockTiles[cornerID].sprite = cornerOut;
+                    if (cornerID == 0) {
+                        blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 180f);
+                    }
+                    else if (cornerID == 1) {
+                        blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 270f);
+                    }
+                    else if (cornerID == 2) {
+                        blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 90f);
+                    }
+                    else {
+                        blockTiles[cornerID].transform.rotation = Quaternion.Euler(0, 0, 0);
+                    }
+                }
+
+            }
         }
+        
 
     }
-}

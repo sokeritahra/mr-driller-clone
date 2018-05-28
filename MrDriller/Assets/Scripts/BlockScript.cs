@@ -41,10 +41,12 @@ public class BlockScript : MonoBehaviour {
     Collider2D[] stuffRight;
     BlockSpriteChanger bsc;
     public bool toBeDestroyed;
+    public PlayerCharacter player;
 
     private void Awake() {
         bm = FindObjectOfType<BlockManager>().GetComponent<BlockManager>();
         bsc = gameObject.GetComponentInChildren<BlockSpriteChanger>();
+        player = FindObjectOfType<PlayerCharacter>();
     }
 
     public void AtLevelStart() {
@@ -110,6 +112,7 @@ public class BlockScript : MonoBehaviour {
             Vector3 placeToSnap = blockInDir.transform.position + new Vector3(direction, 0, 0);
             placeToSnap = new Vector3(Mathf.Round(placeToSnap.x), Mathf.Round(placeToSnap.y), Mathf.Round(placeToSnap.z));
             transform.position = placeToSnap;
+            bs = BlockState.Static;
         }
         bm.SetBlockInGrid(this);
         bs = blockInDir.bs;
@@ -144,7 +147,7 @@ public class BlockScript : MonoBehaviour {
             }
         }
 
-        else if (blockLeft && (blockLeft.bs == BlockState.Static || blockLeft.bs == BlockState.Hold) 
+        if (blockLeft && (blockLeft.bs == BlockState.Static || blockLeft.bs == BlockState.Hold) 
             && blockLeft.bc == bc && blockLeft.group != group) {
             print(this + " MERGING " + blockLeft);
             Merge(blockLeft);
@@ -215,7 +218,7 @@ public class BlockScript : MonoBehaviour {
 
         int tempInt = 0;
         foreach (Collider2D col in stuffBelow) {
-            if (col != gameObject.GetComponent<Collider2D>()) {
+            if (col != gameObject.GetComponent<Collider2D>() && col != player) {
                 blockBelow = col.gameObject.GetComponent<BlockScript>();
                 //print("ALLA ON " + blockBelow);
                 tempInt++; //lisätään yksi tempInt:iin jos alapuolella blokki
