@@ -161,8 +161,6 @@ public class PlayerCharacter : MonoBehaviour {
         if (Input.GetButton("Fire1") && drillTimer <= 0) { 
             CheckBlock(pm);
 
-            print("poranäppäintä painettu!");
-
         }
     }
 
@@ -209,7 +207,10 @@ public class PlayerCharacter : MonoBehaviour {
         }
 
     void DrillBlock(BlockScript block) {
-        bm.PopBlocks(block);
+        if ( block.bs == BlockState.Static) {
+            bm.PopBlocks(block);
+        }
+
         //tarviiks muuta
     }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -30,11 +31,16 @@ public class BlockScript : MonoBehaviour {
     BlockManager bm;
     public List<BlockScript> group;
     SpriteRenderer sr;
-    BlockScript blockBelow;
+    public BlockScript blockBelow;
     BlockScript blockAbove;
+    BlockScript blockLeft;
+    BlockScript blockRight;
     Vector3 below;
     Collider2D[] stuffBelow;
+    Collider2D[] stuffLeft;
+    Collider2D[] stuffRight;
     BlockSpriteChanger bsc;
+    public bool toBeDestroyed;
 
     private void Awake() {
         bm = FindObjectOfType<BlockManager>().GetComponent<BlockManager>();
@@ -47,9 +53,7 @@ public class BlockScript : MonoBehaviour {
         below = transform.position + new Vector3(0, -1, 0);
         blockBelow = bm.FindBlock(below);
         if (blockBelow) {
-            print("the block above " + blockBelow + " is " + this);
             blockBelow.SetBlockAbove(this);
-            print("the block below " + blockBelow.blockAbove + " is " + blockBelow);
         }
 
     }
@@ -58,123 +62,195 @@ public class BlockScript : MonoBehaviour {
         blockAbove = above;
     }
 
-    void FixedUpdate() {
+    void Update() {
         // if block underneath destroyed, hold & wobble for 2 seconds, fall
 
         //TODO: make hold work!
         //wobble
 
         if (bs == BlockState.Hold) {
-            CheckBelow();
-            if (bsc.leftBlock && bsc.leftBlock.bs == BlockState.Static && bsc.leftBlock.bc == bc) {
-                bs = BlockState.Static;
+            //print("holding " + this);
+            holdTimer -= Time.deltaTime;
+            if (blockAbove && bm.CheckIfGroupOnAir(blockAbove.group)) {
+                    bm.HoldBlocks(blockAbove);
             }
-            else if (bsc.rightBlock && bsc.rightBlock.bs == BlockState.Static && bsc.rightBlock.bc == bc) {
-                bs = BlockState.Static;
-            }
-            else {
-                holdTimer -= Time.deltaTime;
-            }
+        }
             //print(holdTimer);
+
+        if (bs == BlockState.Hold && holdTimer <= 0) {
+            bs = BlockState.Falling;
+            //holdTimer = 2f;
         }
 
-        if (holdTimer < 0) {
-            bs = BlockState.Falling;
+        if (bs == BlockState.Falling) {
+            //print(this + " STATE is FALLING");
+            Fall();
+            //if (blockBelow && !blockBelow.toBeDestroyed && blockBelow.bs == BlockState.Static) {
+            //    //print(this + " is on top of " + blockBelow);
+            //    //tell the group to be static
+            //    foreach (BlockScript block in group) {
+            //        //print(block + " going to snap in place");
+            //        block.SnapInPlace();
+            //        }
+            //}
+
+        }
+
+        if (bs == BlockState.Static) {
+            //print(this + " STATE is STATIC");
             holdTimer = 2f;
         }
 
-        ///then stop on top of next block OR merge with a same color block
-        ///
-
-        if (bs == BlockState.Falling) {
-            //print("AAAAAAAA " + this);
-            Fall();
-            //    ///then stop on top of next block OR merge with a same color block
-            //    ///
-        }
-
-
     }
 
-    void Merge(BlockScript blockInDir) {        
-        int direction = blockInDir == bsc.leftBlock ? 1 : -1;
-        Vector3 placeToSnap = blockInDir.transform.position + new Vector3(direction, 0, 0);
-        transform.position = placeToSnap;
+    void Merge(BlockScript blockInDir) {
+        //print("merging " + this + " to " + blockInDir.group);
+        int direction = blockInDir == blockLeft ? 1 : -1;
+        if (blockInDir.bs == BlockState.Static) {
+            Vector3 placeToSnap = blockInDir.transform.position + new Vector3(direction, 0, 0);
+            placeToSnap = new Vector3(Mathf.Round(placeToSnap.x), Mathf.Round(placeToSnap.y), Mathf.Round(placeToSnap.z));
+            transform.position = placeToSnap;
+        }
         bm.SetBlockInGrid(this);
-        bs = BlockState.Static;
+        bs = blockInDir.bs;
         bsc.SpriteUpdate();
-        if (this.group != blockInDir.group) {
-            bm.MergeGroups(this, blockInDir);
-        }
-        //change group
-
+        bm.MergeGroups(this, blockInDir);
     }
-
-    //void MergeRight() {  bool sameAboveOrBelow = checkUp ? sameAbove : sameBelow;
-    //    print("same color on the right");
-    //    Vector3 placeToSnap = bsc.rightBlock.transform.position + new Vector3(-1, 0, 0);
-    //    transform.position = placeToSnap;
-    //    bm.SetBlockInGrid(this);
-    //    bs = BlockState.Static;
-    //    bsc.SpriteUpdate();
-    //    //change group?
-
-    //}
 
     void Fall() {
+        CheckBelow();
+        CheckLeft();
+        CheckRight();
 
-        if (bsc.leftBlock && bsc.leftBlock.bs == BlockState.Static && bsc.leftBlock.bc == bc) {
-            Merge(bsc.leftBlock);
-            if (bsc.rightBlock && bsc.rightBlock.bs == BlockState.Static && bsc.rightBlock.bc == bc) {
-                Merge(bsc.rightBlock);
+        if (blockBelow && !blockBelow.toBeDestroyed && (blockBelow.bs == BlockState.Static || 
+            (blockBelow.group != group && blockBelow.bs == BlockState.Hold))) {
+            if (blockBelow.bc == bc && group != blockBelow.group) {
+                print("MERGE " + this + " WITH " + blockBelow);
+                bm.MergeGroups(this, blockBelow);
+                //Vector3 placeToSnap = blockBelow.transform.position + new Vector3(0, 1, 0);
+                //transform.position = placeToSnap;
+                print(transform.position + " " + blockBelow.transform.position);
+                //holdTimer = blockBelow.holdTimer;
+                foreach (BlockScript block in group) {
+                    //print(block + " going to snap in place");
+                    block.SnapInPlace(blockBelow.bs);
+                }
+            }
+            //print(this + " is on top of " + blockBelow);
+            //tell the group to be static
+            foreach (BlockScript block in group) {
+                //print(block + " going to snap in place");
+                block.SnapInPlace(blockBelow.bs);
+            }
+        }
+
+        else if (blockLeft && (blockLeft.bs == BlockState.Static || blockLeft.bs == BlockState.Hold) 
+            && blockLeft.bc == bc && blockLeft.group != group) {
+            print(this + " MERGING " + blockLeft);
+            Merge(blockLeft);
+            if (blockRight && (blockRight.bs == BlockState.Static || blockRight.bs == BlockState.Hold) 
+                && blockRight.bc == bc && blockRight.group != group) {
+                Merge(blockRight);
+                print("mergasi vasemmalle oli myös oikealla joten mergattiin myös sinne");
             }
             /// if there are more than 3 blocks of the same color, Pop();
         }
-        else if (bsc.rightBlock && bsc.rightBlock.bs == BlockState.Static && bsc.rightBlock.bc == bc) {
-            Merge(bsc.rightBlock);
+        else if (blockRight && (blockRight.bs == BlockState.Static || blockRight.bs == BlockState.Hold) 
+            && blockRight.bc == bc && blockRight.group != group) {
+            print(this + " MERGING " + blockRight);
+            Merge(blockRight);
             /// if there are more than 3 blocks of the same color, Pop();
         }
         else {
-            transform.Translate(0, -velocity * Time.deltaTime, 0);
+            bm.DropBlocks(group);
+            //print("A");
             bm.SetBlockInGrid(this);
-            CheckBelow();
+
         }
+
     }
 
-    void CheckBelow() {
+    private bool CheckRight() {
+        Vector2 centerPoint = new Vector2(transform.position.x - 0.25f, transform.position.y + 0.5f);
+        stuffRight = Physics2D.OverlapBoxAll(centerPoint, new Vector2(0.5f, 0.25f), 0);
+
+        int tempInt = 0;
+        foreach (Collider2D col in stuffRight) {
+            if (col != gameObject.GetComponent<Collider2D>()) {
+                blockRight = col.gameObject.GetComponent<BlockScript>();
+                tempInt++; //lisätään yksi tempInt:iin jos vasemmalla blokki
+            }
+        }
+        return tempInt > 0;
+    }
+
+    public bool CheckLeft() {
+        //luodaan overlap joka kattoo onko alapuolella blokki
+        Vector2 centerPoint = new Vector2(transform.position.x - 0.25f, transform.position.y + 0.5f);
+        stuffLeft = Physics2D.OverlapBoxAll(centerPoint, new Vector2(0.5f, 0.5f), 0);
+
+        int tempInt = 0;
+        foreach (Collider2D col in stuffLeft) {
+            if (col != gameObject.GetComponent<Collider2D>()) {
+                blockLeft = col.gameObject.GetComponent<BlockScript>();
+                tempInt++; //lisätään yksi tempInt:iin jos vasemmalla blokki
+            }
+        }
+        return tempInt > 0;
+    }
+
+
+    public bool CheckBelow() {
         //luodaan overlap joka kattoo onko alapuolella blokki
         Vector2 centerPoint = new Vector2(transform.position.x, transform.position.y - 0.25f);
         stuffBelow = Physics2D.OverlapBoxAll(centerPoint, new Vector2(0.5f, 0.5f), 0);
 
+        //if (col != gameObject.GetComponent<Collider2D>()) {
+        //    blockBelow = col.gameObject.GetComponent<BlockScript>();
+        //    if (blockBelow.toBeDestroyed) {  //lisätään yksi tempInt:iin jos alapuolella blokki
+        //        tempInt++;
+        //    }
+        //    //print(this + " is on top of " + blockBelow);
+        //}
+
+        int tempInt = 0;
         foreach (Collider2D col in stuffBelow) {
             if (col != gameObject.GetComponent<Collider2D>()) {
                 blockBelow = col.gameObject.GetComponent<BlockScript>();
+                //print("ALLA ON " + blockBelow);
+                tempInt++; //lisätään yksi tempInt:iin jos alapuolella blokki
+                //print(this + " is on top of " + blockBelow);
             }
         }
-        //print(blockBelow + " is below " + this);
-        if (blockBelow && blockBelow.bs == BlockState.Static) {
-            //check where we are an if we're going below some line then?
-            Vector3 placeToSnap = blockBelow.transform.position + new Vector3(0, 1, 0);
-            print(this + " should snap on top of " + blockBelow + " at " + placeToSnap);
-            transform.position = placeToSnap;
-            bs = BlockState.Static;
-            if (blockAbove) {
-                blockAbove.transform.position = placeToSnap + new Vector3(0, 1, 0);
-                blockAbove.bs = BlockState.Static;
-            }
-            blockBelow.SetBlockAbove(this);
-            bm.SetBlockInGrid(this);
-            if (blockBelow.bc == bc) {
-                if (this.group != blockBelow.group) {
-                    bm.MergeGroups(this, blockBelow);
-                }
-            }
-            print("the block has moved in the grid to " + gridPos);
+        if(blockBelow && blockBelow.toBeDestroyed) {
+            return false;
         }
+        return tempInt > 0;
+        //print(blockBelow + " is below " + this); 
+    }
+
+    void SnapInPlace(BlockState state) { //että onko blockbelow static vai hold) {
+        print("SNAPPING " + this);
+        bs = state;
+        //if(blockBelow) {
+            holdTimer = blockBelow.holdTimer;
+        //}//mistä voin ottaa holdTimerin jos en blockbelowstA? jonkun muun ??
+        //vois odottaa että alempi alkaa pudota ja sitten vasta jatkaa putoamista
+        //ei saa snäpätä blockbelow:n päälle, pitää snäpätä siihen missä tällä hetkellä on.
+        //Vector3 placeToSnap = blockBelow.transform.position + new Vector3(0, 1, 0);
+        //transform.position = placeToSnap;
+        Vector3 placeToSnap = new Vector3(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y), transform.position.z);
+        //Vector3 placeToSnap = new Vector3(Mathf.Round(transform.position.x), transform.position.y, transform.position.z);
+        transform.position = placeToSnap;
+        //print("STOP " + this);
+        CheckBelow();
+        blockBelow.SetBlockAbove(this);
+        bm.SetBlockInGrid(this);
+        //TÄSTÄ MERGE OTETTU POIS!!!
     }
 
     public void SetGridPos(int posX, int posY, int columns) {
-        gridPos = columns * posY + posX;
+        gridPos = columns * posY + posX +1;
     }
 
     public void SetGroup(List<BlockScript> g) {
@@ -185,11 +261,13 @@ public class BlockScript : MonoBehaviour {
     public void Pop() {
         //kerro block managerille että poksahti
         //animaatio tms?
-        if (blockAbove) {
+        Destroy(gameObject);
+        toBeDestroyed = true;
+
+        if (blockAbove && bm.CheckIfGroupOnAir(blockAbove.group)) {
             bm.HoldBlocks(blockAbove); 
         }
 
-        Destroy(gameObject);
-        print("Pop!");
+        //print("Pop!");
     }
 }

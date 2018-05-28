@@ -53,7 +53,7 @@ public class BlockSpriteChanger : MonoBehaviour {
         //} //voisko tän tehä sillee että ei kutsuta täällä updatessa vaan kutsutaan muista aina ku tarvii?
 	}
 
-    void FindAdjacentBlocks() {
+    public void FindAdjacentBlocks() {
         posx = transform.parent.position.x;
         posy = transform.parent.position.y;
         //print(posx + " " + posy);
@@ -89,16 +89,16 @@ public class BlockSpriteChanger : MonoBehaviour {
         //FindAdjacentBlocks();
 
         if (upBlock) {
-            sameAbove = thisBlock.bs == upBlock.bs && thisBlock.bc == upBlock.bc;
+            sameAbove = thisBlock.bc == upBlock.bc; //thisBlock.bs == upBlock.bs && 
         }
         if (downBlock) {
-            sameBelow = thisBlock.bs == downBlock.bs && thisBlock.bc == downBlock.bc;
+            sameBelow = thisBlock.bc == downBlock.bc;
         }
         if (leftBlock) {
-            sameLeft = thisBlock.bs == leftBlock.bs && thisBlock.bc == leftBlock.bc;
+            sameLeft = thisBlock.bc == leftBlock.bc;
         }
         if (rightBlock) {
-            sameRight = thisBlock.bs == rightBlock.bs && thisBlock.bc == rightBlock.bc;
+            sameRight = thisBlock.bc == rightBlock.bc;
         }
 
         for (int cornerID = 0; cornerID < 4; cornerID++) {

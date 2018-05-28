@@ -33,8 +33,8 @@ public class BlockManager : MonoBehaviour {
     public void SetBlockInGrid (BlockScript block) {
         posx = block.transform.position.x;
         posy = block.transform.position.y;
-        blockGrid[(int)posx, -(int)posy] = block;
-        blockGrid[(int)posx, -(int)posy].SetGridPos((int)posx, -(int)posy, columns);
+        blockGrid[Mathf.RoundToInt(posx), -Mathf.RoundToInt(posy)] = block;
+        blockGrid[Mathf.RoundToInt(posx), -Mathf.RoundToInt(posy)].SetGridPos(Mathf.RoundToInt(posx), -Mathf.RoundToInt(posy), columns);
     }
 
     void FindGroups() {
@@ -131,6 +131,7 @@ public class BlockManager : MonoBehaviour {
             string juttu = "";
             foreach (BlockScript bs in group) {
                 juttu += bs.gridPos;
+                juttu += " ";
             }
             print(AllGroups.IndexOf(group) + " : " + juttu);
         }
@@ -160,7 +161,7 @@ public class BlockManager : MonoBehaviour {
             //print("uusi ryhmä tehty blokille " + thisSquare + " ryhmä: " + AllGroups.IndexOf(tempList));
         }
         else {
-            print(thisSquare.gridPos + " on ryhmässä " + AllGroups.IndexOf(thisSquare.group));
+            print(thisSquare + ":lle luotiin ryhmä " + AllGroups.IndexOf(thisSquare.group));
         }
 
     }
@@ -192,21 +193,23 @@ public class BlockManager : MonoBehaviour {
     public void PopBlocks(BlockScript popped) {
         print(popped);
         foreach (BlockScript block in popped.group) {
-            //print("hei minun nimi on " + block);
-
                 block.Pop();
-
         }
-        //}
-        //toimiikohan tää??
-        //pop (destroy, animation??) the adjacent blocks that are the same color as popped
     }
 
     public void HoldBlocks(BlockScript toFall) {
         foreach (BlockScript block in toFall.group) {
             block.bs = BlockState.Hold;
+
         }
     }
+
+    //public void StopBlocks(List<BlockScript> group) {
+    //    foreach (BlockScript block in group) {
+    //        block.bs = BlockState.Static;
+    //        print("estää " + block + ":n putoamisen");
+    //    }
+    //}
 
     public void MergeGroups(BlockScript first, BlockScript second) {
         foreach (BlockScript block in first.group) {
@@ -214,5 +217,25 @@ public class BlockManager : MonoBehaviour {
             second.group.Add(block);
         }
     }
+
+    public bool CheckIfGroupOnAir(List<BlockScript> group) {
+        //kattoo onko alla tyhjää
+        int tempInt = 0;
+        foreach (BlockScript block in group) {
+            if (block.CheckBelow() && block.blockBelow.group != block.group && block.blockBelow.bs == BlockState.Static) {
+                tempInt++;
+            }
+        }
+        return !(tempInt > 0);
+    }
+
+    public void DropBlocks(List<BlockScript> group) {
+        foreach (BlockScript block in group) {
+            block.transform.Translate(0, -block.velocity * Time.deltaTime / group.Count, 0);
+            print(-block.velocity * Time.deltaTime / group.Count);
+        }
+    }
+
+    
 
 }
