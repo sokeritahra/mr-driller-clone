@@ -99,7 +99,9 @@ public class BlockScript : MonoBehaviour {
         }
 
         if (bs == BlockState.Static) {
-            //print(this + " STATE is STATIC");
+            ////print(this + " STATE is STATIC");
+            //Vector3 placeToSnap = transform.position + new Vector3(direction, 0, 0);
+            //transform.position = new Vector3(Mathf.Round(placeToSnap.x), Mathf.Round(placeToSnap.y), Mathf.Round(placeToSnap.z));
             holdTimer = 2f;
         }
 
@@ -109,6 +111,7 @@ public class BlockScript : MonoBehaviour {
         //print("merging " + this + " to " + blockInDir.group);
         int direction = blockInDir == blockLeft ? 1 : -1;
         if (blockInDir.bs == BlockState.Static) {
+        //if (blockInDir.bs == BlockState.Static || blockInDir.bs == BlockState.Hold) {
             Vector3 placeToSnap = blockInDir.transform.position + new Vector3(direction, 0, 0);
             placeToSnap = new Vector3(Mathf.Round(placeToSnap.x), Mathf.Round(placeToSnap.y), Mathf.Round(placeToSnap.z));
             transform.position = placeToSnap;
@@ -216,6 +219,7 @@ public class BlockScript : MonoBehaviour {
         //    //print(this + " is on top of " + blockBelow);
         //}
 
+        //jos alla on pelaaja ja pelaaja if (stuffBelow.contains
         int tempInt = 0;
         foreach (Collider2D col in stuffBelow) {
             if (col != gameObject.GetComponent<Collider2D>() && col != player) {
@@ -232,12 +236,16 @@ public class BlockScript : MonoBehaviour {
         //print(blockBelow + " is below " + this); 
     }
 
-    void SnapInPlace(BlockState state) { //että onko blockbelow static vai hold) {
-        print("SNAPPING " + this);
+    public void SnapInPlace(BlockState state) { //että onko blockbelow static vai hold) {
+        //print("SNAPPING " + this);
         bs = state;
-        //if(blockBelow) {
+        if(blockBelow) {
             holdTimer = blockBelow.holdTimer;
-        //}//mistä voin ottaa holdTimerin jos en blockbelowstA? jonkun muun ??
+        }
+        else {
+            holdTimer = 2f;
+        }
+                //mistä voin ottaa holdTimerin jos en blockbelowstA? jonkun muun ??
         //vois odottaa että alempi alkaa pudota ja sitten vasta jatkaa putoamista
         //ei saa snäpätä blockbelow:n päälle, pitää snäpätä siihen missä tällä hetkellä on.
         //Vector3 placeToSnap = blockBelow.transform.position + new Vector3(0, 1, 0);
@@ -247,7 +255,10 @@ public class BlockScript : MonoBehaviour {
         transform.position = placeToSnap;
         //print("STOP " + this);
         CheckBelow();
-        blockBelow.SetBlockAbove(this);
+        if (blockBelow) {
+            placeToSnap = blockBelow.transform.position + new Vector3(0, 1, 0);
+            blockBelow.SetBlockAbove(this);
+        }
         bm.SetBlockInGrid(this);
         //TÄSTÄ MERGE OTETTU POIS!!!
     }

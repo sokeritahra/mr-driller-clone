@@ -230,9 +230,23 @@ public class BlockManager : MonoBehaviour {
     }
 
     public void DropBlocks(List<BlockScript> group) {
+        int persikka = 0;
         foreach (BlockScript block in group) {
-            block.transform.Translate(0, -block.velocity * Time.deltaTime / group.Count, 0);
+            if (block.bs == BlockState.Falling) {
+                persikka++;
+            }
         }
+        if (persikka == group.Count) {
+            foreach (BlockScript block in group) {
+                block.transform.Translate(0, (-block.velocity * Time.deltaTime) / group.Count, 0);
+                //print("blokki " + block + " liikkuu nopeudella " + (-block.velocity) / group.Count + " kun frame on " + Time.frameCount);
+            }
+        }
+        //else {
+        //    foreach (BlockScript block in group) {
+        //        block.SnapInPlace()
+        //    }
+        //}
     }
 
     
