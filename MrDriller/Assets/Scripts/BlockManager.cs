@@ -11,8 +11,10 @@ public class BlockManager : MonoBehaviour {
     public int columns;
     //how many columns (how wide the grid is -> x)
     public GameObject blockPrefab;
+    public Vector2 firstBlock = new Vector2(0,0);
     //blokki prefabi
     BlockScript blockScript;
+    public Transform blockFolder;
     //Block testBlock;
     List<List<BlockScript>> AllGroups;
     public BlockScript[] blockArray;
@@ -22,13 +24,38 @@ public class BlockManager : MonoBehaviour {
 
     public void AtLevelStart() {
         //luodaan taulukko ja generoidaan blokit sinne
+        GenerateBlocks();
         blockGrid = new BlockScript[columns, rows];
-
         FindGroups();
         foreach (BlockScript block in blockArray) {
             block.AtLevelStart();
         }
+    }
+
+    void GenerateBlocks() {
+        float firstX = firstBlock.x; 
+        float firstY = firstBlock.y; 
+       
+        for (int i = 0; i < columns; i++) {
+            for (int j = 0; j < rows; j++) {
+                GameObject go = Instantiate(blockPrefab);
+                Vector2 newPosition = new Vector2(firstX + i, firstY - j);
+                blockScript = go.GetComponent<BlockScript>();
+                go.transform.parent = blockFolder;
+                var blockColorRandomizer = Random.value;
+                if (blockColorRandomizer > .75f) {
+                    blockScript.bc = BlockColor.Blue;
+                } else if (blockColorRandomizer > .50f) {
+                    blockScript.bc = BlockColor.Green;
+                } else if(blockColorRandomizer > .25f) {
+                    blockScript.bc = BlockColor.Red;
+                } else {
+                    blockScript.bc = BlockColor.Yellow;
+                }
+                go.transform.position = newPosition; 
+            }
         }
+    }
 
     public void SetBlockInGrid (BlockScript block) {
         posx = block.transform.position.x;
