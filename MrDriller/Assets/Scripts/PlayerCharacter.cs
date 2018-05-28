@@ -14,7 +14,7 @@ public class PlayerCharacter : MonoBehaviour {
     float horizontal; 
     float vertical;
     float climbSpeed = 10f;
-    public float climbTimer = 0.25f; // Time to wait before climbing
+    public float climbTimer = 0.5f; // Time to wait before climbing
     float drillTimer = 0f; // Drill cooldown timer
     float staticTimer = 0f; // Time to recover after near death experience
     float fallTimer;
@@ -125,7 +125,8 @@ public class PlayerCharacter : MonoBehaviour {
                 animS = animDefault;
                 fallTimer -= Time.deltaTime;
                 if (fallTimer < 0) {
-                    rb.AddForce(new Vector2(0, -5), ForceMode2D.Force);
+                    rb.velocity = new Vector2(0, -5f);
+                    //rb.AddForce(new Vector2(0, -5), ForceMode2D.Force);
                     animS = "Falling";
                 }
             } else {
