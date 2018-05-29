@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 
 public class GameManager : MonoBehaviour {
+    public TextMeshProUGUI depthText;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI sugarText;
     public TextMeshProUGUI levelText;
@@ -15,18 +16,21 @@ public class GameManager : MonoBehaviour {
     BlockSpriteChanger[] bscArray;
     BlockManager bm;
     int level = 1;
+    int depth = 0;
     float score;
     float highScore;
 
 
     private void Start() {
         highScore = PlayerPrefs.GetFloat("highScore", 0);
+        depthText = depthText.GetComponent<TextMeshProUGUI>();
         scoreText = scoreText.GetComponent<TextMeshProUGUI>();
         sugarText = sugarText.GetComponent<TextMeshProUGUI>();
         levelText = levelText.GetComponent<TextMeshProUGUI>();
         livesText = livesText.GetComponent<TextMeshProUGUI>();
 
         AtGameStart();
+        depthText.text = ("Depth: " + depth + "µm");
         scoreText.text = ("Score: " + score);
         sugarText.text = ("Sugar level: " + lifeLeft);
         levelText.text = ("Level: " + level);
@@ -62,6 +66,11 @@ public class GameManager : MonoBehaviour {
         scoreText.text = ("Score: " + score);
     }
 
+    public void Depth(int d) {
+        depth = d;
+        depthText.text = ("Depth: " + depth + "µm");
+    }
+    
     public void DeadOnArrival() {
         if (livesLeft > 1) {
             livesLeft--;

@@ -224,6 +224,7 @@ public class PlayerCharacter : MonoBehaviour {
                 }
             }
             previousPm = pm;
+            gm.Depth(Mathf.Abs(Mathf.RoundToInt(transform.position.y - 1)));
         }
 
 
