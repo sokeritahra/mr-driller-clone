@@ -59,6 +59,10 @@ public class GameManager : MonoBehaviour {
         if (lifeLeft <= 0) { // Life amount deducter
             DeadOnArrival();
         }
+
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            Application.Quit();
+        }
     }
 
     public void AddScore() {
