@@ -173,12 +173,14 @@ public class PlayerCharacter : MonoBehaviour {
                 }
             }
         } else {
-            if (horizontal > 0 && !rightHandAntenna) {
+           
+            if (horizontal > 0 && !rightHandAntenna && rb.transform.position.x < bm.columns - 1) {
                 rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
             }
-            if (horizontal < 0 && !leftHandAntenna) {
+            if (horizontal < 0 && !leftHandAntenna && rb.transform.position.x > bm.firstBlock.x) {
                 rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
             }
+           
             if (Mathf.Abs(horizontal) < Mathf.Abs(vertical)) { // Set player (drilling) mode
                 if (vertical < 0) {
                     pm = PlayerMode.Down;
