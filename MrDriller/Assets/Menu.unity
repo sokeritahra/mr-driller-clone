@@ -516,7 +516,7 @@ Prefab:
     - target: {fileID: 114582595859204236, guid: b9d61e92d9e6755428618eda10068cd3,
         type: 2}
       propertyPath: m_padding
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 114837295892439152, guid: b9d61e92d9e6755428618eda10068cd3,
         type: 2}
@@ -526,7 +526,12 @@ Prefab:
     - target: {fileID: 114837295892439152, guid: b9d61e92d9e6755428618eda10068cd3,
         type: 2}
       propertyPath: m_padding
-      value: 0
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224516296684421744, guid: b9d61e92d9e6755428618eda10068cd3,
+        type: 2}
+      propertyPath: m_AnchoredPosition.y
+      value: -1.9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b9d61e92d9e6755428618eda10068cd3, type: 2}

@@ -56,3 +56,4 @@ MonoBehaviour:
   sugarText: {fileID: 0}
   levelText: {fileID: 0}
   livesText: {fileID: 0}
+  statusText: {fileID: 0}
