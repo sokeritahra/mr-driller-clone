@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour {
     public TextMeshProUGUI sugarText;
     public TextMeshProUGUI levelText;
     public TextMeshProUGUI livesText;
+    public TextMeshProUGUI statusText;
     int lifeLeft = 100;
     int livesLeft = 3;
     float lifeDeductionTick = 0.9f;
@@ -28,6 +29,7 @@ public class GameManager : MonoBehaviour {
         sugarText = sugarText.GetComponent<TextMeshProUGUI>();
         levelText = levelText.GetComponent<TextMeshProUGUI>();
         livesText = livesText.GetComponent<TextMeshProUGUI>();
+        statusText = statusText.GetComponent<TextMeshProUGUI>();
 
         AtGameStart();
         depthText.text = ("Depth: " + depth + "µm");
@@ -59,7 +61,7 @@ public class GameManager : MonoBehaviour {
         if (lifeLeft <= 0) { // Life amount deducter
             DeadOnArrival();
         }
-
+        
         if (Input.GetKeyDown(KeyCode.Escape)) {
             Application.Quit();
         }

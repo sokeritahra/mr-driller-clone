@@ -59,7 +59,10 @@ public class PlayerCharacter : MonoBehaviour {
     }
 
     private void Update() {
-
+        if (Input.GetButtonDown("Fire2")) {
+            Time.timeScale = 1 - Time.timeScale;
+            gm.statusText.text = (Time.timeScale == 1) ? "" : "Paused";
+        }
 
         // Debug drawings of playercharacter head antennas and falling sensors
 
@@ -82,6 +85,7 @@ public class PlayerCharacter : MonoBehaviour {
     }
 
     void FixedUpdate() {
+
         // Player Left, right and center collider points (in relation to collider)
         playerCenter = c.bounds.center;
         playerLeft = c.bounds.center - (c.bounds.size.x / 2 * Vector3.right);

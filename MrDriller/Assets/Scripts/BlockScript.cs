@@ -277,7 +277,7 @@ public class BlockScript : MonoBehaviour {
     public void Pop() {
         //kerro block managerille että poksahti
         //animaatio tms?
-
+        
         Destroy(gameObject);
         gm.AddScore();
         toBeDestroyed = true;
