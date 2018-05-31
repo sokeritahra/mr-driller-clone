@@ -92,8 +92,8 @@ public class GameManager : MonoBehaviour {
     void GameOver() {
         scoreText.text = ("Game");
         sugarText.text = ("Over");
-        levelText.text = ("Mutha");
-        livesText.text = ("Fukka");
+        levelText.text = ("Mother");
+        livesText.text = ("Hugger");
         PlayerPrefs.SetFloat("highScore", highScore);
         Time.timeScale = 0;
     }
