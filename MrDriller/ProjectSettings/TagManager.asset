@@ -16,7 +16,7 @@ TagManager:
   - PlayerCharacter
   - Blocks
   - BlockingLayer
-  - 
+  - Mask
   - 
   - 
   - 
@@ -41,6 +41,6 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Units
+  - name: Mask
     uniqueID: 161970111
     locked: 0

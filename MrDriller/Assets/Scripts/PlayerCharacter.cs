@@ -59,7 +59,10 @@ public class PlayerCharacter : MonoBehaviour {
     }
 
     private void Update() {
-
+        if (Input.GetButtonDown("Fire2")) {
+            Time.timeScale = 1 - Time.timeScale;
+            gm.statusText.text = (Time.timeScale == 1) ? "" : "Paused";
+        }
 
         // Debug drawings of playercharacter head antennas and falling sensors
 
@@ -82,6 +85,7 @@ public class PlayerCharacter : MonoBehaviour {
     }
 
     void FixedUpdate() {
+
         // Player Left, right and center collider points (in relation to collider)
         playerCenter = c.bounds.center;
         playerLeft = c.bounds.center - (c.bounds.size.x / 2 * Vector3.right);
@@ -173,12 +177,14 @@ public class PlayerCharacter : MonoBehaviour {
                 }
             }
         } else {
-            if (horizontal > 0 && !rightHandAntenna) {
+           
+            if (horizontal > 0 && !rightHandAntenna && rb.transform.position.x < bm.columns - 1) {
                 rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
             }
-            if (horizontal < 0 && !leftHandAntenna) {
+            if (horizontal < 0 && !leftHandAntenna && rb.transform.position.x > bm.firstBlock.x) {
                 rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
             }
+           
             if (Mathf.Abs(horizontal) < Mathf.Abs(vertical)) { // Set player (drilling) mode
                 if (vertical < 0) {
                     pm = PlayerMode.Down;

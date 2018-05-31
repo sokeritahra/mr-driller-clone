@@ -11,6 +11,7 @@ public class BlockManager : MonoBehaviour {
     public int columns;
     //how many columns (how wide the grid is -> x)
     public GameObject blockPrefab;
+    public PlayerCharacter player;
     public Vector2 firstBlock = new Vector2(0,0);
     //blokki prefabi
     BlockScript blockScript;
@@ -30,6 +31,7 @@ public class BlockManager : MonoBehaviour {
         foreach (BlockScript block in blockArray) {
             block.AtLevelStart();
         }
+        player = FindObjectOfType<PlayerCharacter>();
     }
 
     void GenerateBlocks() {
@@ -227,7 +229,14 @@ public class BlockManager : MonoBehaviour {
                     if (block.CheckBelow()) {
                         snaps.Add(block.blockBelow.group);
                     }
-                    //toimisko tämä: snaps.Add(block.CheckBelow().blockBelow.group)
+                    //toimisko tämä: snaps.Add(block.CheckBelow().group) jos checkbelow palauttaa blockbelown
+                    if (block.CheckLeft()) {
+                        snaps.Add(block.blockLeft.group);
+                    }
+
+                    if (block.CheckRight()) {
+                        snaps.Add(block.blockRight.group);
+                    }
                 }
                 ///     foreach block in g  || block.CheckLeft() || block.CheckRight()
                 ///         if(block snaps)
@@ -404,6 +413,14 @@ public class BlockManager : MonoBehaviour {
         }
     }
 
+    //public void DestroyThreeColumnsOnTop() {
+    //    for (int i = rows-Mathf.Abs(Mathf.RoundToInt(player.transform.position.y)); i > 0; i--) {
+    //        // Destroy blocks without adding to score
+    //        Mathf.RoundToInt(player.transform.position.x);
+    //        Mathf.RoundToInt(player.transform.position.x - 1);
+    //        Mathf.RoundToInt(player.transform.position.x + 1);
+    //    }   
+    //}
     
 
 }
