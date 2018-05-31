@@ -414,13 +414,11 @@ public class BlockManager : MonoBehaviour {
     }
 
     //public void DestroyThreeColumnsOnTop() {
-    //    for (int i = rows-Mathf.Abs(Mathf.RoundToInt(player.transform.position.y)); i > 0; i--) {
+    //    for (int i = rows - Mathf.Abs(Mathf.RoundToInt(player.transform.position.y)); i > 0; i--) {
     //        // Destroy blocks without adding to score
-    //        Mathf.RoundToInt(player.transform.position.x);
-    //        Mathf.RoundToInt(player.transform.position.x - 1);
-    //        Mathf.RoundToInt(player.transform.position.x + 1);
-    //    }   
+    //        Destroy block from vector2(Mathf.RoundToInt(player.transform.position.x), i);
+    //        Destroy block from vector2(Mathf.RoundToInt(player.transform.position.x - 1), i);
+    //        Destroy block from vector2(Mathf.RoundToInt(player.transform.position.x + 1), i);
+    //    }
     //}
-    
-
 }
