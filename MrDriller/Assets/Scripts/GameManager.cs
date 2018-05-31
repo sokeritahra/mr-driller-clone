@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour {
     int depth = 0;
     float score;
     float highScore;
-
+    public string BGMaudioEvent;
 
     private void Start() {
         highScore = PlayerPrefs.GetFloat("highScore", 0);
@@ -38,6 +38,8 @@ public class GameManager : MonoBehaviour {
         levelText.text = ("Level: " + level);
         livesText.text = ("Lives left: " + livesLeft);
         //different levels?
+
+        Fabric.EventManager.Instance.PostEvent(BGMaudioEvent);
     }
 
     void AtGameStart() {

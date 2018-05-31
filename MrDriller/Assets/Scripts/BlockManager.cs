@@ -25,7 +25,7 @@ public class BlockManager : MonoBehaviour {
 
     public void AtLevelStart() {
         //luodaan taulukko ja generoidaan blokit sinne
-        //GenerateBlocks();
+        GenerateBlocks();
         blockGrid = new BlockScript[columns, rows];
         FindGroups();
         foreach (BlockScript block in blockArray) {
@@ -39,7 +39,7 @@ public class BlockManager : MonoBehaviour {
         float firstY = firstBlock.y;
 
         for (int i = 0; i < columns; i++) {
-            for (int j = 0; j < rows; j++) {
+            for (int j = 0; j < rows-1; j++) {
                 GameObject go = Instantiate(blockPrefab);
                 go.name = ((i * rows) + j).ToString();
                 Vector2 newPosition = new Vector2(firstX + i, firstY - j);
@@ -193,9 +193,6 @@ public class BlockManager : MonoBehaviour {
             thisSquare.SetGroup(tempList);
             //print("uusi ryhmä tehty blokille " + thisSquare + " ryhmä: " + AllGroups.IndexOf(tempList));
         }
-        else {
-            print(thisSquare + ":lle luotiin ryhmä " + AllGroups.IndexOf(thisSquare.group));
-        }
 
     }
 
@@ -213,134 +210,177 @@ public class BlockManager : MonoBehaviour {
     }
 
     public void DropBlocks(List<BlockScript> group) {
-        //int anyStatic = 0;
-        ////print(group.Count);
-        //foreach (BlockScript block in group) {
-        //    if (block.bs == BlockState.Static) {
-        //        anyStatic++;
-        //    }
-        //}
-        //if (anyStatic == 0) {
-            //print("pitäis tippuu");
+
        foreach (BlockScript block in group) {
                 block.transform.Translate(0, (-block.velocity * Time.deltaTime), 0);
-                //print("blokki " + block + " liikkuu nopeudella " + (-block.velocity) / group.Count + " kun frame on " + Time.frameCount);
             }
         }
 
     void Update() {
+        List<List<BlockScript>> toBeRemoved = new List<List<BlockScript>>();
 
         foreach (List<BlockScript> g in AllGroups) {
             //tsekkaa putoavista snäppääkö
             int falling = 0;
+            int holding = 0;
             foreach (BlockScript block in g) {
                 if (block.bs == BlockState.Falling) {
                     falling++;
                 }
+                else if (block.bs == BlockState.Hold) {
+                    holding++;
+                }
             }
 
+            //voiko tässä haitata se missä järjestyksessä foreach käy ryhmät läpi?
+            //TODO: JOSKUS TÄÄ KELLUMAAN??? LUULEE ETTÄ ALLA ON JOTAIN VAIKKEI OLE
+
             if (falling == g.Count) {
-                List<List<BlockScript>> snaps = new List<List<BlockScript>>();
+                List<List<BlockScript>> merges = new List<List<BlockScript>>();
+                int snaps = 0;
                 foreach (BlockScript block in g) {
-                    //tää ei vielä kato onko samaa väriä, onko eri ryhmässä
-                    if (block.CheckBelow()) {
-                        snaps.Add(block.blockBelow.group);
+                    //katsotaan onko samaa väriä ja eri ryhmässä eli pitääkö mergee
+                    //mutta pitäis kattoo myös pitääkö vain snäpätä
+                    if (block.CheckSameBelow()) {
+                        merges.Add(block.blockBelow.group);
                     }
-                    //toimisko tämä: snaps.Add(block.CheckBelow().group) jos checkbelow palauttaa blockbelown
+                    else if (block.CheckAnyBelow()) {
+                        snaps++;
+                    }
+
+                    //TODO: EI MERGEE SIVUILLE KUN ON PYSÄHTYNYT BLOKIN PÄÄLLE
                     if (block.CheckLeft()) {
-                        snaps.Add(block.blockLeft.group);
+                        merges.Add(block.blockLeft.group);
+                        print("merging from the LEFT " + block.blockLeft + " with " + block);
+                        //jos jokin näistä on static, snäpätessä staticiks
                     }
 
                     if (block.CheckRight()) {
-                        snaps.Add(block.blockRight.group);
+                        merges.Add(block.blockRight.group);
+                        print("merging from the RighT " + block.blockRight + " with " + block);
+                        //jos jokin näistä on static, snäpätessä staticiks
                     }
                 }
-                if (snaps.Count > 0) {
-                    snaps.Add(g);
-                    //merge kaikki snapslistassa
+                if (merges.Count > 0) {
+
+                    foreach (List<BlockScript> mg in merges) {
+                        MergeGroups(mg, g);
+                        toBeRemoved.Add(mg);
+                        print("merging " + mg + " with " + g);
+                    }
+                    //HUOM HUOM! TÄMÄ SEURAAVA PÄTEE SIIS VAIN MERGEÄVILLE RYHMILLE
+                    //SEN PITÄISI TOIMIA MYÖS ERIVÄRISILLE RYHMILLE!
+                    //TODOOOOOOOOOOOOOOOOOO!!!
+                    float holdTime = 2f;
+                    foreach (BlockScript block in g) {
+                        holdTime = holdTime < block.holdTimer ? holdTime : block.holdTimer;
+                    }
+                    foreach (BlockScript block in g) {
+                        block.holdTimer = holdTime;
+                        block.SnapInPlace(BlockState.Hold);
+                        print("snapping and changing to hold " + block + " and holdtime is " + block.holdTimer);
+                    }
+                    //TODO: snäppäys - voinko tehä snäppifunktion joka toimii sekä sivuille että alas?
+                    //voiko toimia että sen laittaa staticiksi - muuttuuko holdiksi at all tai tarpeeks nopee?
+                    //tai siis eihän se tietenkään mihinkään muutu vaan se pitää laittaa
+                    //mutta niin se laitetaankin tuolla else-kohdassa
+
+                    //MILLON TÄÄ PITÄÄ TEHÄ bm.SetBlockInGrid(this);
+                }
+                else if (snaps > 0) {
+                    foreach (BlockScript block in g) {
+                        block.SnapInPlace(BlockState.Static);
+                        //block.SnapInPlace(block.blockBelow.bs);
+                        //TODO: tässä tapahtuu nyt niin että jokainen blokki ottaa alapuolella sijaitsevasta blokista erikseen sen
+                        //blockstaten ja sen pitäis mennä sillee että jos jokin niistä (blockbelow) on static sen pitäis olla kaikille 
+                        //g:ssä static ja jos ne kaikki (blockbelow) on hold, blockille myös hold
+                    }
                 }
                 else {
-                    //fall
+                    DropBlocks(g);
+                    foreach (BlockScript block in g) {
+                        SetBlockInGrid(block);
+                        block.SetBelow();
+                        block.SetLeft();
+                        block.SetRight();
+                        //PITÄISKÖ NÄITÄ PÄIVITELLÄ MUULLOINKIN?
+                    }
                 }
-
             }
 
+            else if (holding == g.Count) {
+                foreach (BlockScript block in g) {
+                    block.SetBelow();
+                    block.SetLeft();
+                    block.SetRight();
+                }
+                //print("holding");
+
+                foreach (BlockScript block in g) {
+                    block.holdTimer -= Time.deltaTime;
+                }
+                // tällä tavalla olin blockscriptin snapissa tätä asiaa käsitellyt;
+                //if (blockBelow) {
+                //    var tempTime = blockBelow.holdTimer;
+                //    foreach (BlockScript block in group) {
+                //        if (block.blockBelow) {
+                //            tempTime = tempTime < block.blockBelow.holdTimer ? tempTime : block.blockBelow.holdTimer;
+                //        }
+                //    }
+                //    foreach (BlockScript block in group) {
+                //        block.holdTimer = tempTime;
+                //    }
+                //    placeToSnap = blockBelow.transform.position + new Vector3(0, 1, 0);
+                //    blockBelow.SetBlockAbove(this);
+                //}
+
+                //else {
+                //    print("no block below " + this);
+                //    holdTimer = 2f;
+                //}
+                /// ehkä täällä vois olla holdtimer? mut sit se pitäis olla joka ryhmälle erikseen :G pitäisköhän sittenki jättää se joka 
+                /// blokkiin ja sitte vaa käsitellä sitä könttänä aina foreach loopeilla
+                //    
+
+            }
             //tsekkaa ei-putoavista pitäiskö pudota
-            if (falling < g.Count ) {
-
+            else {
+                foreach (BlockScript block in g) {
+                    block.SetBelow();
+                    block.SetLeft();
+                    block.SetRight();
+                }
+                if (CheckIfGroupOnAir(g)) {
+                    print("Group's states changed to hold");
+                    foreach (BlockScript block in g) {
+                        block.bs = BlockState.Hold;
+                        block.holdTimer = 2f;
+                        print("group contains " + block);
+                    }
+                }
+                //kyllähän pitää pudota myös sillon ku alapuolella olevat putoo?
+                //riittääkö??
+                //    if (blockAbove && blockAbove.group != group && bm.CheckIfGroupOnAir(blockAbove.group)) {
+                //            bm.HoldBlocks(blockAbove);
+                //    }
+                }
             }
 
+        foreach (List<BlockScript> g in toBeRemoved) {
+            AllGroups.Remove(g);
         }
 
-
-
-        //if (blockGrid[0, 0] != null) {
-        //    testBlock = blockGrid[0, 0].GetComponent<Block>();
-        //    testBlock.Pop();
-        //}
+        //millon tsekataan mikä puhkeaA?
 
         //taulukko ja blokin transform vastaa toisiaan kun taulukon ruutu on 1 unity-yksikkö * 1 unity-yksikkö
     }
-
-    //void Fall() {
-    //    CheckBelow();
-    //    CheckLeft();
-    //    CheckRight();
-
-    //    if (blockBelow && !blockBelow.toBeDestroyed && (blockBelow.bs == BlockState.Static || 
-    //        (blockBelow.group != group && blockBelow.bs == BlockState.Hold))) {
-    //        if (blockBelow.bc == bc && group != blockBelow.group) {
-    //            print("MERGE " + this + " WITH " + blockBelow);
-    //            bm.MergeGroups(this, blockBelow);
-    //            //Vector3 placeToSnap = blockBelow.transform.position + new Vector3(0, 1, 0);
-    //            //transform.position = placeToSnap;
-    //            print(transform.position + " " + blockBelow.transform.position);
-    //            //holdTimer = blockBelow.holdTimer;
-    //            foreach (BlockScript block in group) {
-    //                //print(block + " going to snap in place");
-    //                block.SnapInPlace(blockBelow.bs);
-    //            }
-    //        }
-    //        //print(this + " is on top of " + blockBelow);
-    //        //tell the group to be static
-    //        foreach (BlockScript block in group) {
-    //            //print(block + " going to snap in place");
-    //            block.SnapInPlace(blockBelow.bs);
-    //        }
-    //    }
-
-
-    //    if (blockLeft && (blockLeft.bs == BlockState.Static || blockLeft.bs == BlockState.Hold) 
-    //        && blockLeft.bc == bc && blockLeft.group != group) {
-    //        print(this + " MERGING LEFT " + blockLeft);
-    //        Merge(blockLeft);
-    //        if (blockRight && (blockRight.bs == BlockState.Static || blockRight.bs == BlockState.Hold) 
-    //            && blockRight.bc == bc && blockRight.group != group) {
-    //            Merge(blockRight);
-    //            print("mergasi vasemmalle oli myös oikealla joten mergattiin myös sinne");
-    //        }
-    //        /// if there are more than 3 blocks of the same color, Pop();
-    //    }
-    //    else if (blockRight && (blockRight.bs == BlockState.Static || blockRight.bs == BlockState.Hold) 
-    //        && blockRight.bc == bc && blockRight.group != group) {
-    //        print(this + " MERGING RIGHT " + blockRight);
-    //        Merge(blockRight);
-    //        /// if there are more than 3 blocks of the same color, Pop();
-    //    }
-    //    else {
-    //        bm.DropBlocks(group);
-    //        //print("A");
-    //        bm.SetBlockInGrid(this); // ?
-
-    //    }
-
-    //}
 
     public void PopBlocks(BlockScript popped) {
         print(popped);
         foreach (BlockScript block in popped.group) {
                 block.Pop();
         }
+        AllGroups.Remove(popped.group);
     }
 
     public void HoldBlocks(BlockScript toFall) {
@@ -348,35 +388,13 @@ public class BlockManager : MonoBehaviour {
             block.bs = BlockState.Hold;
         }
 
-        //if (bs == BlockState.Hold) {
-        //    //print("holding " + this);
-        //    holdTimer -= Time.deltaTime;
-        //    if (blockAbove && blockAbove.group != group && bm.CheckIfGroupOnAir(blockAbove.group)) {
-        //            bm.HoldBlocks(blockAbove);
-        //    }
-        //    Vector3 placeToSnap = new Vector3(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y), Mathf.Round(transform.position.z));
-        //    if (transform.position != placeToSnap) {
-        //        transform.position = placeToSnap;
-        //        //print("snapped " + this + " when holding");
-        //    }
-        //}
-        //if (bs == BlockState.Hold && holdTimer <= 0) {
-        //    bs = BlockState.Falling;
-        //    holdTimer = 2f;
-        //}
+        
     }
 
-    //public void StopBlocks(List<BlockScript> group) {
-    //    foreach (BlockScript block in group) {
-    //        block.bs = BlockState.Static;
-    //        print("estää " + block + ":n putoamisen");
-    //    }
-    //}
-
-    public void MergeGroups(BlockScript first, BlockScript second) {
-        foreach (BlockScript block in first.group) {
-            block.SetGroup(second.group);
-            second.group.Add(block);
+    public void MergeGroups(List<BlockScript> first, List<BlockScript> second) { //merge first to second
+        foreach (BlockScript block in first) {
+            block.SetGroup(second);
+            second.Add(block);
         }
     }
 
@@ -384,11 +402,13 @@ public class BlockManager : MonoBehaviour {
         //kattoo onko alla tyhjää
         int tempInt = 0;
         foreach (BlockScript block in group) {
-            if (block.CheckBelow() && block.blockBelow.group != block.group && block.blockBelow.bs == BlockState.Static) {
-                tempInt++;
+            //if (!block.CheckBelow()) { //toimiiko / miten pitää tehä jos checkbelow palauttaa blokin??
+            if ((block.CheckAnyBelow() && block.blockBelow.group != block.group && block.blockBelow.bs == BlockState.Static)
+                || block.levelEnd || (block.blockBelow && block.blockBelow.levelEnd)) {
+                tempInt++; //lisätään yksi, jos alla on blokki joka on eri ryhmässä ja static tai jos alla on tai blokki itse on levelEnd
             }
         }
-        return !(tempInt > 0);
+        return !(tempInt > 0); //jos enemmän kuin yksi palautetaan false
     }
 
     
