@@ -212,6 +212,22 @@ public class BlockManager : MonoBehaviour {
         }
     }
 
+    public void DropBlocks(List<BlockScript> group) {
+        //int anyStatic = 0;
+        ////print(group.Count);
+        //foreach (BlockScript block in group) {
+        //    if (block.bs == BlockState.Static) {
+        //        anyStatic++;
+        //    }
+        //}
+        //if (anyStatic == 0) {
+            //print("pitäis tippuu");
+       foreach (BlockScript block in group) {
+                block.transform.Translate(0, (-block.velocity * Time.deltaTime), 0);
+                //print("blokki " + block + " liikkuu nopeudella " + (-block.velocity) / group.Count + " kun frame on " + Time.frameCount);
+            }
+        }
+
     void Update() {
 
         foreach (List<BlockScript> g in AllGroups) {
@@ -226,6 +242,7 @@ public class BlockManager : MonoBehaviour {
             if (falling == g.Count) {
                 List<List<BlockScript>> snaps = new List<List<BlockScript>>();
                 foreach (BlockScript block in g) {
+                    //tää ei vielä kato onko samaa väriä, onko eri ryhmässä
                     if (block.CheckBelow()) {
                         snaps.Add(block.blockBelow.group);
                     }
@@ -238,28 +255,20 @@ public class BlockManager : MonoBehaviour {
                         snaps.Add(block.blockRight.group);
                     }
                 }
-                ///     foreach block in g  || block.CheckLeft() || block.CheckRight()
-                ///         if(block snaps)
-                ///         snaps.Add(other group (the group g is supposed to snap to)
+                if (snaps.Count > 0) {
+                    snaps.Add(g);
+                    //merge kaikki snapslistassa
+                }
+                else {
+                    //fall
+                }
+
             }
 
             //tsekkaa ei-putoavista pitäiskö pudota
             if (falling < g.Count ) {
 
             }
-            ///foreach (List<BlockScript> g that is falling in groups) {
-            ///     snaps = null list
-            ///     foreach block in g
-            ///         if(block snaps)
-            ///         snaps.Add(other group (the group g is supposed to snap to)
-            ///     ja sitten if snaps > 0
-            ///         snaps.Add(g)
-            ///         merge kaikki snaps-listassa
-            ///     else
-            ///         fall??
-
-
-
 
         }
 
@@ -270,8 +279,6 @@ public class BlockManager : MonoBehaviour {
         //    testBlock.Pop();
         //}
 
-        //tsekataan mitkä blokit on yhdessä
-        //(mitkä on staattisia ja mitkä liikkuvia?)
         //taulukko ja blokin transform vastaa toisiaan kun taulukon ruutu on 1 unity-yksikkö * 1 unity-yksikkö
     }
 
@@ -384,41 +391,16 @@ public class BlockManager : MonoBehaviour {
         return !(tempInt > 0);
     }
 
-    public void DropBlocks(List<BlockScript> group) {
-        int anyStatic = 0;
-        //print(group.Count);
-
-        foreach (BlockScript block in group) {
-
-            if (block.bs == BlockState.Static) {
-                anyStatic++;
-            }
-        }
-
-        if (anyStatic == 0) {
-            //print("pitäis tippuu");
-            foreach (BlockScript block in group) {
-                block.transform.Translate(0, (-block.velocity * Time.deltaTime) / group.Count, 0);
-                //print("blokki " + block + " liikkuu nopeudella " + (-block.velocity) / group.Count + " kun frame on " + Time.frameCount);
-            }
-        }
-        
-        else {
-            foreach (BlockScript block in group) {
-                block.SnapInPlace(BlockState.Static);
-
-                //entä sillon ku muut palikat oliski hold??
-                //jos yhdessäkin saman ryhmän palikassa on static sillon pitää olla static?
-            }
-        }
-    }
+    
 
     //public void DestroyThreeColumnsOnTop() {
-    //    for (int i = rows - Mathf.Abs(Mathf.RoundToInt(player.transform.position.y)); i > 0; i--) {
+    //    for (int i = rows-Mathf.Abs(Mathf.RoundToInt(player.transform.position.y)); i > 0; i--) {
     //        // Destroy blocks without adding to score
-    //        Destroy block from vector2(Mathf.RoundToInt(player.transform.position.x), i);
-    //        Destroy block from vector2(Mathf.RoundToInt(player.transform.position.x - 1), i);
-    //        Destroy block from vector2(Mathf.RoundToInt(player.transform.position.x + 1), i);
-    //    }
+    //        Mathf.RoundToInt(player.transform.position.x);
+    //        Mathf.RoundToInt(player.transform.position.x - 1);
+    //        Mathf.RoundToInt(player.transform.position.x + 1);
+    //    }   
     //}
+    
+
 }
