@@ -25,7 +25,7 @@ public class BlockManager : MonoBehaviour {
 
     public void AtLevelStart() {
         //luodaan taulukko ja generoidaan blokit sinne
-        //GenerateBlocks();
+        GenerateBlocks();
         blockGrid = new BlockScript[columns, rows];
         FindGroups();
         foreach (BlockScript block in blockArray) {
