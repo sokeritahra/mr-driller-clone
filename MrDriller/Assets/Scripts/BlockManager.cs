@@ -24,7 +24,7 @@ public class BlockManager : MonoBehaviour {
 
     public void AtLevelStart() {
         //luodaan taulukko ja generoidaan blokit sinne
-        GenerateBlocks();
+        //GenerateBlocks();
         blockGrid = new BlockScript[columns, rows];
         FindGroups();
         foreach (BlockScript block in blockArray) {
@@ -33,26 +33,30 @@ public class BlockManager : MonoBehaviour {
     }
 
     void GenerateBlocks() {
-        float firstX = firstBlock.x; 
-        float firstY = firstBlock.y; 
-       
+        float firstX = firstBlock.x;
+        float firstY = firstBlock.y;
+
         for (int i = 0; i < columns; i++) {
             for (int j = 0; j < rows; j++) {
                 GameObject go = Instantiate(blockPrefab);
+                go.name = ((i * rows) + j).ToString();
                 Vector2 newPosition = new Vector2(firstX + i, firstY - j);
                 blockScript = go.GetComponent<BlockScript>();
                 go.transform.parent = blockFolder;
                 var blockColorRandomizer = Random.value;
                 if (blockColorRandomizer > .75f) {
                     blockScript.bc = BlockColor.Blue;
-                } else if (blockColorRandomizer > .50f) {
+                }
+                else if (blockColorRandomizer > .50f) {
                     blockScript.bc = BlockColor.Green;
-                } else if(blockColorRandomizer > .25f) {
+                }
+                else if (blockColorRandomizer > .25f) {
                     blockScript.bc = BlockColor.Red;
-                } else {
+                }
+                else {
                     blockScript.bc = BlockColor.Yellow;
                 }
-                go.transform.position = newPosition; 
+                go.transform.position = newPosition;
             }
         }
     }
@@ -207,6 +211,51 @@ public class BlockManager : MonoBehaviour {
     }
 
     void Update() {
+
+        foreach (List<BlockScript> g in AllGroups) {
+            //tsekkaa putoavista snäppääkö
+            int falling = 0;
+            foreach (BlockScript block in g) {
+                if (block.bs == BlockState.Falling) {
+                    falling++;
+                }
+            }
+
+            if (falling == g.Count) {
+                List<List<BlockScript>> snaps = new List<List<BlockScript>>();
+                foreach (BlockScript block in g) {
+                    if (block.CheckBelow()) {
+                        snaps.Add(block.blockBelow.group);
+                    }
+                    //toimisko tämä: snaps.Add(block.CheckBelow().blockBelow.group)
+                }
+                ///     foreach block in g  || block.CheckLeft() || block.CheckRight()
+                ///         if(block snaps)
+                ///         snaps.Add(other group (the group g is supposed to snap to)
+            }
+
+            //tsekkaa ei-putoavista pitäiskö pudota
+            if (falling < g.Count ) {
+
+            }
+            ///foreach (List<BlockScript> g that is falling in groups) {
+            ///     snaps = null list
+            ///     foreach block in g
+            ///         if(block snaps)
+            ///         snaps.Add(other group (the group g is supposed to snap to)
+            ///     ja sitten if snaps > 0
+            ///         snaps.Add(g)
+            ///         merge kaikki snaps-listassa
+            ///     else
+            ///         fall??
+
+
+
+
+        }
+
+
+
         //if (blockGrid[0, 0] != null) {
         //    testBlock = blockGrid[0, 0].GetComponent<Block>();
         //    testBlock.Pop();
@@ -216,6 +265,60 @@ public class BlockManager : MonoBehaviour {
         //(mitkä on staattisia ja mitkä liikkuvia?)
         //taulukko ja blokin transform vastaa toisiaan kun taulukon ruutu on 1 unity-yksikkö * 1 unity-yksikkö
     }
+
+    //void Fall() {
+    //    CheckBelow();
+    //    CheckLeft();
+    //    CheckRight();
+
+    //    if (blockBelow && !blockBelow.toBeDestroyed && (blockBelow.bs == BlockState.Static || 
+    //        (blockBelow.group != group && blockBelow.bs == BlockState.Hold))) {
+    //        if (blockBelow.bc == bc && group != blockBelow.group) {
+    //            print("MERGE " + this + " WITH " + blockBelow);
+    //            bm.MergeGroups(this, blockBelow);
+    //            //Vector3 placeToSnap = blockBelow.transform.position + new Vector3(0, 1, 0);
+    //            //transform.position = placeToSnap;
+    //            print(transform.position + " " + blockBelow.transform.position);
+    //            //holdTimer = blockBelow.holdTimer;
+    //            foreach (BlockScript block in group) {
+    //                //print(block + " going to snap in place");
+    //                block.SnapInPlace(blockBelow.bs);
+    //            }
+    //        }
+    //        //print(this + " is on top of " + blockBelow);
+    //        //tell the group to be static
+    //        foreach (BlockScript block in group) {
+    //            //print(block + " going to snap in place");
+    //            block.SnapInPlace(blockBelow.bs);
+    //        }
+    //    }
+
+
+    //    if (blockLeft && (blockLeft.bs == BlockState.Static || blockLeft.bs == BlockState.Hold) 
+    //        && blockLeft.bc == bc && blockLeft.group != group) {
+    //        print(this + " MERGING LEFT " + blockLeft);
+    //        Merge(blockLeft);
+    //        if (blockRight && (blockRight.bs == BlockState.Static || blockRight.bs == BlockState.Hold) 
+    //            && blockRight.bc == bc && blockRight.group != group) {
+    //            Merge(blockRight);
+    //            print("mergasi vasemmalle oli myös oikealla joten mergattiin myös sinne");
+    //        }
+    //        /// if there are more than 3 blocks of the same color, Pop();
+    //    }
+    //    else if (blockRight && (blockRight.bs == BlockState.Static || blockRight.bs == BlockState.Hold) 
+    //        && blockRight.bc == bc && blockRight.group != group) {
+    //        print(this + " MERGING RIGHT " + blockRight);
+    //        Merge(blockRight);
+    //        /// if there are more than 3 blocks of the same color, Pop();
+    //    }
+    //    else {
+    //        bm.DropBlocks(group);
+    //        //print("A");
+    //        bm.SetBlockInGrid(this); // ?
+
+    //    }
+
+    //}
 
     public void PopBlocks(BlockScript popped) {
         print(popped);
@@ -227,8 +330,24 @@ public class BlockManager : MonoBehaviour {
     public void HoldBlocks(BlockScript toFall) {
         foreach (BlockScript block in toFall.group) {
             block.bs = BlockState.Hold;
-
         }
+
+        //if (bs == BlockState.Hold) {
+        //    //print("holding " + this);
+        //    holdTimer -= Time.deltaTime;
+        //    if (blockAbove && blockAbove.group != group && bm.CheckIfGroupOnAir(blockAbove.group)) {
+        //            bm.HoldBlocks(blockAbove);
+        //    }
+        //    Vector3 placeToSnap = new Vector3(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y), Mathf.Round(transform.position.z));
+        //    if (transform.position != placeToSnap) {
+        //        transform.position = placeToSnap;
+        //        //print("snapped " + this + " when holding");
+        //    }
+        //}
+        //if (bs == BlockState.Hold && holdTimer <= 0) {
+        //    bs = BlockState.Falling;
+        //    holdTimer = 2f;
+        //}
     }
 
     //public void StopBlocks(List<BlockScript> group) {
@@ -257,23 +376,32 @@ public class BlockManager : MonoBehaviour {
     }
 
     public void DropBlocks(List<BlockScript> group) {
-        int persikka = 0;
+        int anyStatic = 0;
+        //print(group.Count);
+
         foreach (BlockScript block in group) {
-            if (block.bs == BlockState.Falling) {
-                persikka++;
+
+            if (block.bs == BlockState.Static) {
+                anyStatic++;
             }
         }
-        if (persikka == group.Count) {
+
+        if (anyStatic == 0) {
+            //print("pitäis tippuu");
             foreach (BlockScript block in group) {
                 block.transform.Translate(0, (-block.velocity * Time.deltaTime) / group.Count, 0);
                 //print("blokki " + block + " liikkuu nopeudella " + (-block.velocity) / group.Count + " kun frame on " + Time.frameCount);
             }
         }
-        //else {
-        //    foreach (BlockScript block in group) {
-        //        block.SnapInPlace()
-        //    }
-        //}
+        
+        else {
+            foreach (BlockScript block in group) {
+                block.SnapInPlace(BlockState.Static);
+
+                //entä sillon ku muut palikat oliski hold??
+                //jos yhdessäkin saman ryhmän palikassa on static sillon pitää olla static?
+            }
+        }
     }
 
     

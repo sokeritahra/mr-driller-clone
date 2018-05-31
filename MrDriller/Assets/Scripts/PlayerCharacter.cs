@@ -330,7 +330,7 @@ public class PlayerCharacter : MonoBehaviour {
             return;
         }
 
-        print("Poraus koordinaatit: " + Mathf.RoundToInt(x) + ", " + Mathf.RoundToInt(y) );
+        //print("Poraus koordinaatit: " + Mathf.RoundToInt(x) + ", " + Mathf.RoundToInt(y) );
         bs = bm.blockGrid[Mathf.RoundToInt(x), Mathf.RoundToInt(y)];
             
         print(bs);
@@ -339,7 +339,6 @@ public class PlayerCharacter : MonoBehaviour {
             DrillBlock(bs);
         }
 
-        print("porattiin " + bs + " paikassa " + transform.position);
     }
     // Check if grounded
     bool IsGrounded() {
