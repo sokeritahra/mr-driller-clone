@@ -269,7 +269,7 @@ public class BlockScript : MonoBehaviour {
 
     public BlockScript SetBelow() {
         //luodaan overlap joka kattoo onko alapuolella blokki
-        Vector2 centerPoint = new Vector2(transform.position.x, transform.position.y - 0.6f);
+        Vector2 centerPoint = new Vector2(transform.position.x, transform.position.y - 0.54f);
         stuffBelow = Physics2D.OverlapPointAll(centerPoint);
 
         foreach (Collider2D col in stuffBelow) {
