@@ -22,6 +22,7 @@ public class BlockManager : MonoBehaviour {
     float posx = 0;
     float posy = 0;
     public Color[] colorList;
+    public int lvlEndBlocks;
 
     public void AtLevelStart() {
         //luodaan taulukko ja generoidaan blokit sinne
@@ -34,12 +35,15 @@ public class BlockManager : MonoBehaviour {
         player = FindObjectOfType<PlayerCharacter>();
     }
 
+    //if the block above is durable -> chance of generating a candy block?
+    //should the durable & candy blocks be generated?
+    //if there is a durable block here, delete the generated block from here
     void GenerateBlocks() {
         float firstX = firstBlock.x;
         float firstY = firstBlock.y;
 
         for (int i = 0; i < columns; i++) {
-            for (int j = 0; j < rows-1; j++) {
+            for (int j = 0; j < rows-lvlEndBlocks; j++) {
                 GameObject go = Instantiate(blockPrefab);
                 go.name = ((i * rows) + j).ToString();
                 Vector2 newPosition = new Vector2(firstX + i, firstY - j);
@@ -77,11 +81,6 @@ public class BlockManager : MonoBehaviour {
         foreach (BlockScript block in blockArray) {
             SetBlockInGrid(block);
         }
-
-        //rows = -(int)posy;
-        //columns = (int)posx;
-        // ei tää toimi näin kun tän pitäis toimia niin että otetaan yhen palikan transform ja 
-        // se sit kertoo monesko palikka ja missä kohtaa ruudukkoa blockGrid[x, y] = block;
 
         AllGroups = new List<List<BlockScript>>();
         for (int y = 0; y < rows; y++) {
@@ -166,7 +165,7 @@ public class BlockManager : MonoBehaviour {
                 juttu += bs.gridPos;
                 juttu += " ";
             }
-            print(AllGroups.IndexOf(group) + " : " + juttu);
+           // print(AllGroups.IndexOf(group) + " : " + juttu);
         }
 
         //print(" täsä kaikki: " + AllGroups);
@@ -218,6 +217,7 @@ public class BlockManager : MonoBehaviour {
 
     void Update() {
         List<List<BlockScript>> toBeRemoved = new List<List<BlockScript>>();
+        List<List<BlockScript>> toBePopped = new List<List<BlockScript>>();
 
         foreach (List<BlockScript> g in AllGroups) {
             //tsekkaa putoavista snäppääkö
@@ -232,15 +232,16 @@ public class BlockManager : MonoBehaviour {
                 }
             }
 
-            //voiko tässä haitata se missä järjestyksessä foreach käy ryhmät läpi?
-            //TODO: JOSKUS TÄÄ KELLUMAAN??? LUULEE ETTÄ ALLA ON JOTAIN VAIKKEI OLE
-
             if (falling == g.Count) {
+
+                //TODO: poksahtaako heti kun alkaa pudota vai vasta pysähdyttyään?
+                if (g.Count > 3 && !toBePopped.Contains(g)) {
+                    toBePopped.Add(g);
+                }
                 List<List<BlockScript>> merges = new List<List<BlockScript>>();
                 int snaps = 0;
                 foreach (BlockScript block in g) {
-                    //katsotaan onko samaa väriä ja eri ryhmässä eli pitääkö mergee
-                    //mutta pitäis kattoo myös pitääkö vain snäpätä
+
                     if (block.CheckSameBelow()) {
                         merges.Add(block.blockBelow.group);
                     }
@@ -266,10 +267,15 @@ public class BlockManager : MonoBehaviour {
                         MergeGroups(mg, g);
                         toBeRemoved.Add(mg);
                         print("merging " + mg + " with " + g);
+                        //SHOULD POP IF GROUP.COUNT > 3
+                        if (g.Count > 3 && !toBePopped.Contains(g)) {
+                            toBePopped.Add(g);
+                        }
+
                     }
                     //HUOM HUOM! TÄMÄ SEURAAVA PÄTEE SIIS VAIN MERGEÄVILLE RYHMILLE
                     //SEN PITÄISI TOIMIA MYÖS ERIVÄRISILLE RYHMILLE!
-                    //TODOOOOOOOOOOOOOOOOOO!!!
+                    //TODO!!!
                     float holdTime = 2f;
                     foreach (BlockScript block in g) {
                         holdTime = holdTime < block.holdTimer ? holdTime : block.holdTimer;
@@ -277,7 +283,7 @@ public class BlockManager : MonoBehaviour {
                     foreach (BlockScript block in g) {
                         block.holdTimer = holdTime;
                         block.SnapInPlace(BlockState.Hold);
-                        print("snapping and changing to hold " + block + " and holdtime is " + block.holdTimer);
+                        //print("snapping and changing to hold " + block + " and holdtime is " + block.holdTimer);
                     }
                     //TODO: snäppäys - voinko tehä snäppifunktion joka toimii sekä sivuille että alas?
                     //voiko toimia että sen laittaa staticiksi - muuttuuko holdiksi at all tai tarpeeks nopee?
@@ -297,13 +303,7 @@ public class BlockManager : MonoBehaviour {
                 }
                 else {
                     DropBlocks(g);
-                    foreach (BlockScript block in g) {
-                        SetBlockInGrid(block);
-                        block.SetBelow();
-                        block.SetLeft();
-                        block.SetRight();
-                        //PITÄISKÖ NÄITÄ PÄIVITELLÄ MUULLOINKIN?
-                    }
+
                 }
             }
 
@@ -318,28 +318,7 @@ public class BlockManager : MonoBehaviour {
                 foreach (BlockScript block in g) {
                     block.holdTimer -= Time.deltaTime;
                 }
-                // tällä tavalla olin blockscriptin snapissa tätä asiaa käsitellyt;
-                //if (blockBelow) {
-                //    var tempTime = blockBelow.holdTimer;
-                //    foreach (BlockScript block in group) {
-                //        if (block.blockBelow) {
-                //            tempTime = tempTime < block.blockBelow.holdTimer ? tempTime : block.blockBelow.holdTimer;
-                //        }
-                //    }
-                //    foreach (BlockScript block in group) {
-                //        block.holdTimer = tempTime;
-                //    }
-                //    placeToSnap = blockBelow.transform.position + new Vector3(0, 1, 0);
-                //    blockBelow.SetBlockAbove(this);
-                //}
-
-                //else {
-                //    print("no block below " + this);
-                //    holdTimer = 2f;
-                //}
-                /// ehkä täällä vois olla holdtimer? mut sit se pitäis olla joka ryhmälle erikseen :G pitäisköhän sittenki jättää se joka 
-                /// blokkiin ja sitte vaa käsitellä sitä könttänä aina foreach loopeilla
-                //    
+ 
 
             }
             //tsekkaa ei-putoavista pitäiskö pudota
@@ -350,20 +329,17 @@ public class BlockManager : MonoBehaviour {
                     block.SetRight();
                 }
                 if (CheckIfGroupOnAir(g)) {
-                    print("Group's states changed to hold");
+                    //print("Group's states changed to hold");
                     foreach (BlockScript block in g) {
                         block.bs = BlockState.Hold;
                         block.holdTimer = 2f;
-                        print("group contains " + block);
+                        //print("group contains " + block);
                     }
                 }
-                //kyllähän pitää pudota myös sillon ku alapuolella olevat putoo?
-                //riittääkö??
-                //    if (blockAbove && blockAbove.group != group && bm.CheckIfGroupOnAir(blockAbove.group)) {
-                //            bm.HoldBlocks(blockAbove);
-                //    }
+
                 }
 
+            //UNCOMMENT if falling / merging not working
             foreach (BlockScript block in g) {
                 block.SetBelow();
                 block.SetLeft();
@@ -375,17 +351,22 @@ public class BlockManager : MonoBehaviour {
             AllGroups.Remove(g);
         }
 
+        foreach (List<BlockScript> g in toBePopped) {
+            PopBlocks(g, 5);
+        }
+
         //millon tsekataan mikä puhkeaA?
 
         //taulukko ja blokin transform vastaa toisiaan kun taulukon ruutu on 1 unity-yksikkö * 1 unity-yksikkö
     }
 
-    public void PopBlocks(BlockScript popped) {
-        print(popped);
-        foreach (BlockScript block in popped.group) {
-                block.Pop();
+    //TODO!!! KUN TARPEEKSI MONTA MERGEE YHTEEN!!
+    public void PopBlocks(List<BlockScript> gToPop, int hits) {
+        //print(popped);
+        foreach (BlockScript block in gToPop) {
+                block.Pop(hits);
         }
-        AllGroups.Remove(popped.group);
+        AllGroups.Remove(gToPop);
     }
 
     public void HoldBlocks(BlockScript toFall) {

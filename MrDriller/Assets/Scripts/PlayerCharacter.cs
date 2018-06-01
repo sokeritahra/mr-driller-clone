@@ -358,7 +358,6 @@ public class PlayerCharacter : MonoBehaviour {
         //print("Poraus koordinaatit: " + Mathf.RoundToInt(x) + ", " + Mathf.RoundToInt(y) );
         bs = bm.blockGrid[Mathf.RoundToInt(x), Mathf.RoundToInt(y)];
             
-        print(bs);
             
         if (bs) {
             DrillBlock(bs);
@@ -372,7 +371,7 @@ public class PlayerCharacter : MonoBehaviour {
     // Pop the block (from BlockManager)
     void DrillBlock(BlockScript block) {
         if(block.bs == BlockState.Static || block.bs == BlockState.Hold) {
-            bm.PopBlocks(block);
+            bm.PopBlocks(block.group, 1);
         }
     }
     // Death on arrival

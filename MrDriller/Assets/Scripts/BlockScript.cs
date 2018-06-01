@@ -9,7 +9,7 @@ public enum BlockColor {
     Green,
     Yellow,
     Grey,
-    Sugar,
+    Candy,
     LevelEnd
 }
 //väri: 5 eri väriä + sokeri
@@ -45,12 +45,16 @@ public class BlockScript : MonoBehaviour {
     public bool toBeDestroyed;
     public PlayerCharacter player;
     public bool levelEnd;
+    int hitsLeft = 1;
 
     private void Awake() {
         bm = FindObjectOfType<BlockManager>().GetComponent<BlockManager>();
         gm = FindObjectOfType<GameManager>().GetComponent<GameManager>();
         bsc = gameObject.GetComponentInChildren<BlockSpriteChanger>();
         player = FindObjectOfType<PlayerCharacter>();
+        if (bc == BlockColor.Grey) {
+            hitsLeft = 5;
+        }
     }
 
     public void AtLevelStart() {
@@ -232,8 +236,8 @@ public class BlockScript : MonoBehaviour {
 
     public bool CheckLeft() {
         SetLeft();
-        print("onko palikkaa vasemmalla " + blockLeft);
-        print("onko palikka vasemmalla static tai holding " + (blockLeft && (blockLeft.bs == BlockState.Static || blockLeft.bs == BlockState.Hold)));
+        //print("onko palikkaa vasemmalla " + blockLeft);
+        //print("onko palikka vasemmalla static tai holding " + (blockLeft && (blockLeft.bs == BlockState.Static || blockLeft.bs == BlockState.Hold)));
         return (blockLeft && (blockLeft.bs == BlockState.Static || blockLeft.bs == BlockState.Hold)
             && blockLeft.bc == bc && blockLeft.group != group);
     }
@@ -340,13 +344,16 @@ public class BlockScript : MonoBehaviour {
         //print("blokki nro " + gridPos + " on ryhmässä nro " + groupNumber);
     }
 
-    public void Pop() {
+    public void Pop(int hits) {
         //kerro block managerille että poksahti
         //animaatio tms?
-        
-        Destroy(gameObject);
-        gm.AddScore();
-        toBeDestroyed = true;
+        hitsLeft = hitsLeft - hits;
+        if (hitsLeft < 1) {
+            Destroy(gameObject);
+            gm.AddScore();
+            toBeDestroyed = true;
+        }
+        //TODO : SUGAR DEPLETION??
 
         //if (blockAbove && bm.CheckIfGroupOnAir(blockAbove.group)) {
         //    bm.HoldBlocks(blockAbove); 
