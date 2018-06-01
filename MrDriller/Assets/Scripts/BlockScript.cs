@@ -214,10 +214,16 @@ public class BlockScript : MonoBehaviour {
         //Vector2 centerPoint = new Vector2(transform.position.x + 0.5f, transform.position.y + 0.45f);
         //stuffRight = Physics2D.OverlapBoxAll(centerPoint, new Vector2(0.5f, 0.2f), 0);
         stuffRight = Physics2D.OverlapPointAll(new Vector2((transform.position.x + 0.75f), (transform.position.y + 0.45f)));
+        bool found = false;
         foreach (Collider2D col in stuffRight) {
             if (col != gameObject.GetComponent<Collider2D>() && col != player.GetComponent<Collider2D>()) {
                 blockRight = col.gameObject.GetComponent<BlockScript>();
+                found = true;
             }
+        }
+
+        if (!found) {
+            blockRight = null;
         }
         //if(blockRight)
         //    blockRight.blockLeft = this;
@@ -236,10 +242,16 @@ public class BlockScript : MonoBehaviour {
         //Vector2 centerPoint = new Vector2(transform.position.x - 0.5f, transform.position.y + 0.45f);
         //stuffLeft = Physics2D.OverlapBoxAll(centerPoint, new Vector2(0.5f, 0.2f), 0);
         stuffLeft = Physics2D.OverlapPointAll(new Vector2((transform.position.x - 0.75f), (transform.position.y + 0.45f)));
+        bool found = false;
         foreach (Collider2D col in stuffLeft) {
             if (col != gameObject.GetComponent<Collider2D>() && col != player.GetComponent<Collider2D>()) {
                 blockLeft = col.gameObject.GetComponent<BlockScript>();
+                found = true;
             }
+        }
+
+        if (!found) {
+            blockLeft = null;
         }
         //if(blockLeft)
         //    blockLeft.blockRight = this;
@@ -272,14 +284,18 @@ public class BlockScript : MonoBehaviour {
         Vector2 centerPoint = new Vector2(transform.position.x, transform.position.y - 0.54f);
         stuffBelow = Physics2D.OverlapPointAll(centerPoint);
 
+        bool found = false;
         foreach (Collider2D col in stuffBelow) {
-            if (col != gameObject.GetComponent<Collider2D>() && col != player.GetComponent<Collider2D>()) {
+            if (col != gameObject.GetComponent<Collider2D>() && col != player.GetComponent<Collider2D>()) { //TODO: siisti
                 blockBelow = col.gameObject.GetComponent<BlockScript>();
+                found = true;
                 //print("ALLA ON " + blockBelow);
                 //print(this + " is on top of " + blockBelow);
             }
         }
-
+        if(!found) {
+            blockBelow = null;
+        }
         return blockBelow;
     }
 

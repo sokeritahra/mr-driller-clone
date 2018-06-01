@@ -9,12 +9,12 @@ public class PlayerCharacter : MonoBehaviour {
     public PlayerMode pm;
     public PlayerMode previousPm;
     Animator anim;
-    bool alive = true;
+    public bool alive = true;
     float speed = 5; // Player movement speed
     float horizontal; 
     float vertical;
     float climbSpeed = 10f;
-    public float climbTimer = 0.5f; // Time to wait before climbing
+    public float climbTimer = 0.4f; // Time to wait before climbing
     float drillTimer = 0f; // Drill cooldown timer
     float staticTimer = 0f; // Time to recover after near death experience
     float fallTimer;
@@ -115,6 +115,16 @@ public class PlayerCharacter : MonoBehaviour {
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
 
+        //// What to do if block falls on the way if climbing
+        //if (pm == PlayerMode.Climbing && leftHandAntenna || rightHandAntenna) {
+        //    pm = previousPm;
+        //}
+
+        // Force reset static mode
+        if (pm == PlayerMode.Static && staticTimer < 0) {
+            pm = previousPm;
+        }
+
         // What to do if player is not grounded or set staticMode
         if (!IsGrounded() || staticTimer > 0 || pm == PlayerMode.Climbing) {
             if (pm == PlayerMode.Climbing) {
@@ -159,7 +169,12 @@ public class PlayerCharacter : MonoBehaviour {
                 }
                 if (transform.position.y > climbUpTarget.y) {
                     animS = animDefault;
-                    rb.velocity = new Vector2(speed, 0);
+                    if (pm == PlayerMode.Climbing &&rightHandAntenna) {
+                        pm = previousPm;
+                    } else {
+                        rb.velocity = new Vector2(speed, 0);
+                    }
+
                 }
                 if (transform.position.x > climbRightTarget.x) {
                     pm = previousPm;
@@ -170,7 +185,11 @@ public class PlayerCharacter : MonoBehaviour {
                 }
                 if (transform.position.y > climbUpTarget.y) {
                     animS = animDefault;
-                    rb.velocity = new Vector2(-speed, 0);
+                    if (pm == PlayerMode.Climbing && leftHandAntenna) {
+                        pm = previousPm;
+                    } else {
+                        rb.velocity = new Vector2(-speed, 0);
+                    }
                 }
                 if (transform.position.x < climbLeftTarget.x) {
                     pm = previousPm;
@@ -226,7 +245,7 @@ public class PlayerCharacter : MonoBehaviour {
                     }
                 } else {
 
-                    climbTimer = 0.25f;
+                    climbTimer = 0.4f;
                 }
             }
             previousPm = pm;
@@ -252,14 +271,14 @@ public class PlayerCharacter : MonoBehaviour {
             climbUpTarget = (transform.position + Vector3.up * 1.01f);
             climbLeftTarget = (transform.position + Vector3.left * 0.75f);
             pm = PlayerMode.Climbing;
-            climbTimer = 0.25f;
+            climbTimer = 0.4f;
         }
 
         if (rightHandAntenna && !upperRightAntenna && climbTimer < 0 && pm != PlayerMode.Climbing) {
             climbUpTarget = (transform.position + Vector3.up * 1.01f);
             climbRightTarget = (transform.position + Vector3.right * 0.75f);
             pm = PlayerMode.Climbing;
-            climbTimer = 0.25f;
+            climbTimer = 0.4f;
         }
         
         if (staticTimer > 0) { // Animation / Player static timer
@@ -292,7 +311,7 @@ public class PlayerCharacter : MonoBehaviour {
                 } else {
                     animS = "Assed_Right";
                     transform.position = (Vector2)transform.position + (Vector2.right / 2);
-                    staticTimer = 1.5f;
+                    staticTimer = 1.0f;
                 }
             } else {
                 // NDE bellied or assed towards left

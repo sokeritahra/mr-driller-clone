@@ -248,7 +248,6 @@ public class BlockManager : MonoBehaviour {
                         snaps++;
                     }
 
-                    //TODO: EI MERGEE SIVUILLE KUN ON PYSÄHTYNYT BLOKIN PÄÄLLE
                     if (block.CheckLeft()) {
                         merges.Add(block.blockLeft.group);
                         print("merging from the LEFT " + block.blockLeft + " with " + block);
@@ -364,7 +363,13 @@ public class BlockManager : MonoBehaviour {
                 //            bm.HoldBlocks(blockAbove);
                 //    }
                 }
+
+            foreach (BlockScript block in g) {
+                block.SetBelow();
+                block.SetLeft();
+                block.SetRight();
             }
+        }
 
         foreach (List<BlockScript> g in toBeRemoved) {
             AllGroups.Remove(g);
