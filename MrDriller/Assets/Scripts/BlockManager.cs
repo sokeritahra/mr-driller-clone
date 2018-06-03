@@ -55,21 +55,16 @@ public class BlockManager : MonoBehaviour {
                 blockScript = go.GetComponent<BlockScript>();
                 go.transform.parent = blockFolder;
                 var blockColorRandomizer = Random.value;
-                if (blockColorRandomizer > .75f) {
+                if (blockColorRandomizer > .8f) {
                     blockScript.bc = BlockColor.Blue;
-                }
-                else if (blockColorRandomizer > .50f) {
+                } else if (blockColorRandomizer > .6f) {
                     blockScript.bc = BlockColor.Green;
-                }
-                else if (blockColorRandomizer > .25f) {
+                } else if (blockColorRandomizer > .4f) {
                     blockScript.bc = BlockColor.Red;
-                }
-                //else if (blockColorRandomizer > .2f)
-                //{
-                //    blockScript.bc = BlockColor.Candy;
-                //}
-                else {
+                } else if (blockColorRandomizer > .2f) {
                     blockScript.bc = BlockColor.Yellow;
+                } else {
+                    blockScript.bc = BlockColor.Grey;
                 }
                 go.transform.position = newPosition;
             }

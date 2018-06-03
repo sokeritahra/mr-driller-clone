@@ -69,6 +69,10 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    public void SugarDepletion() {
+        lifeLeft = lifeLeft - 20;
+    }
+
     public void AddScore() {
         score += 100;
         scoreText.text = ("Score: " + score);

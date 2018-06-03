@@ -45,7 +45,7 @@ public class BlockScript : MonoBehaviour {
     public bool toBeDestroyed;
     public PlayerCharacter player;
     public bool levelEnd;
-    int hitsLeft = 1;
+    public int hitsLeft = 1;
     Collider2D c2d;
 
     private void Awake() {
@@ -57,11 +57,14 @@ public class BlockScript : MonoBehaviour {
             c2d = gameObject.GetComponent<Collider2D>();
             c2d.enabled = false;
         }
+
+    }
+
+    private void Start() {
         if (bc == BlockColor.Grey) {
             hitsLeft = 5;
         }
     }
-
     public void AtLevelStart() {
         //kun on static tarvii vaan kerran kattoo mikä palikka on alla
         //sille täytyy kertoo mikä on sen yllä jotta se voi kutsua sitä
@@ -251,9 +254,14 @@ public class BlockScript : MonoBehaviour {
         //animaatio tms?
         hitsLeft = hitsLeft - hits;
         if (hitsLeft < 1) {
+            if (bc == BlockColor.Grey) {
+                gm.SugarDepletion();
+            }
+
             Destroy(gameObject);
             gm.AddScore();
             toBeDestroyed = true;
+            
         }
 
 
