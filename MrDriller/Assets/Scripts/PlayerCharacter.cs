@@ -48,6 +48,7 @@ public class PlayerCharacter : MonoBehaviour {
     Vector3 climbUpTarget;
     Vector3 climbLeftTarget;
     Vector3 climbRightTarget;
+    //TODO: make special antennas for candy?
 
     void Awake() {
         rb = GetComponent<Rigidbody2D>();
@@ -108,7 +109,9 @@ public class PlayerCharacter : MonoBehaviour {
         groundCheckLeft = Physics2D.Raycast(playerLeft + indent, Vector2.down, groundRayLength, blockLayerMask);
         groundCheckRight = Physics2D.Raycast(playerRight - indent, Vector2.down, groundRayLength, blockLayerMask);
 
-
+        //if ( player on tarpeeksi lähellä candya)
+        //takeCandy();
+        //sugar nousee
 
 
         // Read input from controller/keyboard
@@ -255,15 +258,15 @@ public class PlayerCharacter : MonoBehaviour {
 
         // Slipping
         //**************** If You remove the following part from comments, CHECK GROUNDED BOOL*********************
-        if (!groundCheckCenter && !groundCheckLeft || !groundCheckRight) {
-            if (!groundCheckCenter && !groundCheckLeft && !groundCheckRight) {
+        //if (!groundCheckCenter && !groundCheckLeft || !groundCheckRight) {
+        //    if (!groundCheckCenter && !groundCheckLeft && !groundCheckRight) {
 
-            } else if (!groundCheckLeft) {
-                rb.velocity = new Vector2(-speed, 0);
-            } else {
-                rb.velocity = new Vector2(speed, 0);
-            }
-        }
+        //    } else if (!groundCheckLeft) {
+        //        rb.velocity = new Vector2(-speed, 0);
+        //    } else {
+        //        rb.velocity = new Vector2(speed, 0);
+        //    }
+        //}
         //*********************************************************************************************************
 
         // Climbing
@@ -366,6 +369,7 @@ public class PlayerCharacter : MonoBehaviour {
     }
     // Check if grounded
     bool IsGrounded() {
+        //return ((groundCheckCenter) || (groundCheckLeft) || (groundCheckRight));
         return (groundCheckCenter || groundCheckLeft || groundCheckRight);
     }
     // Pop the block (from BlockManager)
@@ -374,6 +378,9 @@ public class PlayerCharacter : MonoBehaviour {
             bm.PopBlocks(block.group, 1);
         }
     }
+
+    //TODO : SUGAR DEPLETION??
+
     // Death on arrival
     void ColdAndLonelyDeath() { // Name probably says it all
         gm.DeadOnArrival();

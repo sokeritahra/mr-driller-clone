@@ -46,12 +46,17 @@ public class BlockScript : MonoBehaviour {
     public PlayerCharacter player;
     public bool levelEnd;
     int hitsLeft = 1;
+    Collider2D c2d;
 
     private void Awake() {
         bm = FindObjectOfType<BlockManager>().GetComponent<BlockManager>();
         gm = FindObjectOfType<GameManager>().GetComponent<GameManager>();
         bsc = gameObject.GetComponentInChildren<BlockSpriteChanger>();
         player = FindObjectOfType<PlayerCharacter>();
+        if(bc == BlockColor.Candy) {
+            c2d = gameObject.GetComponent<Collider2D>();
+            c2d.enabled = false;
+        }
         if (bc == BlockColor.Grey) {
             hitsLeft = 5;
         }
@@ -82,39 +87,10 @@ public class BlockScript : MonoBehaviour {
         //TODO: make hold work!
         //wobble
 
-        //if (bs == BlockState.Hold) {
-        //    //print("holding " + this);
-        //    //if (blockAbove && blockAbove.group != group && bm.CheckIfGroupOnAir(blockAbove.group)) {
-        //    //        bm.HoldBlocks(blockAbove);
-        //    //}
-
-        ////mitä ihmettä tämä on?
-        //    //Vector3 placeToSnap = new Vector3(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y), Mathf.Round(transform.position.z));
-        //    //if (transform.position != placeToSnap) {
-        //    //    transform.position = placeToSnap;
-        //    //    //print("snapped " + this + " when holding");
-        //    //}
-        //}
-        //print(holdTimer);
-
         if (bs == BlockState.Hold && holdTimer <= 0) {
             bs = BlockState.Falling;
             //holdTimer = 2f;
         }
-
-        //if (bs == BlockState.Falling) {
-        //    //print(this + " STATE is FALLING");
-        //    Fall();
-        //    //if (blockBelow && !blockBelow.toBeDestroyed && blockBelow.bs == BlockState.Static) {
-        //    //    //print(this + " is on top of " + blockBelow);
-        //    //    //tell the group to be static
-        //    //    foreach (BlockScript block in group) {
-        //    //        //print(block + " going to snap in place");
-        //    //        block.SnapInPlace();
-        //    //        }
-        //    //}
-
-        //}
 
         if (bs == BlockState.Static) {
             ////print(this + " STATE is STATIC");
@@ -153,60 +129,6 @@ public class BlockScript : MonoBehaviour {
         bsc.SpriteUpdate();
         //bm.MergeGroups(this, blockInDir);
     }
-
-    //void Fall() {
-    //    //CheckBelow();
-    //    CheckLeft();
-    //    CheckRight();
-
-    //    if (blockBelow && !blockBelow.toBeDestroyed && (blockBelow.bs == BlockState.Static || 
-    //        (blockBelow.group != group && blockBelow.bs == BlockState.Hold))) {
-    //        if (blockBelow.bc == bc && group != blockBelow.group) {
-    //            print("MERGE " + this + " WITH " + blockBelow);
-    //            //bm.MergeGroups(this, blockBelow);
-    //            //Vector3 placeToSnap = blockBelow.transform.position + new Vector3(0, 1, 0);
-    //            //transform.position = placeToSnap;
-    //            print(transform.position + " " + blockBelow.transform.position);
-    //            //holdTimer = blockBelow.holdTimer;
-    //            foreach (BlockScript block in group) {
-    //                //print(block + " going to snap in place");
-    //                block.SnapInPlace(blockBelow.bs);
-    //            }
-    //        }
-    //        //print(this + " is on top of " + blockBelow);
-    //        //tell the group to be static
-    //        foreach (BlockScript block in group) {
-    //            //print(block + " going to snap in place");
-    //            block.SnapInPlace(blockBelow.bs);
-    //        }
-    //    }
-
-
-    //    if (blockLeft && (blockLeft.bs == BlockState.Static || blockLeft.bs == BlockState.Hold) 
-    //        && blockLeft.bc == bc && blockLeft.group != group) {
-    //        print(this + " MERGING LEFT " + blockLeft);
-    //        Merge(blockLeft);
-    //        if (blockRight && (blockRight.bs == BlockState.Static || blockRight.bs == BlockState.Hold) 
-    //            && blockRight.bc == bc && blockRight.group != group) {
-    //            Merge(blockRight);
-    //            print("mergasi vasemmalle oli myös oikealla joten mergattiin myös sinne");
-    //        }
-    //        /// if there are more than 3 blocks of the same color, Pop();
-    //    }
-    //    else if (blockRight && (blockRight.bs == BlockState.Static || blockRight.bs == BlockState.Hold) 
-    //        && blockRight.bc == bc && blockRight.group != group) {
-    //        print(this + " MERGING RIGHT " + blockRight);
-    //        Merge(blockRight);
-    //        /// if there are more than 3 blocks of the same color, Pop();
-    //    }
-    //    else {
-    //        bm.DropBlocks(group);
-    //        //print("A");
-    //        bm.SetBlockInGrid(this); // ?
-
-    //    }
-
-    //}
 
     public bool CheckRight() {
         SetRight();
@@ -310,26 +232,6 @@ public class BlockScript : MonoBehaviour {
         Vector3 placeToSnap = new Vector3(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y), transform.position.z);
         //Vector3 placeToSnap = new Vector3(Mathf.Round(transform.position.x), transform.position.y, transform.position.z);
         transform.position = placeToSnap;
-        //print("STOP " + this);
-        //SetBelow(); //tarviiks tätä?
-        //if (blockBelow) {
-        //    var tempTime = blockBelow.holdTimer;
-        //    foreach (BlockScript block in group) {
-        //        if (block.blockBelow) {
-        //            tempTime = tempTime < block.blockBelow.holdTimer ? tempTime : block.blockBelow.holdTimer;
-        //        }
-        //    }
-        //    foreach (BlockScript block in group) {
-        //        block.holdTimer = tempTime;
-        //    }
-        //    placeToSnap = blockBelow.transform.position + new Vector3(0, 1, 0);
-        //    blockBelow.SetBlockAbove(this);
-        //}
-
-        //else {
-        //    print("no block below " + this);
-        //    holdTimer = 2f;
-        //}
 
         bm.SetBlockInGrid(this);
         //TÄSTÄ MERGE OTETTU POIS!!!
@@ -353,12 +255,7 @@ public class BlockScript : MonoBehaviour {
             gm.AddScore();
             toBeDestroyed = true;
         }
-        //TODO : SUGAR DEPLETION??
 
-        //if (blockAbove && bm.CheckIfGroupOnAir(blockAbove.group)) {
-        //    bm.HoldBlocks(blockAbove); 
-        //}
 
-        //print("Pop!");
     }
 }

@@ -44,6 +44,11 @@ public class BlockManager : MonoBehaviour {
 
         for (int i = 0; i < columns; i++) {
             for (int j = 0; j < rows-lvlEndBlocks; j++) {
+                var candyRandomizer = Random.value;
+                if (candyRandomizer > .05)
+                {
+                    //tee cndy ja else tee blokki
+                }
                 GameObject go = Instantiate(blockPrefab);
                 go.name = ((i * rows) + j).ToString();
                 Vector2 newPosition = new Vector2(firstX + i, firstY - j);
@@ -59,6 +64,10 @@ public class BlockManager : MonoBehaviour {
                 else if (blockColorRandomizer > .25f) {
                     blockScript.bc = BlockColor.Red;
                 }
+                //else if (blockColorRandomizer > .2f)
+                //{
+                //    blockScript.bc = BlockColor.Candy;
+                //}
                 else {
                     blockScript.bc = BlockColor.Yellow;
                 }
@@ -96,7 +105,6 @@ public class BlockManager : MonoBehaviour {
                     if (thisSquare.bc == leftSquare.bc && thisSquare.bc == topSquare.bc) {
                         //jos on samanvärinen sekä vasemmalla että ylempänä lisätään ylempään
                         topSquare.group.Add(thisSquare);
-                        //kutsu spritefunktiota
                         thisSquare.SetGroup(topSquare.group);
 
                         if (leftSquare.group != topSquare.group) {
@@ -115,12 +123,7 @@ public class BlockManager : MonoBehaviour {
 
                             //print("this block " + thisSquare.gridPos + " and the one(s) on the left added to the one on top");
                         }
-                        else {
-                            //jos vasemmalla ja ylhäällä olevat blokit on samassa ryhmässä, mitään ei tuhota 
-                            //TODO: vaihda blokin ryhmänumero: thisSquare.SetGroupNumber(
-                            //print("this block " + thisSquare.gridPos + " and the blocks on the top and left added to the same group!");
-
-                        }
+                            //jos vasemmalla ja ylhäällä olevat blokit on samassa ryhmässä, mitään ei tuhota
                     }
 
                     else {
@@ -171,8 +174,6 @@ public class BlockManager : MonoBehaviour {
         //print(" täsä kaikki: " + AllGroups);
     }
 
-    // tee tästä semmonen että poistetaan ryhmä jossa ei oo enää ketää et jos checcaa vasemman ni sit ei tee heti omaa ryhmää
-    //vaan vasta sitte jos ylhäälläkään ei oo :sob: void LeftCheck()
     void CheckOtherSquare(BlockScript otherSquare, BlockScript thisSquare) {
         if (thisSquare.bc == otherSquare.bc) {
             //print("samanväriset " + thisSquare + " ja " + otherSquare);
@@ -234,10 +235,6 @@ public class BlockManager : MonoBehaviour {
 
             if (falling == g.Count) {
 
-                //TODO: poksahtaako heti kun alkaa pudota vai vasta pysähdyttyään?
-                if (g.Count > 3 && !toBePopped.Contains(g)) {
-                    toBePopped.Add(g);
-                }
                 List<List<BlockScript>> merges = new List<List<BlockScript>>();
                 int snaps = 0;
                 foreach (BlockScript block in g) {
@@ -300,6 +297,11 @@ public class BlockManager : MonoBehaviour {
                         //blockstaten ja sen pitäis mennä sillee että jos jokin niistä (blockbelow) on static sen pitäis olla kaikille 
                         //g:ssä static ja jos ne kaikki (blockbelow) on hold, blockille myös hold
                     }
+                    
+                    if (g.Count > 3 && !toBePopped.Contains(g))
+                    {
+                        toBePopped.Add(g);
+                    }
                 }
                 else {
                     DropBlocks(g);
@@ -328,6 +330,7 @@ public class BlockManager : MonoBehaviour {
                     block.SetLeft();
                     block.SetRight();
                 }
+
                 if (CheckIfGroupOnAir(g)) {
                     //print("Group's states changed to hold");
                     foreach (BlockScript block in g) {
@@ -340,11 +343,12 @@ public class BlockManager : MonoBehaviour {
                 }
 
             //UNCOMMENT if falling / merging not working
-            foreach (BlockScript block in g) {
-                block.SetBelow();
-                block.SetLeft();
-                block.SetRight();
-            }
+            //foreach (BlockScript block in g)
+            //{
+            //    block.SetBelow();
+            //    block.SetLeft();
+            //    block.SetRight();
+            //}
         }
 
         foreach (List<BlockScript> g in toBeRemoved) {
@@ -360,7 +364,6 @@ public class BlockManager : MonoBehaviour {
         //taulukko ja blokin transform vastaa toisiaan kun taulukon ruutu on 1 unity-yksikkö * 1 unity-yksikkö
     }
 
-    //TODO!!! KUN TARPEEKSI MONTA MERGEE YHTEEN!!
     public void PopBlocks(List<BlockScript> gToPop, int hits) {
         //print(popped);
         foreach (BlockScript block in gToPop) {
@@ -373,8 +376,6 @@ public class BlockManager : MonoBehaviour {
         foreach (BlockScript block in toFall.group) {
             block.bs = BlockState.Hold;
         }
-
-        
     }
 
     public void MergeGroups(List<BlockScript> first, List<BlockScript> second) { //merge first to second
@@ -397,11 +398,10 @@ public class BlockManager : MonoBehaviour {
         return !(tempInt > 0); //jos enemmän kuin yksi palautetaan false
     }
 
-    
-
     //public void DestroyThreeColumnsOnTop() {
-    //    for (int i = rows-Mathf.Abs(Mathf.RoundToInt(player.transform.position.y)); i > 0; i--) {
+    //    for (int y = rows-Mathf.Abs(Mathf.RoundToInt(player.transform.position.y)); y > 0; y--) {
     //        // Destroy blocks without adding to score
+    //        //lisätään toBePopped-listaan kaikki joihin pätee:
     //        Mathf.RoundToInt(player.transform.position.x);
     //        Mathf.RoundToInt(player.transform.position.x - 1);
     //        Mathf.RoundToInt(player.transform.position.x + 1);
