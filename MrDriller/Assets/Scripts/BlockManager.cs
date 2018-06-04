@@ -16,6 +16,7 @@ public class BlockManager : MonoBehaviour {
     //blokki prefabi
     BlockScript blockScript;
     public Transform blockFolder;
+    public Transform endBlocks;
     //Block testBlock;
     List<List<BlockScript>> AllGroups;
     public BlockScript[] blockArray;
@@ -26,7 +27,7 @@ public class BlockManager : MonoBehaviour {
 
     public void AtLevelStart() {
         //luodaan taulukko ja generoidaan blokit sinne
-        GenerateBlocks();
+        GenerateBlocks(1);
         blockGrid = new BlockScript[columns, rows];
         FindGroups();
         foreach (BlockScript block in blockArray) {
@@ -38,37 +39,89 @@ public class BlockManager : MonoBehaviour {
     //if the block above is durable -> chance of generating a candy block?
     //should the durable & candy blocks be generated?
     //if there is a durable block here, delete the generated block from here
-    void GenerateBlocks() {
-        //float firstX = firstBlock.x;
-        //float firstY = firstBlock.y;
+    public void GenerateBlocks(int level) {
 
-        for (int i = 0; i < rows - lvlEndBlocks; i++) {
-            for (int j = 0; j < columns; j++) {
-                var candyRandomizer = Random.value;
-                if (candyRandomizer > .05)
-                {
-                    //tee cndy ja else tee blokki
+        if (level == 1) {
+
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < columns; j++) {
+                    if (i < rows - lvlEndBlocks) {
+                        var candyRandomizer = Random.value;
+                        if (candyRandomizer > .05) {
+                            //tee cndy ja else tee blokki
+                        }
+                        GameObject go = Instantiate(blockPrefab);
+                        go.name = (i + "_" + j).ToString();
+                        Vector2 newPosition = new Vector2(firstBlock.x + j, firstBlock.y - i);
+                        blockScript = go.GetComponent<BlockScript>();
+                        go.transform.parent = blockFolder;
+                        var blockColorRandomizer = Random.value;
+                        if (blockColorRandomizer > .775f) {
+                            blockScript.bc = BlockColor.Blue;
+                        } else if (blockColorRandomizer > .55f) {
+                            blockScript.bc = BlockColor.Green;
+                        } else if (blockColorRandomizer > .325f) {
+                            blockScript.bc = BlockColor.Red;
+                        } else if (blockColorRandomizer > .1f) {
+                            blockScript.bc = BlockColor.Yellow;
+                        } else {
+                            blockScript.bc = BlockColor.Grey;
+                        }
+                        go.transform.position = newPosition;
+                    } else {
+                        GameObject go = Instantiate(blockPrefab);
+                        go.name = (i + "_" + j).ToString();
+                        Vector2 newPosition = new Vector2(firstBlock.x + j, firstBlock.y - i);
+                        blockScript = go.GetComponent<BlockScript>();
+                        go.transform.parent = endBlocks;
+                        blockScript.bc = BlockColor.LevelEnd;
+                        blockScript.bs = BlockState.Static;
+                        blockScript.levelEnd = true;
+                        go.transform.position = newPosition;
+                    }
                 }
-                GameObject go = Instantiate(blockPrefab);
-                go.name = (i + "_" + j).ToString();
-                Vector2 newPosition = new Vector2(firstBlock.x + j, firstBlock.y - i);
-                blockScript = go.GetComponent<BlockScript>();
-                go.transform.parent = blockFolder;
-                var blockColorRandomizer = Random.value;
-                if (blockColorRandomizer > .8f) {
-                    blockScript.bc = BlockColor.Blue;
-                } else if (blockColorRandomizer > .6f) {
-                    blockScript.bc = BlockColor.Green;
-                } else if (blockColorRandomizer > .4f) {
-                    blockScript.bc = BlockColor.Red;
-                } else if (blockColorRandomizer > .2f) {
-                    blockScript.bc = BlockColor.Yellow;
-                } else {
-                    blockScript.bc = BlockColor.Grey;
-                }
-                go.transform.position = newPosition;
             }
-        }
+        } //**************************Testikäyttöön only!!******************************************
+        if (level == 2) {
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < columns; j++) {
+                    if (i < rows - lvlEndBlocks) {
+                        var candyRandomizer = Random.value;
+                        if (candyRandomizer > .05) {
+                            //tee cndy ja else tee blokki
+                        }
+                        GameObject go = Instantiate(blockPrefab);
+                        go.name = (i + "_" + j).ToString();
+                        Vector2 newPosition = new Vector2(firstBlock.x + j, (firstBlock.y - i)-100);
+                        blockScript = go.GetComponent<BlockScript>();
+                        go.transform.parent = blockFolder;
+                        var blockColorRandomizer = Random.value;
+                        if (blockColorRandomizer > .9f) {
+                            blockScript.bc = BlockColor.Blue;
+                        } else if (blockColorRandomizer > .8f) {
+                            blockScript.bc = BlockColor.Green;
+                        } else if (blockColorRandomizer > .7f) {
+                            blockScript.bc = BlockColor.Red;
+                        } else if (blockColorRandomizer > .6f) {
+                            blockScript.bc = BlockColor.Yellow;
+                        } else {
+                            blockScript.bc = BlockColor.Grey;
+                        }
+                        go.transform.position = newPosition;
+                    } else {
+                        GameObject go = Instantiate(blockPrefab);
+                        go.name = (i + "_" + j).ToString();
+                        Vector2 newPosition = new Vector2(firstBlock.x + j, firstBlock.y - i);
+                        blockScript = go.GetComponent<BlockScript>();
+                        go.transform.parent = endBlocks;
+                        blockScript.bc = BlockColor.LevelEnd;
+                        blockScript.bs = BlockState.Static;
+                        blockScript.levelEnd = true;
+                        go.transform.position = newPosition;
+                    }
+                }
+            }
+        } //**************************Testikäyttöön only!!******************************************
     }
 
     public void SetBlockInGrid (BlockScript block) {

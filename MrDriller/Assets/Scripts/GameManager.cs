@@ -33,11 +33,11 @@ public class GameManager : MonoBehaviour {
         statusText = statusText.GetComponent<TextMeshProUGUI>();
 
         AtGameStart();
-        depthText.text = ("Depth: " + depth + "µm");
-        scoreText.text = ("Score: " + score);
-        sugarText.text = ("Sugar level: " + lifeLeft);
-        levelText.text = ("Level: " + level);
-        livesText.text = ("Lives left: " + livesLeft);
+        depthText.text = (depth + "µm");
+        scoreText.text = ("" + score);
+        sugarText.text = ("" + lifeLeft);
+        levelText.text = ("" + level);
+        livesText.text = ("" + livesLeft);
         //different levels?
 
         Fabric.EventManager.Instance.PostEvent(BGMaudioEvent);
@@ -64,7 +64,7 @@ public class GameManager : MonoBehaviour {
         while (lifeDeductionCounter > lifeDeductionTick) {
             lifeLeft -= 1;
             lifeDeductionCounter -= lifeDeductionTick;
-            sugarText.text = ("Sugar level: " + lifeLeft);
+            sugarText.text = ("" + lifeLeft);
         }
 
         if (lifeLeft <= 0) { // Life amount deducter
@@ -88,25 +88,25 @@ public class GameManager : MonoBehaviour {
 
     public void SugarDepletion() {
         lifeLeft = lifeLeft - 20;
-        statusText.text = "Kohta on mehut vex!";
+        statusText.text = "Sugar -20%";
         statusTextTimer = 5;
     }
 
     public void AddScore() {
         score += 100;
-        scoreText.text = ("Score: " + score);
+        scoreText.text = ("" + score);
     }
 
     public void Depth(int d) {
         depth = d;
-        depthText.text = ("Depth: " + depth + "µm");
+        depthText.text = (depth + "µm");
     }
     
     public void DeadOnArrival() {
         if (livesLeft > 1) {
             livesLeft--;
-            livesText.text = ("Lives left: " + livesLeft);
-            statusText.text = "Yksi henki läx!";
+            livesText.text = ("" + livesLeft);
+            statusText.text = "A Life is lost";
             statusTextTimer = 5;
             lifeLeft = 100;
         } else {

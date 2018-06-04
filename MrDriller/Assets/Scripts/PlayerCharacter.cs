@@ -23,6 +23,7 @@ public class PlayerCharacter : MonoBehaviour {
     BlockScript bs;
     BlockManager bm;
     GameManager gm;
+    bool genBlocks = true;
     string animS = "";
     string animDefault = "Aim_Down";
     float drillDepth = 0.75f;
@@ -85,7 +86,6 @@ public class PlayerCharacter : MonoBehaviour {
     }
 
     void FixedUpdate() {
-
         // Player Left, right and center collider points (in relation to collider)
         playerCenter = c.bounds.center;
         playerLeft = c.bounds.center - (c.bounds.size.x / 2 * Vector3.right);
@@ -112,6 +112,13 @@ public class PlayerCharacter : MonoBehaviour {
         //takeCandy();
         //sugar nousee
 
+        //************************************ TestiKoodia*************************************
+
+        if (transform.position.y < -10 && genBlocks == true) {
+           // bm.GenerateBlocks(2);
+            genBlocks = false;
+        }
+        //************************************TestiKoodia *************************************
 
         // Read input from controller/keyboard
         horizontal = Input.GetAxis("Horizontal");
