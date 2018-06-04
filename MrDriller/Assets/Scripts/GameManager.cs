@@ -92,8 +92,14 @@ public class GameManager : MonoBehaviour {
         statusTextTimer = 5;
     }
 
-    public void AddScore() {
-        score += 100;
+    public void CandyGet() {
+        lifeLeft = lifeLeft + 20;
+        statusText.text = "Candy GET! Sugar +20%";
+        statusTextTimer = 5;
+    }
+
+    public void AddScore(int addS) {
+        score += addS;
         scoreText.text = ("" + score);
     }
 

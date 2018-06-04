@@ -53,10 +53,10 @@ public class BlockScript : MonoBehaviour {
         gm = FindObjectOfType<GameManager>().GetComponent<GameManager>();
         bsc = gameObject.GetComponentInChildren<BlockSpriteChanger>();
         player = FindObjectOfType<PlayerCharacter>();
-        if(bc == BlockColor.Candy) {
-            c2d = gameObject.GetComponent<Collider2D>();
-            c2d.enabled = false;
-        }
+        //if(bc == BlockColor.Candy) {
+        //    c2d = gameObject.GetComponent<Collider2D>();
+        //    c2d.enabled = false;
+        //}
 
     }
 
@@ -249,7 +249,7 @@ public class BlockScript : MonoBehaviour {
         //print("blokki nro " + gridPos + " on ryhmässä nro " + groupNumber);
     }
 
-    public void Pop(int hits) {
+    public void Pop(int hits, int score) {
         //kerro block managerille että poksahti
         //animaatio tms?
         hitsLeft = hitsLeft - hits;
@@ -259,7 +259,7 @@ public class BlockScript : MonoBehaviour {
             }
 
             Destroy(gameObject);
-            gm.AddScore();
+            gm.AddScore(score);
             toBeDestroyed = true;
             
         }

@@ -304,6 +304,8 @@ MonoBehaviour:
   columns: 9
   blockPrefab: {fileID: 1177085574887066, guid: 2304ff9ce42c02c40b0e4a4c412a4f68,
     type: 2}
+  candyPrefab: {fileID: 1416484304316338, guid: c4b636ca27e4a3a4da54b2baa68b2098,
+    type: 2}
   player: {fileID: 545900927}
   firstBlock: {x: 0, y: 0}
   blockFolder: {fileID: 1840310643}

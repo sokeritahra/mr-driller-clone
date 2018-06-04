@@ -11,6 +11,7 @@ public class BlockManager : MonoBehaviour {
     public int columns;
     //how many columns (how wide the grid is -> x)
     public GameObject blockPrefab;
+	public GameObject candyPrefab;
     public PlayerCharacter player;
     public Vector2 firstBlock = new Vector2(0,0);
     //blokki prefabi
@@ -39,6 +40,49 @@ public class BlockManager : MonoBehaviour {
     //if the block above is durable -> chance of generating a candy block?
     //should the durable & candy blocks be generated?
     //if there is a durable block here, delete the generated block from here
+
+
+    public void CreateBlock(int type, int row, int column) {
+        //candy = type 1, block = type 2,  level end block = type 3
+        string typeS;
+        if (type == 1) {
+            typeS = "Candy";
+        } else if (type == 2) {
+            typeS = "Block";
+        } else {
+            typeS = "LvlEnd";
+        }
+        GameObject go;
+
+        //configure candies
+        if (type == 1) {
+			go = Instantiate (candyPrefab);
+            blockScript = go.GetComponent<BlockScript>();
+            blockScript.bc = BlockColor.Candy;
+			blockScript.bs = BlockState.Static;
+		} else {
+			go = Instantiate (blockPrefab);
+		} 
+        //for all types, change name and position
+		go.name = (typeS + "_" + rows + "_" + column).ToString();
+		Vector2 newPosition = new Vector2(firstBlock.x + column, firstBlock.y - row);
+        go.transform.position = newPosition;
+        blockScript = go.GetComponent<BlockScript>();
+
+        //separate level end blocks from blocks and candies (why?)
+        //configure level end blocks
+        if (type < 3)
+        {
+            go.transform.parent = blockFolder;
+        }
+        else {
+            go.transform.parent = endBlocks;
+            blockScript.bc = BlockColor.LevelEnd;
+            blockScript.bs = BlockState.Static;
+            blockScript.levelEnd = true;
+  		}
+	}
+		
     public void GenerateBlocks(int level) {
 
         if (level == 1) {
@@ -47,37 +91,37 @@ public class BlockManager : MonoBehaviour {
                 for (int j = 0; j < columns; j++) {
                     if (i < rows - lvlEndBlocks) {
                         var candyRandomizer = Random.value;
-                        if (candyRandomizer > .05) {
+                        if (candyRandomizer < .05) {
+                            CreateBlock(1, i, j);
                             //tee cndy ja else tee blokki
                         }
-                        GameObject go = Instantiate(blockPrefab);
-                        go.name = (i + "_" + j).ToString();
-                        Vector2 newPosition = new Vector2(firstBlock.x + j, firstBlock.y - i);
-                        blockScript = go.GetComponent<BlockScript>();
-                        go.transform.parent = blockFolder;
-                        var blockColorRandomizer = Random.value;
-                        if (blockColorRandomizer > .775f) {
-                            blockScript.bc = BlockColor.Blue;
-                        } else if (blockColorRandomizer > .55f) {
-                            blockScript.bc = BlockColor.Green;
-                        } else if (blockColorRandomizer > .325f) {
-                            blockScript.bc = BlockColor.Red;
-                        } else if (blockColorRandomizer > .1f) {
-                            blockScript.bc = BlockColor.Yellow;
-                        } else {
-                            blockScript.bc = BlockColor.Grey;
-                        }
-                        go.transform.position = newPosition;
+                        else {
+                            CreateBlock(2, i, j);
+                            //assign color to blocks
+                            var blockColorRandomizer = Random.value;
+                            if (blockColorRandomizer > .775f)
+                            {
+                                blockScript.bc = BlockColor.Blue;
+                            }
+                            else if (blockColorRandomizer > .55f)
+                            {
+                                blockScript.bc = BlockColor.Green;
+                            }
+                            else if (blockColorRandomizer > .325f)
+                            {
+                                blockScript.bc = BlockColor.Red;
+                            }
+                            else if (blockColorRandomizer > .1f)
+                            {
+                                blockScript.bc = BlockColor.Yellow;
+                            }
+                            else
+                            {
+                                blockScript.bc = BlockColor.Grey;
+                            }
+                            }
                     } else {
-                        GameObject go = Instantiate(blockPrefab);
-                        go.name = (i + "_" + j).ToString();
-                        Vector2 newPosition = new Vector2(firstBlock.x + j, firstBlock.y - i);
-                        blockScript = go.GetComponent<BlockScript>();
-                        go.transform.parent = endBlocks;
-                        blockScript.bc = BlockColor.LevelEnd;
-                        blockScript.bs = BlockState.Static;
-                        blockScript.levelEnd = true;
-                        go.transform.position = newPosition;
+                        CreateBlock(3, i, j);
                     }
                 }
             }
@@ -87,37 +131,38 @@ public class BlockManager : MonoBehaviour {
                 for (int j = 0; j < columns; j++) {
                     if (i < rows - lvlEndBlocks) {
                         var candyRandomizer = Random.value;
-                        if (candyRandomizer > .05) {
+                        if (candyRandomizer < .05) {
+                            CreateBlock(1, i, j);
                             //tee cndy ja else tee blokki
                         }
-                        GameObject go = Instantiate(blockPrefab);
-                        go.name = (i + "_" + j).ToString();
-                        Vector2 newPosition = new Vector2(firstBlock.x + j, (firstBlock.y - i)-100);
-                        blockScript = go.GetComponent<BlockScript>();
-                        go.transform.parent = blockFolder;
-                        var blockColorRandomizer = Random.value;
-                        if (blockColorRandomizer > .9f) {
-                            blockScript.bc = BlockColor.Blue;
-                        } else if (blockColorRandomizer > .8f) {
-                            blockScript.bc = BlockColor.Green;
-                        } else if (blockColorRandomizer > .7f) {
-                            blockScript.bc = BlockColor.Red;
-                        } else if (blockColorRandomizer > .6f) {
-                            blockScript.bc = BlockColor.Yellow;
-                        } else {
-                            blockScript.bc = BlockColor.Grey;
+                        else
+                        {
+                            CreateBlock(2, i, j);
+                            //assign color to blocks
+                            var blockColorRandomizer = Random.value;
+                            if (blockColorRandomizer > .9f)
+                            {
+                                blockScript.bc = BlockColor.Blue;
+                            }
+                            else if (blockColorRandomizer > .8f)
+                            {
+                                blockScript.bc = BlockColor.Green;
+                            }
+                            else if (blockColorRandomizer > .7f)
+                            {
+                                blockScript.bc = BlockColor.Red;
+                            }
+                            else if (blockColorRandomizer > .6f)
+                            {
+                                blockScript.bc = BlockColor.Yellow;
+                            }
+                            else
+                            {
+                                blockScript.bc = BlockColor.Grey;
+                            }
                         }
-                        go.transform.position = newPosition;
                     } else {
-                        GameObject go = Instantiate(blockPrefab);
-                        go.name = (i + "_" + j).ToString();
-                        Vector2 newPosition = new Vector2(firstBlock.x + j, firstBlock.y - i);
-                        blockScript = go.GetComponent<BlockScript>();
-                        go.transform.parent = endBlocks;
-                        blockScript.bc = BlockColor.LevelEnd;
-                        blockScript.bs = BlockState.Static;
-                        blockScript.levelEnd = true;
-                        go.transform.position = newPosition;
+                        CreateBlock(3, i, j);
                     }
                 }
             }
@@ -127,6 +172,7 @@ public class BlockManager : MonoBehaviour {
     public void SetBlockInGrid (BlockScript block) {
         posx = block.transform.position.x;
         posy = block.transform.position.y;
+		print(Mathf.RoundToInt(posx) + " " + -Mathf.RoundToInt(posy));
         blockGrid[Mathf.RoundToInt(posx), -Mathf.RoundToInt(posy)] = block;
         blockGrid[Mathf.RoundToInt(posx), -Mathf.RoundToInt(posy)].SetGridPos(Mathf.RoundToInt(posx), -Mathf.RoundToInt(posy), columns);
     }
@@ -404,7 +450,7 @@ public class BlockManager : MonoBehaviour {
         }
 
         foreach (List<BlockScript> g in toBePopped) {
-            PopBlocks(g, 5);
+            PopBlocks(g, 5, 100);
         }
 
         //millon tsekataan mikä puhkeaa?
@@ -412,10 +458,10 @@ public class BlockManager : MonoBehaviour {
         //taulukko ja blokin transform vastaa toisiaan kun taulukon ruutu on 1 unity-yksikkö * 1 unity-yksikkö
     }
 
-    public void PopBlocks(List<BlockScript> gToPop, int hits) {
+    public void PopBlocks(List<BlockScript> gToPop, int hits, int score) {
         //print(popped);
         foreach (BlockScript block in gToPop) {
-                block.Pop(hits);
+                block.Pop(hits, score);
         }
         AllGroups.Remove(gToPop);
     }

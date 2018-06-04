@@ -32,6 +32,7 @@ public class PlayerCharacter : MonoBehaviour {
     float handRayLength = 0.4f;
     float groundRayLength = 0.4f;
     LayerMask blockLayerMask = 1 << 9; // Layermask of blocks
+    LayerMask candyLayerMask = 1 << 12; // Layermask of candy
     RaycastHit2D groundCheckRight;
     RaycastHit2D groundCheckLeft;
     RaycastHit2D groundCheckCenter;
@@ -42,6 +43,7 @@ public class PlayerCharacter : MonoBehaviour {
     RaycastHit2D rightHandAntenna;
     RaycastHit2D upperLeftAntenna;
     RaycastHit2D upperRightAntenna;
+    Collider2D[] candyCol;
     Vector2 indent = new Vector2(0.05f, 0);
     Vector2 playerCenter;
     Vector2 playerLeft;
@@ -49,7 +51,7 @@ public class PlayerCharacter : MonoBehaviour {
     Vector3 climbUpTarget;
     Vector3 climbLeftTarget;
     Vector3 climbRightTarget;
-    //TODO: make special antennas for candy?
+    int candyTaken = 0;
 
     void Awake() {
         rb = GetComponent<Rigidbody2D>();
@@ -107,10 +109,13 @@ public class PlayerCharacter : MonoBehaviour {
         groundCheckCenter = Physics2D.Raycast(playerCenter, Vector2.down, groundRayLength, blockLayerMask);
         groundCheckLeft = Physics2D.Raycast(playerLeft + indent, Vector2.down, groundRayLength, blockLayerMask);
         groundCheckRight = Physics2D.Raycast(playerRight - indent, Vector2.down, groundRayLength, blockLayerMask);
+        // Candy Antenna
+        candyCol = Physics2D.OverlapBoxAll(playerCenter, new Vector2(0.9f, 0.9f), 0, candyLayerMask);
 
-        //if ( player on tarpeeksi lähellä candya)
-        //takeCandy();
-        //sugar nousee
+        if (candyCol.Length > 0) {
+            TakeCandy(candyCol[0].gameObject);
+        }
+
 
         //************************************ TestiKoodia*************************************
 
@@ -381,10 +386,16 @@ public class PlayerCharacter : MonoBehaviour {
     // Pop the block (from BlockManager)
     void DrillBlock(BlockScript block) {
         if(block.bs == BlockState.Static || block.bs == BlockState.Hold) {
-            bm.PopBlocks(block.group, 1);
+            bm.PopBlocks(block.group, 1, 100);
         }
     }
 
+    void TakeCandy(GameObject candy) {
+        candyTaken++;
+        var candyScript = candy.GetComponent<BlockScript>();
+        bm.PopBlocks(candyScript.group, 1, 100*candyTaken);
+        gm.CandyGet();
+    }
     //TODO : SUGAR DEPLETION??
 
     // Death on arrival
