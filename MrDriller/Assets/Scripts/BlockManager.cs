@@ -39,19 +39,19 @@ public class BlockManager : MonoBehaviour {
     //should the durable & candy blocks be generated?
     //if there is a durable block here, delete the generated block from here
     void GenerateBlocks() {
-        float firstX = firstBlock.x;
-        float firstY = firstBlock.y;
+        //float firstX = firstBlock.x;
+        //float firstY = firstBlock.y;
 
-        for (int i = 0; i < columns; i++) {
-            for (int j = 0; j < rows-lvlEndBlocks; j++) {
+        for (int i = 0; i < rows - lvlEndBlocks; i++) {
+            for (int j = 0; j < columns; j++) {
                 var candyRandomizer = Random.value;
                 if (candyRandomizer > .05)
                 {
                     //tee cndy ja else tee blokki
                 }
                 GameObject go = Instantiate(blockPrefab);
-                go.name = ((i * rows) + j).ToString();
-                Vector2 newPosition = new Vector2(firstX + i, firstY - j);
+                go.name = (i + "_" + j).ToString();
+                Vector2 newPosition = new Vector2(firstBlock.x + j, firstBlock.y - i);
                 blockScript = go.GetComponent<BlockScript>();
                 go.transform.parent = blockFolder;
                 var blockColorRandomizer = Random.value;
@@ -354,7 +354,7 @@ public class BlockManager : MonoBehaviour {
             PopBlocks(g, 5);
         }
 
-        //millon tsekataan mikä puhkeaA?
+        //millon tsekataan mikä puhkeaa?
 
         //taulukko ja blokin transform vastaa toisiaan kun taulukon ruutu on 1 unity-yksikkö * 1 unity-yksikkö
     }
@@ -394,14 +394,12 @@ public class BlockManager : MonoBehaviour {
     }
 
     //public void DestroyThreeColumnsOnTop() {
-    //    for (int y = rows-Mathf.Abs(Mathf.RoundToInt(player.transform.position.y)); y > 0; y--) {
+    //    for (int y = rows - Mathf.Abs(Mathf.RoundToInt(player.transform.position.y)); y > 0; y--) {
     //        // Destroy blocks without adding to score
-    //        //lisätään toBePopped-listaan kaikki joihin pätee:
-    //        Mathf.RoundToInt(player.transform.position.x);
-    //        Mathf.RoundToInt(player.transform.position.x - 1);
-    //        Mathf.RoundToInt(player.transform.position.x + 1);
-    //    }   
+    //        //lisätään toBePopped-listaan kaikki joihin pätee: vai toBeRemoved? kysyy Ari
+    //        new Vector2(Mathf.RoundToInt(player.transform.position.x), y * -1);
+    //        new Vector2(Mathf.RoundToInt(player.transform.position.x + 1), y * -1);
+    //        new Vector2(Mathf.RoundToInt(player.transform.position.x - 1), y * -1);
+    //    }
     //}
-    
-
 }

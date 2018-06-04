@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour {
     public TextMeshProUGUI levelText;
     public TextMeshProUGUI livesText;
     public TextMeshProUGUI statusText;
+    float statusTextTimer = 0;
     int lifeLeft = 100;
     int livesLeft = 3;
     float lifeDeductionTick = 0.9f;
@@ -52,6 +53,12 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    private void Update() {
+        if (statusTextTimer < 0) {
+            statusText.text = "";
+        }
+    }
+
     private void FixedUpdate() {
         lifeDeductionCounter += Time.deltaTime;
         while (lifeDeductionCounter > lifeDeductionTick) {
@@ -67,10 +74,22 @@ public class GameManager : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Escape)) {
             Application.Quit();
         }
+
+        if(statusTextTimer > 0) {
+            statusTextTimer -= Time.deltaTime;
+        }
+    }
+
+    public void PauseGame() {
+        Time.timeScale = 1 - Time.timeScale;
+        statusText.text = (Time.timeScale == 1) ? "" : "Paused";
+        statusTextTimer = 0.1f;
     }
 
     public void SugarDepletion() {
         lifeLeft = lifeLeft - 20;
+        statusText.text = "Kohta on mehut vex!";
+        statusTextTimer = 5;
     }
 
     public void AddScore() {
@@ -87,6 +106,8 @@ public class GameManager : MonoBehaviour {
         if (livesLeft > 1) {
             livesLeft--;
             livesText.text = ("Lives left: " + livesLeft);
+            statusText.text = "Yksi henki läx!";
+            statusTextTimer = 5;
             lifeLeft = 100;
         } else {
             GameOver();

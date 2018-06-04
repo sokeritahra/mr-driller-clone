@@ -61,8 +61,7 @@ public class PlayerCharacter : MonoBehaviour {
 
     private void Update() {
         if (Input.GetButtonDown("Fire2")) {
-            Time.timeScale = 1 - Time.timeScale;
-            gm.statusText.text = (Time.timeScale == 1) ? "" : "Paused";
+            gm.PauseGame();
         }
 
         // Debug drawings of playercharacter head antennas and falling sensors
@@ -258,15 +257,15 @@ public class PlayerCharacter : MonoBehaviour {
 
         // Slipping
         //**************** If You remove the following part from comments, CHECK GROUNDED BOOL*********************
-        //if (!groundCheckCenter && !groundCheckLeft || !groundCheckRight) {
-        //    if (!groundCheckCenter && !groundCheckLeft && !groundCheckRight) {
+        if (!groundCheckCenter && !groundCheckLeft || !groundCheckRight) {
+            if (!groundCheckCenter && !groundCheckLeft && !groundCheckRight) {
 
-        //    } else if (!groundCheckLeft) {
-        //        rb.velocity = new Vector2(-speed, 0);
-        //    } else {
-        //        rb.velocity = new Vector2(speed, 0);
-        //    }
-        //}
+            } else if (!groundCheckLeft) {
+                rb.velocity = new Vector2(-speed, 0);
+            } else {
+                rb.velocity = new Vector2(speed, 0);
+            }
+        }
         //*********************************************************************************************************
 
         // Climbing
@@ -333,7 +332,7 @@ public class PlayerCharacter : MonoBehaviour {
 
     // Check playermode and if there is a block to drill in that direction 
     void CheckBlock(PlayerMode mode) {
-        drillTimer = 0.5f;
+        drillTimer = 0.2f;
         staticTimer = 0.2f;
         float x = transform.position.x;
         float y = transform.position.y * -1f;
