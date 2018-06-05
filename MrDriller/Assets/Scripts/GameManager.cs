@@ -23,6 +23,8 @@ public class GameManager : MonoBehaviour {
     float highScore;
     public string BGMaudioEvent;
     public string exhaustedAudioEvent;
+    public string sugarAudioEvent;
+    public string depletedAudioEvent;
 
     private void Start() {
         highScore = PlayerPrefs.GetFloat("highScore", 0);
@@ -107,13 +109,15 @@ public class GameManager : MonoBehaviour {
     public void SugarDepletion() {
         lifeLeft = lifeLeft - 20;
         statusText.text = "Sugar -20%";
-        statusTextTimer = 5;
+        statusTextTimer = 3;
+        Fabric.EventManager.Instance.PostEvent(depletedAudioEvent);
     }
 
     public void CandyGet() {
         lifeLeft = lifeLeft + 20;
         statusText.text = "Candy GET! Sugar +20%";
-        statusTextTimer = 5;
+        statusTextTimer = 3;
+        Fabric.EventManager.Instance.PostEvent(sugarAudioEvent);
     }
 
     public void AddScore(int addS) {
@@ -131,7 +135,7 @@ public class GameManager : MonoBehaviour {
             livesLeft--;
             livesText.text = ("" + livesLeft);
             statusText.text = "A Life is lost";
-            statusTextTimer = 5;
+            statusTextTimer = 3;
             lifeLeft = 100;
         } else {
             GameOver();
