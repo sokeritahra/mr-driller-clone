@@ -122,10 +122,10 @@ public class PlayerCharacter : MonoBehaviour {
 
         //************************************ TestiKoodia*************************************
 
-        if (transform.position.y < -10 && genBlocks == true) {
-            // bm.GenerateBlocks(2);
-            genBlocks = false;
-        }
+        //if (transform.position.y < -10 && genBlocks == true) {
+        //    bm.GenerateBlocks(2);
+        //    genBlocks = false;
+        //}
         //************************************TestiKoodia *************************************
 
         // Read input from controller/keyboard
