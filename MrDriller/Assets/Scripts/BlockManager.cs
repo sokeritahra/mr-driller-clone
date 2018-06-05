@@ -26,9 +26,9 @@ public class BlockManager : MonoBehaviour {
     public Color[] colorList;
     public int lvlEndBlocks;
 
-    public void AtLevelStart() {
+    public void AtLevelStart(int level) {
         //luodaan taulukko ja generoidaan blokit sinne
-        GenerateBlocks(1);
+        GenerateBlocks(level);
         blockGrid = new BlockScript[columns, rows];
         FindGroups();
         foreach (BlockScript block in blockArray) {
@@ -64,7 +64,7 @@ public class BlockManager : MonoBehaviour {
 			go = Instantiate (blockPrefab);
 		} 
         //for all types, change name and position
-		go.name = (typeS + "_" + rows + "_" + column).ToString();
+		go.name = (typeS + "_" + row + "_" + column).ToString();
 		Vector2 newPosition = new Vector2(firstBlock.x + column, firstBlock.y - row);
         go.transform.position = newPosition;
         blockScript = go.GetComponent<BlockScript>();
@@ -172,7 +172,6 @@ public class BlockManager : MonoBehaviour {
     public void SetBlockInGrid (BlockScript block) {
         posx = block.transform.position.x;
         posy = block.transform.position.y;
-		print(Mathf.RoundToInt(posx) + " " + -Mathf.RoundToInt(posy));
         blockGrid[Mathf.RoundToInt(posx), -Mathf.RoundToInt(posy)] = block;
         blockGrid[Mathf.RoundToInt(posx), -Mathf.RoundToInt(posy)].SetGridPos(Mathf.RoundToInt(posx), -Mathf.RoundToInt(posy), columns);
     }
@@ -191,11 +190,12 @@ public class BlockManager : MonoBehaviour {
 
                 var thisSquare = blockGrid[x, y];
 
-                if (x != 0 && y != 0) {
+                if (thisSquare.bc != BlockColor.Candy && x != 0 && y != 0) {
 
                     var leftSquare = blockGrid[x - 1, y];
                     var topSquare = blockGrid[x, y - 1];
 
+                    //candyt aina yksitellen omassa ryhmässään
                     if (thisSquare.bc == leftSquare.bc && thisSquare.bc == topSquare.bc) {
                         //jos on samanvärinen sekä vasemmalla että ylempänä lisätään ylempään
                         topSquare.group.Add(thisSquare);
@@ -214,14 +214,11 @@ public class BlockManager : MonoBehaviour {
                             AllGroups.Remove(leftSquare.group);
                             //asetetaan viittaus oikeaan ryhmään -- tämän saa tehdä vasta tuhoamisen jälkeen!!
                             leftSquare.SetGroup(topSquare.group);
-
-                            //print("this block " + thisSquare.gridPos + " and the one(s) on the left added to the one on top");
                         }
                             //jos vasemmalla ja ylhäällä olevat blokit on samassa ryhmässä, mitään ei tuhota
                     }
 
                     else {
-                        //print("nyt ei ole " + thisSquare + " ja vasen ja yläkerta samat");
                         //onko vasemmalla
                         CheckOtherSquare(leftSquare, thisSquare);
                         //onko ylhäällä
@@ -229,7 +226,7 @@ public class BlockManager : MonoBehaviour {
                     }
                 }
 
-                else if (x != 0) {
+                else if (thisSquare.bc != BlockColor.Candy && x != 0) {
 
                     var leftSquare = blockGrid[x - 1, y];
 
@@ -238,7 +235,7 @@ public class BlockManager : MonoBehaviour {
 
                 }
 
-                else if (y != 0) {
+                else if (thisSquare.bc != BlockColor.Candy && y != 0) {
 
                     var topSquare = blockGrid[x, y - 1];
 
@@ -249,7 +246,6 @@ public class BlockManager : MonoBehaviour {
                 else {
                     List<BlockScript> tempList = new List<BlockScript> { thisSquare };
                     AllGroups.Add(tempList);
-                    //print("moi");
                     //kerro blockscriptille missä ryhmässä se on
                     //int tempInt = AllGroups.FindIndex(l => l == tempList);
                     thisSquare.SetGroup(tempList);
@@ -310,7 +306,7 @@ public class BlockManager : MonoBehaviour {
             }
         }
 
-    void Update() {
+    void FixedUpdate() {
         List<List<BlockScript>> toBeRemoved = new List<List<BlockScript>>();
         List<List<BlockScript>> toBePopped = new List<List<BlockScript>>();
 
@@ -332,25 +328,31 @@ public class BlockManager : MonoBehaviour {
                 List<List<BlockScript>> merges = new List<List<BlockScript>>();
                 int snaps = 0;
                 foreach (BlockScript block in g) {
+                    if(block.bc != BlockColor.Candy) {
+                        if (block.CheckSameBelow()) {
+                            merges.Add(block.blockBelow.group);
+                        }
+                        else if (block.CheckAnyBelow()) {
+                            snaps++;
+                        }
 
-                    if (block.CheckSameBelow()) {
-                        merges.Add(block.blockBelow.group);
+                        if (block.CheckLeft()) {
+                            merges.Add(block.blockLeft.group);
+                            print("merging from the LEFT " + block.blockLeft + " with " + block);
+                            //jos jokin näistä on static, snäpätessä staticiks
+                        }
+
+                        if (block.CheckRight()) {
+                            merges.Add(block.blockRight.group);
+                            print("merging from the RighT " + block.blockRight + " with " + block);
+                            //jos jokin näistä on static, snäpätessä staticiks
+                        }
                     }
+                    //candyiltä pitää tarkistaa myös snäpätäänkö
                     else if (block.CheckAnyBelow()) {
                         snaps++;
                     }
-
-                    if (block.CheckLeft()) {
-                        merges.Add(block.blockLeft.group);
-                        print("merging from the LEFT " + block.blockLeft + " with " + block);
-                        //jos jokin näistä on static, snäpätessä staticiks
-                    }
-
-                    if (block.CheckRight()) {
-                        merges.Add(block.blockRight.group);
-                        print("merging from the RighT " + block.blockRight + " with " + block);
-                        //jos jokin näistä on static, snäpätessä staticiks
-                    }
+                    
                 }
                 if (merges.Count > 0) {
 
@@ -450,6 +452,11 @@ public class BlockManager : MonoBehaviour {
         }
 
         foreach (List<BlockScript> g in toBePopped) {
+            foreach (BlockScript block in g) {
+                if (block.bc == BlockColor.Grey) {
+                    block.didGreyGetDrilled = false;
+                }
+            }
             PopBlocks(g, 5, 100);
         }
 
@@ -458,6 +465,7 @@ public class BlockManager : MonoBehaviour {
         //taulukko ja blokin transform vastaa toisiaan kun taulukon ruutu on 1 unity-yksikkö * 1 unity-yksikkö
     }
 
+    //huom! tämä ei koskaan tapahtu harmaille blokeille
     public void PopBlocks(List<BlockScript> gToPop, int hits, int score) {
         //print(popped);
         foreach (BlockScript block in gToPop) {
@@ -483,7 +491,6 @@ public class BlockManager : MonoBehaviour {
         //kattoo onko alla tyhjää
         int tempInt = 0;
         foreach (BlockScript block in group) {
-            //if (!block.CheckBelow()) { //toimiiko / miten pitää tehä jos checkbelow palauttaa blokin??
             if ((block.CheckAnyBelow() && block.blockBelow.group != block.group && block.blockBelow.bs == BlockState.Static)
                 || block.levelEnd || (block.blockBelow && block.blockBelow.levelEnd)) {
                 tempInt++; //lisätään yksi, jos alla on blokki joka on eri ryhmässä ja static tai jos alla on tai blokki itse on levelEnd
@@ -492,13 +499,40 @@ public class BlockManager : MonoBehaviour {
         return !(tempInt > 0); //jos enemmän kuin yksi palautetaan false
     }
 
-    //public void DestroyThreeColumnsOnTop() {
-    //    for (int y = rows - Mathf.Abs(Mathf.RoundToInt(player.transform.position.y)); y > 0; y--) {
-    //        // Destroy blocks without adding to score
-    //        //lisätään toBePopped-listaan kaikki joihin pätee: vai toBeRemoved? kysyy Ari
-    //        new Vector2(Mathf.RoundToInt(player.transform.position.x), y * -1);
-    //        new Vector2(Mathf.RoundToInt(player.transform.position.x + 1), y * -1);
-    //        new Vector2(Mathf.RoundToInt(player.transform.position.x - 1), y * -1);
-    //    }
-    //}
+    public void DestroyThreeColumnsOnTop() {
+        print("destroy three columns");
+        print(Mathf.Abs(Mathf.RoundToInt(player.transform.position.y)));
+        for (int y = Mathf.Abs(Mathf.RoundToInt(player.transform.position.y)); y > -1; y--) {
+            // Destroy blocks without adding to score
+            //lisätään toBePopped-listaan kaikki joihin pätee: vai toBeRemoved? kysyy Ari molempiin t. Sara
+            List<List<BlockScript>> toBeRemoved = new List<List<BlockScript>>();
+            List<List<BlockScript>> toBePopped = new List<List<BlockScript>>();
+
+            foreach(List<BlockScript> group in AllGroups) {
+                int onTop = 0;
+                foreach (BlockScript block in group) {
+                    if (block.transform.position == new Vector3(Mathf.RoundToInt(player.transform.position.x), y * -1, 0) ||
+                        block.transform.position == new Vector3(Mathf.RoundToInt(player.transform.position.x + 1), y * -1, 0) ||
+                        block.transform.position == new Vector3(Mathf.RoundToInt(player.transform.position.x - 1), y * -1, 0)) {
+                        onTop++;
+                        print("going to destroy " + block);
+                    }
+                }
+                if (onTop > 0) {
+                    toBeRemoved.Add(group);
+
+                    toBePopped.Add(group);
+                }
+            }
+
+            foreach (List<BlockScript> g in toBeRemoved) {
+                AllGroups.Remove(g);
+            }
+
+            foreach (List<BlockScript> g in toBePopped) {
+                PopBlocks(g, 6, 0);
+            }
+
+        }
+    }
 }

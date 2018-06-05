@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviour {
     void AtGameStart() {
         // Load level, generate blocks, drop player in scene
         bm = FindObjectOfType<BlockManager>();
-        bm.AtLevelStart();
+        bm.AtLevelStart(level);
         bscArray = FindObjectsOfType<BlockSpriteChanger>();
         foreach (BlockSpriteChanger bsc in bscArray) {
             bsc.AtLevelStart();
@@ -57,9 +57,15 @@ public class GameManager : MonoBehaviour {
         if (statusTextTimer < 0) {
             statusText.text = "";
         }
+
     }
 
     private void FixedUpdate() {
+
+        if (lifeLeft > 100) {
+            lifeLeft = 100;
+        }
+
         lifeDeductionCounter += Time.deltaTime;
         while (lifeDeductionCounter > lifeDeductionTick) {
             lifeLeft -= 1;
@@ -78,6 +84,7 @@ public class GameManager : MonoBehaviour {
         if(statusTextTimer > 0) {
             statusTextTimer -= Time.deltaTime;
         }
+
     }
 
     public void PauseGame() {
@@ -123,12 +130,11 @@ public class GameManager : MonoBehaviour {
     void GameOver() {
         scoreText.text = ("Game");
         sugarText.text = ("Over");
-        levelText.text = ("Mother");
-        livesText.text = ("Hugger");
+        //levelText.text = ("Mother");
+        //livesText.text = ("Hugger");
         PlayerPrefs.SetFloat("highScore", highScore);
         Time.timeScale = 0;
     }
 
-    //create level & level end blocks
-    //the level end blocks are below the last row of blocks
+
 }

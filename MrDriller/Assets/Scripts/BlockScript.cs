@@ -47,17 +47,13 @@ public class BlockScript : MonoBehaviour {
     public bool levelEnd;
     public int hitsLeft = 1;
     Collider2D c2d;
+    public bool didGreyGetDrilled = true;
 
     private void Awake() {
         bm = FindObjectOfType<BlockManager>().GetComponent<BlockManager>();
         gm = FindObjectOfType<GameManager>().GetComponent<GameManager>();
         bsc = gameObject.GetComponentInChildren<BlockSpriteChanger>();
         player = FindObjectOfType<PlayerCharacter>();
-        //if(bc == BlockColor.Candy) {
-        //    c2d = gameObject.GetComponent<Collider2D>();
-        //    c2d.enabled = false;
-        //}
-
     }
 
     private void Start() {
@@ -81,7 +77,7 @@ public class BlockScript : MonoBehaviour {
         blockAbove = above;
     }
 
-    void Update() {
+    void FixedUpdate() {
         if (levelEnd) {
             bs = BlockState.Static;
         }
@@ -254,7 +250,7 @@ public class BlockScript : MonoBehaviour {
         //animaatio tms?
         hitsLeft = hitsLeft - hits;
         if (hitsLeft < 1) {
-            if (bc == BlockColor.Grey) {
+            if (bc == BlockColor.Grey && didGreyGetDrilled) {
                 gm.SugarDepletion();
             }
 
