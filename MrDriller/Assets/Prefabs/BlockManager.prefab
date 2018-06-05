@@ -55,9 +55,11 @@ MonoBehaviour:
   columns: 9
   blockPrefab: {fileID: 1177085574887066, guid: 2304ff9ce42c02c40b0e4a4c412a4f68,
     type: 2}
+  candyPrefab: {fileID: 0}
   player: {fileID: 0}
   firstBlock: {x: 0, y: 0}
   blockFolder: {fileID: 0}
+  endBlocks: {fileID: 0}
   blockArray: []
   colorList:
   - {r: 0.8, g: 0.27450982, b: 0.3372549, a: 1}
@@ -65,4 +67,6 @@ MonoBehaviour:
   - {r: 0.41960785, g: 0.49803922, b: 0.07058824, a: 1}
   - {r: 1, g: 0.7882353, b: 0.15686275, a: 1}
   - {r: 0.3137255, g: 0.1764706, b: 0.49803922, a: 1}
+  - {r: 1, g: 0.3820755, b: 0.9397147, a: 1}
+  - {r: 0.44139376, g: 0.8584906, b: 0.67537487, a: 1}
   lvlEndBlocks: 1

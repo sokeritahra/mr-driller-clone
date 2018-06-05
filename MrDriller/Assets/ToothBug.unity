@@ -304,6 +304,8 @@ MonoBehaviour:
   columns: 9
   blockPrefab: {fileID: 1177085574887066, guid: 2304ff9ce42c02c40b0e4a4c412a4f68,
     type: 2}
+  candyPrefab: {fileID: 1416484304316338, guid: c4b636ca27e4a3a4da54b2baa68b2098,
+    type: 2}
   player: {fileID: 545900927}
   firstBlock: {x: 0, y: 0}
   blockFolder: {fileID: 1840310643}
@@ -316,7 +318,7 @@ MonoBehaviour:
   - {r: 1, g: 0.9765201, b: 0.6556604, a: 1}
   - {r: 0.7735849, g: 0.7735849, b: 0.7735849, a: 1}
   - {r: 0.9811321, g: 0.27305093, b: 0.7963991, a: 1}
-  - {r: 0.90588236, g: 0.019607844, b: 0.5411765, a: 1}
+  - {r: 0.019607833, g: 0.90588236, b: 0.52847594, a: 1}
   lvlEndBlocks: 9
 --- !u!4 &315471598
 Transform:
