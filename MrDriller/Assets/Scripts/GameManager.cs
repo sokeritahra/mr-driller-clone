@@ -54,6 +54,15 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    void NewLevel() {
+        level++;
+        bm.AtLevelStart(level);
+        bscArray = FindObjectsOfType<BlockSpriteChanger>();
+        foreach (BlockSpriteChanger bsc in bscArray) {
+            bsc.AtLevelStart();
+        }
+    }
+
     private void Update() {
         if (statusTextTimer < 0) {
             statusText.text = "";

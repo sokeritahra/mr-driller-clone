@@ -342,6 +342,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 0
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &9377177
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -474,6 +475,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 0
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &15818424
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -920,6 +922,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 0
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &50444179
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -2975,6 +2978,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 0
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &155559232
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -3584,6 +3588,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 1
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &182510985
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -3778,6 +3783,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 0
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &188905084
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -4876,6 +4882,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 1
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &306473939
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -5198,6 +5205,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 0
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &319477732
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -6394,6 +6402,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 0
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &460846644
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -8355,6 +8364,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 1
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &602597967
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -9534,6 +9544,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 0
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &679105043
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -11155,6 +11166,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 0
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &780095742
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -11710,6 +11722,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 1
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &839798522
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -12179,6 +12192,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 0
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &863015353
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -12311,6 +12325,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 1
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &863910232
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -12706,6 +12721,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 0
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &881647679
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -14248,6 +14264,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 0
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &965500217
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -16744,6 +16761,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 1
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &1109332304
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -18174,6 +18192,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 1
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &1249083582
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -19040,7 +19059,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1119981880249654, guid: 180add0e4b470a643ad11b009a43c238, type: 2}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 180add0e4b470a643ad11b009a43c238, type: 2}
@@ -19131,6 +19150,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 0
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &1261364641
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -19810,6 +19830,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 1
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &1305876998
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -20452,6 +20473,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 0
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &1345377191
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -21398,6 +21420,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 0
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &1397474123
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -22954,6 +22977,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 1
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &1517417762
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -23219,6 +23243,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 1
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &1535939169
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -24203,6 +24228,56 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8045350257fddba4a8b6475fd27b9c07, type: 2}
   m_IsPrefabParent: 0
+--- !u!1001 &1602571514
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4140726551609530, guid: c4b636ca27e4a3a4da54b2baa68b2098, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4140726551609530, guid: c4b636ca27e4a3a4da54b2baa68b2098, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4140726551609530, guid: c4b636ca27e4a3a4da54b2baa68b2098, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4140726551609530, guid: c4b636ca27e4a3a4da54b2baa68b2098, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4140726551609530, guid: c4b636ca27e4a3a4da54b2baa68b2098, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4140726551609530, guid: c4b636ca27e4a3a4da54b2baa68b2098, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4140726551609530, guid: c4b636ca27e4a3a4da54b2baa68b2098, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4140726551609530, guid: c4b636ca27e4a3a4da54b2baa68b2098, type: 2}
+      propertyPath: m_RootOrder
+      value: 19
+      objectReference: {fileID: 0}
+    - target: {fileID: 1416484304316338, guid: c4b636ca27e4a3a4da54b2baa68b2098, type: 2}
+      propertyPath: m_Name
+      value: Candy (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1416484304316338, guid: c4b636ca27e4a3a4da54b2baa68b2098, type: 2}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: c4b636ca27e4a3a4da54b2baa68b2098, type: 2}
+  m_IsPrefabParent: 0
 --- !u!1 &1607982203
 GameObject:
   m_ObjectHideFlags: 0
@@ -24289,6 +24364,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 1
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &1607982207
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -24421,6 +24497,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 0
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &1608356594
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -24938,6 +25015,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 0
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &1651576190
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -25384,6 +25462,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 0
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &1719141447
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -25581,6 +25660,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 0
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &1720529671
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -26285,6 +26365,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 1
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &1774258582
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -26482,6 +26563,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 0
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &1787218893
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -27866,6 +27948,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 1
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &1862828356
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -28090,6 +28173,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 1
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &1870860744
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -30655,6 +30739,7 @@ MonoBehaviour:
   player: {fileID: 0}
   levelEnd: 0
   hitsLeft: 1
+  didGreyGetDrilled: 1
 --- !u!212 &2120128913
 SpriteRenderer:
   m_ObjectHideFlags: 0
