@@ -25,7 +25,8 @@ public class BlockManager : MonoBehaviour {
     float posy = 0;
     public Color[] colorList;
     public int lvlEndBlocks;
-
+    // public string poppedAudioEvent;
+    // Fabric.EventManager.Instance.PostEvent(poppedAudioEvent); Sara, laita tämä sinne missä kaikki paukkuu!
     public void AtLevelStart(int level) {
         //luodaan taulukko ja generoidaan blokit sinne
         GenerateBlocks(level);

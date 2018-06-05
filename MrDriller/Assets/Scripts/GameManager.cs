@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour {
     float score;
     float highScore;
     public string BGMaudioEvent;
+    public string exhaustedAudioEvent;
 
     private void Start() {
         highScore = PlayerPrefs.GetFloat("highScore", 0);
@@ -75,6 +76,7 @@ public class GameManager : MonoBehaviour {
 
         if (lifeLeft <= 0) { // Life amount deducter
             DeadOnArrival();
+            Fabric.EventManager.Instance.PostEvent(exhaustedAudioEvent);
         }
         
         if (Input.GetKeyDown(KeyCode.Escape)) {

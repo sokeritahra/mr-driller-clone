@@ -53,6 +53,12 @@ public class PlayerCharacter : MonoBehaviour {
     Vector3 climbRightTarget;
     int candyTaken = 0;
     float reviveTimer = 0;
+    bool alreadyPlayed = false;
+    public string vomitAudioEvent;
+    public string climbAudioEvent;
+    public string fallingAudioEvent;
+    public string flippedAudioEvent;
+    public string squashedAudioEvent;
 
     void Awake() {
         rb = GetComponent<Rigidbody2D>();
@@ -161,7 +167,12 @@ public class PlayerCharacter : MonoBehaviour {
                     if (fallTimer < 0) {
                         rb.velocity = new Vector2(0, -5f);
                         //rb.AddForce(new Vector2(0, -5), ForceMode2D.Force);
+                        
                         animS = "Falling";
+                        if (!alreadyPlayed) {
+                            Fabric.EventManager.Instance.PostEvent(fallingAudioEvent);
+                            alreadyPlayed = true;
+                        }
                     }
                 } else {
                     pm = PlayerMode.Static;
@@ -172,8 +183,9 @@ public class PlayerCharacter : MonoBehaviour {
                 //if (alive) {
                 rb.velocity = new Vector2(0, 0);
                 pm = previousPm;
+                alreadyPlayed = false;
                 animS = animDefault;
-                fallTimer = .5f;
+                fallTimer = .2f;
                 //}
             }
 
@@ -290,6 +302,7 @@ public class PlayerCharacter : MonoBehaviour {
                 climbLeftTarget = (transform.position + Vector3.left * 0.75f);
                 pm = PlayerMode.Climbing;
                 climbTimer = 0.4f;
+                Fabric.EventManager.Instance.PostEvent(climbAudioEvent);
             }
 
             if (rightHandAntenna && !upperRightAntenna && climbTimer < 0 && pm != PlayerMode.Climbing) {
@@ -297,6 +310,7 @@ public class PlayerCharacter : MonoBehaviour {
                 climbRightTarget = (transform.position + Vector3.right * 0.75f);
                 pm = PlayerMode.Climbing;
                 climbTimer = 0.4f;
+                Fabric.EventManager.Instance.PostEvent(climbAudioEvent);
             }
 
             if (staticTimer > 0) { // Animation / Player static timer
@@ -307,8 +321,9 @@ public class PlayerCharacter : MonoBehaviour {
                 drillTimer -= Time.deltaTime;
             }
             // Drilling
-            if (Input.GetButton("Fire1") && drillTimer <= 0) {
+            if (Input.GetButtonDown("Fire1") && drillTimer <= 0) {
                 CheckBlock(pm);
+                Fabric.EventManager.Instance.PostEvent(vomitAudioEvent);
                 print("poranäppäintä painettu!");
             }
 
@@ -320,6 +335,7 @@ public class PlayerCharacter : MonoBehaviour {
                     pm = PlayerMode.Static;
                     anim.Play(animS);
                     alive = false;
+                    Fabric.EventManager.Instance.PostEvent(squashedAudioEvent);
                     ColdAndLonelyDeath();
                     c.enabled = false;
                     reviveTimer = 2f;
@@ -330,10 +346,12 @@ public class PlayerCharacter : MonoBehaviour {
                         animS = "Bellied_Right";
                         transform.position = (Vector2)transform.position + (Vector2.right / 2);
                         staticTimer = 1.0f;
+                        Fabric.EventManager.Instance.PostEvent(flippedAudioEvent);
                     } else {
                         animS = "Assed_Right";
                         transform.position = (Vector2)transform.position + (Vector2.right / 2);
                         staticTimer = 1.0f;
+                        Fabric.EventManager.Instance.PostEvent(flippedAudioEvent);
                     }
                 } else {
                     // NDE bellied or assed towards left
@@ -341,10 +359,12 @@ public class PlayerCharacter : MonoBehaviour {
                         animS = "Bellied_Left";
                         transform.position = (Vector2)transform.position + (Vector2.left / 2);
                         staticTimer = 1.0f;
+                        Fabric.EventManager.Instance.PostEvent(flippedAudioEvent);
                     } else {
                         animS = "Assed_Left";
                         transform.position = (Vector2)transform.position + (Vector2.left / 2);
                         staticTimer = 1.0f;
+                        Fabric.EventManager.Instance.PostEvent(flippedAudioEvent);
                     }
                 }
             }
