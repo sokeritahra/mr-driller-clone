@@ -28,6 +28,14 @@ public class BlockManager : MonoBehaviour {
     public int lvlEndBlocks;
     public GameManager gm;
     public string poppedAudioEvent;
+    public List<int> ekaRivi = new List<int>();
+    public List<int> tokaRivi = new List<int>();
+    public List<int> kolRivi = new List<int>();
+    public List<int> nelRivi = new List<int>();
+    public List<int> viiRivi = new List<int>();
+    public List<int> kuuRivi = new List<int>();
+    public List<int> seiRivi = new List<int>();
+    public List<List<int>> inttiLista = new List<List<int>>();
 
     public void AtLevelStart(int level) {
         //luodaan taulukko ja generoidaan blokit sinne
@@ -97,24 +105,25 @@ public class BlockManager : MonoBehaviour {
         if (level == 1) {
             //TODO: TUTORIAL ALKU!
             int levelStartRows = 7;
-            //int[, ,] levelStartBlocks = new int[7, columns, 4] { { { 1, 2, 3 }, { 4, 5, 6 } },
-            //                     { { 7, 8, 9 }, { 10, 11, 12 } } };
-            //Dictionary<Vector2, int> dict = new Dictionary<string, int>
-            //{
-            //    { "one", 1 },
-            //    { "two", 2 },
-            //    { "three", 3 },
-            //    { "four", 4 }
-            //};
-            //for (int i = 0; i < levelStartRows; i++) {
-            //    for (int j = 0; j < columns; j++) {
-            //        if(i == 0 && j == 4) {
 
-            //        }
-            //        CreateBlock(3, i, j);
-            //    }
-            //}
-            for (int i = 0; i < rows; i++) {
+            inttiLista.Add(ekaRivi);
+            inttiLista.Add(tokaRivi);
+            inttiLista.Add(kolRivi);
+            inttiLista.Add(nelRivi);
+            inttiLista.Add(viiRivi);
+            inttiLista.Add(kuuRivi);
+            inttiLista.Add(seiRivi);
+
+            for (int i = 0; i < levelStartRows; i++) {
+                for (int j = 0; j < columns; j++) {
+                    CreateBlock(inttiLista[i][j], i, j);
+                    //if(i+j < 4 || ( 0 < Mathf.Abs((i+j)-8) && Mathf.Abs((i + j) - 8) < 4 ) ) {
+                    //    blockScript.bc = BlockColor.Grey;
+                    //}
+                }
+            }
+
+            for (int i = levelStartRows; i < rows; i++) {
                 for (int j = 0; j < columns; j++) {
                     if (i < rows - lvlEndBlocks) {
                         var candyRandomizer = Random.value;
