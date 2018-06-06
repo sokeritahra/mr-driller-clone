@@ -18,7 +18,7 @@ public class GameManager : MonoBehaviour {
     float lifeDeductionCounter = 0;
     BlockSpriteChanger[] bscArray;
     BlockManager bm;
-    int level = 0;
+    int level = 1;
     int depth = 0;
     float score;
     float highScore;
@@ -33,6 +33,9 @@ public class GameManager : MonoBehaviour {
     Vector3 camStartPos;
     public string lvlClearedAudioEvent;
     bool played;
+    Transform endBlokit;
+    Transform blokit;
+    bool gameEnded;
 
     private void Start() {
         highScore = PlayerPrefs.GetFloat("highScore", 0);
@@ -60,18 +63,23 @@ public class GameManager : MonoBehaviour {
     public void AtGameStart() {
         // Load level, generate blocks, drop player in scene
         bm = FindObjectOfType<BlockManager>();
+        endBlokit = bm.endBlocks;
+        blokit = bm.blockFolder;
+        blokit.gameObject.SetActive(true);
+        endBlokit.gameObject.SetActive(true);
+        player.gameObject.SetActive(true);
         NewLevel();
     }
 
     public void LevelEnd() {
+        level++;
         levelEndReached = true;
         lifeLeftAtLvlEnd = lifeLeft;
     }
 
     void NewLevel() {
         lifeLeft = lifeLeftAtLvlEnd;
-        level++;
-        print("starting new level!");
+        statusText.text = "Level " + level + " START!";
         bm.AtLevelStart(level);
         bscArray = FindObjectsOfType<BlockSpriteChanger>();
         foreach (BlockSpriteChanger bsc in bscArray) {
@@ -81,29 +89,32 @@ public class GameManager : MonoBehaviour {
     }
 
     private void Update() {
+
         if (statusTextTimer < 0) {
             statusText.text = "";
         }
 
-        if (levelEndReached && lvlEndTimer >= 0) {
+        if (level > 3 && !gameEnded) {
+            GameEnd();
+        } else if (level < 4 && levelEndReached && lvlEndTimer >= 0) {
             lvlEndTimer -= Time.deltaTime;
         }
 
-        if (lvlEndTimer < 4) {
+        if (lvlEndTimer < 3) {
             bm.PopAll();
             if (!played) {
                 Fabric.EventManager.Instance.PostEvent(lvlClearedAudioEvent);
                 played = true;
             }
             statusText.text = "LEVEL CLEARED!";
-            statusTextTimer = 3;
+            statusTextTimer = 2;
         }
 
         if (lvlEndTimer < 0) {
             levelEndReached = false;
             player.StartNewLvl();
             cam.transform.position = camStartPos + new Vector3(0, 5, 0);
-            lvlEndTimer = 5f;
+            lvlEndTimer = 4f;
             NewLevel();
         }
 
@@ -195,5 +206,19 @@ public class GameManager : MonoBehaviour {
         Time.timeScale = 0;
     }
 
+    public void ReturnToMenu() {
+        bm.PopAll();
+        blokit.gameObject.SetActive(false);
+        endBlokit.gameObject.SetActive(false);
+        player.gameObject.SetActive(false);
+    }
 
+    void GameEnd() {
+        Fabric.EventManager.Instance.PostEvent(lvlClearedAudioEvent);
+        played = true;
+        statusText.text = "YOU WIN!!!";
+        statusTextTimer = 5f;
+        gameEnded = true;
+        //pysäytä laskureita, ReturnToMenu();
+    }
 }

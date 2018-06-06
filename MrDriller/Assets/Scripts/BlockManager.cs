@@ -119,7 +119,16 @@ public class BlockManager : MonoBehaviour {
                     CreateBlock(inttiLista[i][j], i, j);
                     if(i+j < 4 || (j > 4 && j - i >= 5)) {
                         blockScript.bc = BlockColor.Grey;
-                    } else if (i==0){
+                    } else if (i == 0){
+                        blockScript.bc = BlockColor.Yellow;
+                    } else if (i == 1) {
+                        blockScript.bc = BlockColor.Blue;
+                    } else if (i == 2) {
+                        blockScript.bc = BlockColor.Green;
+                    } else if (i == 3) {
+                        blockScript.bc = BlockColor.Red;
+                    } else if (i == 4) {
+                        blockScript.bc = BlockColor.Yellow;
                     }
                 }
             }
@@ -520,9 +529,13 @@ public class BlockManager : MonoBehaviour {
                             //print("snapping and changing to hold " + block + " and holdtime is " + block.holdTimer);
                         }
 
-                        if (g.Count > 3 && !toBePopped.Contains(g)) {
-                            toBePopped.Add(g);
+                    }
+
+                    if (g.Count > 3 && !toBePopped.Contains(g)) {
+                        foreach (BlockScript block in g) {
+                            print(block + " gonna pop!");
                         }
+                        toBePopped.Add(g);
                     }
                 }
                 else {
@@ -557,7 +570,7 @@ public class BlockManager : MonoBehaviour {
                     //print("Group's states changed to hold");
                     foreach (BlockScript block in g) {
                         block.bs = BlockState.Hold;
-                        block.holdTimer = 1.5f;
+                        block.holdTimer = 2f;
                         //print("group contains " + block);
                     }
                 }
