@@ -114,7 +114,7 @@ public class BlockManager : MonoBehaviour {
             //        CreateBlock(3, i, j);
             //    }
             //}
-            for (int i = levelStartRows; i < rows; i++) {
+            for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < columns; j++) {
                     if (i < rows - lvlEndBlocks) {
                         var candyRandomizer = Random.value;
