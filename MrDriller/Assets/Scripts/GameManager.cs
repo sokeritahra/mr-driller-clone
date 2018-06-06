@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour {
     float lifeDeductionCounter = 0;
     BlockSpriteChanger[] bscArray;
     BlockManager bm;
-    int level = 1;
+    int level = 0;
     int depth = 0;
     float score;
     float highScore;
@@ -25,6 +25,11 @@ public class GameManager : MonoBehaviour {
     public string exhaustedAudioEvent;
     public string sugarAudioEvent;
     public string depletedAudioEvent;
+    public PlayerCharacter player;
+    float lvlEndTimer = 2f;
+    bool levelEndReached;
+    Camera cam;
+    Vector3 camStartPos;
 
     private void Start() {
         highScore = PlayerPrefs.GetFloat("highScore", 0);
@@ -44,20 +49,24 @@ public class GameManager : MonoBehaviour {
         //different levels?
 
         Fabric.EventManager.Instance.PostEvent(BGMaudioEvent);
+        player = FindObjectOfType<PlayerCharacter>();
+        cam = FindObjectOfType<Camera>();
+        camStartPos = cam.transform.position;
     }
 
     void AtGameStart() {
         // Load level, generate blocks, drop player in scene
         bm = FindObjectOfType<BlockManager>();
-        bm.AtLevelStart(level);
-        bscArray = FindObjectsOfType<BlockSpriteChanger>();
-        foreach (BlockSpriteChanger bsc in bscArray) {
-            bsc.AtLevelStart();
-        }
+        NewLevel();
+    }
+
+    public void LevelEnd() {
+        levelEndReached = true;
     }
 
     void NewLevel() {
         level++;
+        print("starting new level!");
         bm.AtLevelStart(level);
         bscArray = FindObjectsOfType<BlockSpriteChanger>();
         foreach (BlockSpriteChanger bsc in bscArray) {
@@ -70,9 +79,27 @@ public class GameManager : MonoBehaviour {
             statusText.text = "";
         }
 
+        if (levelEndReached && lvlEndTimer >= 0) {
+            lvlEndTimer -= Time.deltaTime;
+        }
+
+        if (lvlEndTimer < 1) {
+            bm.PopAll();
+        }
+
+        if (lvlEndTimer < 0) {
+            levelEndReached = false;
+            player.StartNewLvl();
+            cam.transform.position = camStartPos + new Vector3(0, 5, 0);
+            lvlEndTimer = 2f;
+            NewLevel();
+        }
+
     }
 
     private void FixedUpdate() {
+
+
 
         if (lifeLeft > 100) {
             lifeLeft = 100;

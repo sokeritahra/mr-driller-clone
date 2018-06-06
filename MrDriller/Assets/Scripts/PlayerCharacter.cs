@@ -23,7 +23,7 @@ public class PlayerCharacter : MonoBehaviour {
     BlockScript bs;
     BlockManager bm;
     GameManager gm;
-    bool genBlocks = true;
+    //bool genBlocks = true;
     string animS = "";
     string animDefault = "Aim_Down";
     float drillDepth = 0.75f;
@@ -59,6 +59,7 @@ public class PlayerCharacter : MonoBehaviour {
     public string fallingAudioEvent;
     public string flippedAudioEvent;
     public string squashedAudioEvent;
+    Vector3 startPos;
 
     void Awake() {
         rb = GetComponent<Rigidbody2D>();
@@ -67,6 +68,7 @@ public class PlayerCharacter : MonoBehaviour {
         bm = FindObjectOfType<BlockManager>();
         gm = FindObjectOfType<GameManager>().GetComponent<GameManager>();
         c = GetComponent<CapsuleCollider2D>();
+        startPos = rb.position;
     }
 
     private void Update() {
@@ -324,7 +326,7 @@ public class PlayerCharacter : MonoBehaviour {
             if (Input.GetButtonDown("Fire1") && drillTimer <= 0) {
                 CheckBlock(pm);
                 Fabric.EventManager.Instance.PostEvent(vomitAudioEvent);
-                print("poranäppäintä painettu!");
+                //print("poranäppäintä painettu!");
             }
 
 
@@ -371,7 +373,7 @@ public class PlayerCharacter : MonoBehaviour {
         }
 
         else if (reviveTimer < 0) {
-            bm.DestroyThreeColumnsOnTop();
+            bm.PopThreeColumnsOnTop();
             Revive();
         }
     }
@@ -451,5 +453,9 @@ public class PlayerCharacter : MonoBehaviour {
     void ColdAndLonelyDeath() { // Name probably says it all
         gm.DeadOnArrival();
         print("Aarghh!");
+    }
+
+    public void StartNewLvl() {
+        rb.position = new Vector3(rb.position.x, (startPos.y + 5f), 0);
     }
 }
