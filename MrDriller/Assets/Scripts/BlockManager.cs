@@ -117,9 +117,9 @@ public class BlockManager : MonoBehaviour {
             for (int i = 0; i < levelStartRows; i++) {
                 for (int j = 0; j < columns; j++) {
                     CreateBlock(inttiLista[i][j], i, j);
-                    //if(i+j < 4 || ( 0 < Mathf.Abs((i+j)-8) && Mathf.Abs((i + j) - 8) < 4 ) ) {
-                    //    blockScript.bc = BlockColor.Grey;
-                    //}
+                    if(i+j < 4 || (j > 5 && j - i >= 5)) {
+                        blockScript.bc = BlockColor.Grey;
+                    }
                 }
             }
 
