@@ -25,6 +25,8 @@ public class BlockManager : MonoBehaviour {
     float posy = 0;
     public Color[] colorList;
     public int lvlEndBlocks;
+    public GameManager gm;
+
     // public string poppedAudioEvent;
     // Fabric.EventManager.Instance.PostEvent(poppedAudioEvent); Sara, laita tämä sinne missä kaikki paukkuu!
     public void AtLevelStart(int level) {
@@ -87,7 +89,7 @@ public class BlockManager : MonoBehaviour {
     public void GenerateBlocks(int level) {
 
         if (level == 1) {
-
+            //TODO: TUTORIAL ALKU!
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < columns; j++) {
                     if (i < rows - lvlEndBlocks) {
@@ -126,48 +128,83 @@ public class BlockManager : MonoBehaviour {
                     }
                 }
             }
-        } //**************************Testikäyttöön only!!******************************************
-        if (level == 2) {
+        } 
+        else if (level == 2) {
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < columns; j++) {
                     if (i < rows - lvlEndBlocks) {
                         var candyRandomizer = Random.value;
-                        if (candyRandomizer < .05) {
+                        if (candyRandomizer < .02) {
                             CreateBlock(1, i, j);
                             //tee cndy ja else tee blokki
                         }
-                        else
-                        {
+                        else {
                             CreateBlock(2, i, j);
                             //assign color to blocks
                             var blockColorRandomizer = Random.value;
-                            if (blockColorRandomizer > .9f)
-                            {
+                            if (blockColorRandomizer > .5f) {
                                 blockScript.bc = BlockColor.Blue;
                             }
-                            else if (blockColorRandomizer > .8f)
-                            {
+                            else if (blockColorRandomizer > .2f) {
                                 blockScript.bc = BlockColor.Green;
                             }
-                            else if (blockColorRandomizer > .7f)
-                            {
-                                blockScript.bc = BlockColor.Red;
-                            }
-                            else if (blockColorRandomizer > .6f)
-                            {
-                                blockScript.bc = BlockColor.Yellow;
-                            }
-                            else
-                            {
+                            //else if (blockColorRandomizer > .4f)
+                            //{
+                            //    blockScript.bc = BlockColor.Red;
+                            //}
+                            //else if (blockColorRandomizer > .3f)
+                            //{
+                            //    blockScript.bc = BlockColor.Yellow;
+                            //}
+                            else {
                                 blockScript.bc = BlockColor.Grey;
                             }
                         }
-                    } else {
+                    }
+                    else {
                         CreateBlock(3, i, j);
                     }
                 }
             }
-        } //**************************Testikäyttöön only!!******************************************
+        }
+        else {
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < columns; j++) {
+                    if (i < rows - lvlEndBlocks) {
+                        var candyRandomizer = Random.value;
+                        if (candyRandomizer < .001) {
+                            CreateBlock(1, i, j);
+                            //tee cndy ja else tee blokki
+                        }
+                        else {
+                            CreateBlock(2, i, j);
+                            //assign color to blocks
+                            var blockColorRandomizer = Random.value;
+                            if (blockColorRandomizer > .01f) {
+                                blockScript.bc = BlockColor.Blue;
+                            }
+                            else if (blockColorRandomizer > .002f) {
+                                blockScript.bc = BlockColor.Green;
+                            }
+                            //else if (blockColorRandomizer > .4f)
+                            //{
+                            //    blockScript.bc = BlockColor.Red;
+                            //}
+                            //else if (blockColorRandomizer > .3f)
+                            //{
+                            //    blockScript.bc = BlockColor.Yellow;
+                            //}
+                            else {
+                                blockScript.bc = BlockColor.Grey;
+                            }
+                        }
+                    }
+                    else {
+                        CreateBlock(3, i, j);
+                    }
+                }
+            }
+        } 
     }
 
     public void SetBlockInGrid (BlockScript block) {
@@ -469,10 +506,15 @@ public class BlockManager : MonoBehaviour {
     //huom! tämä ei koskaan tapahtu harmaille blokeille
     public void PopBlocks(List<BlockScript> gToPop, int hits, int score) {
         //print(popped);
+        bool lvlEndReached = false;
         foreach (BlockScript block in gToPop) {
+            lvlEndReached = block.levelEnd;
                 block.Pop(hits, score);
         }
         AllGroups.Remove(gToPop);
+        if (lvlEndReached) {
+            gm.LevelEnd();
+        }
     }
 
     public void HoldBlocks(BlockScript toFall) {
@@ -500,8 +542,61 @@ public class BlockManager : MonoBehaviour {
         return !(tempInt > 0); //jos enemmän kuin yksi palautetaan false
     }
 
-    public void DestroyThreeColumnsOnTop() {
-        print("destroy three columns");
+    public void PopAll() {
+        List<List<BlockScript>> toBeRemoved = new List<List<BlockScript>>();
+        List<List<BlockScript>> toBePopped = new List<List<BlockScript>>();
+
+        foreach (List<BlockScript> g in AllGroups) {
+            toBeRemoved.Add(g);
+            toBePopped.Add(g);
+        }
+        foreach (List<BlockScript> g in toBeRemoved) {
+            AllGroups.Remove(g);
+        }
+        foreach (List<BlockScript> g in toBePopped) {
+            PopBlocks(g, 6, 0);
+        }
+
+    }
+
+        //public void PopFarAwayBlocks() {
+        //    for (int y = Mathf.Abs(Mathf.RoundToInt(player.transform.position.y)) -15 ; y > -1; y--) {
+        //        // Destroy blocks without adding to score
+        //        //lisätään toBePopped-listaan kaikki joihin pätee: vai toBeRemoved? kysyy Ari molempiin t. Sara
+        //        List<List<BlockScript>> toBeRemoved = new List<List<BlockScript>>();
+        //        List<List<BlockScript>> toBePopped = new List<List<BlockScript>>();
+
+        //        foreach (List<BlockScript> group in AllGroups) {
+        //            int onTop = 0;
+        //            foreach (BlockScript block in group) {
+        //                var roundedPos = new Vector3(Mathf.RoundToInt(block.transform.position.x), Mathf.RoundToInt(block.transform.position.y),
+        //                    Mathf.RoundToInt(block.transform.position.z));
+
+        //                if (roundedPos.y == y * -1) {
+        //                    onTop++;
+        //                    print("going to destroy " + block);
+        //                }
+        //            }
+        //            if (onTop > 0) {
+        //                toBeRemoved.Add(group);
+
+        //                toBePopped.Add(group);
+        //            }
+        //        }
+
+        //        foreach (List<BlockScript> g in toBeRemoved) {
+        //            AllGroups.Remove(g);
+        //        }
+
+        //        foreach (List<BlockScript> g in toBePopped) {
+        //            PopBlocks(g, 6, 0);
+        //        }
+
+        //    }
+        //}
+
+        public void PopThreeColumnsOnTop() {
+        print("pop three columns");
         print(Mathf.Abs(Mathf.RoundToInt(player.transform.position.y)));
         for (int y = Mathf.Abs(Mathf.RoundToInt(player.transform.position.y)); y > -1; y--) {
             // Destroy blocks without adding to score
@@ -512,9 +607,12 @@ public class BlockManager : MonoBehaviour {
             foreach(List<BlockScript> group in AllGroups) {
                 int onTop = 0;
                 foreach (BlockScript block in group) {
-                    if (block.transform.position == new Vector3(Mathf.RoundToInt(player.transform.position.x), y * -1, 0) ||
-                        block.transform.position == new Vector3(Mathf.RoundToInt(player.transform.position.x + 1), y * -1, 0) ||
-                        block.transform.position == new Vector3(Mathf.RoundToInt(player.transform.position.x - 1), y * -1, 0)) {
+                    var roundedPos = new Vector3(Mathf.RoundToInt(block.transform.position.x), Mathf.RoundToInt(block.transform.position.y),
+                        Mathf.RoundToInt(block.transform.position.z));
+
+                    if (roundedPos == new Vector3(Mathf.RoundToInt(player.transform.position.x), y * -1, 0) ||
+                        roundedPos == new Vector3(Mathf.RoundToInt(player.transform.position.x + 1), y * -1, 0) ||
+                        roundedPos == new Vector3(Mathf.RoundToInt(player.transform.position.x - 1), y * -1, 0)) {
                         onTop++;
                         print("going to destroy " + block);
                     }

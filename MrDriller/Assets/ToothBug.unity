@@ -511,7 +511,8 @@ MonoBehaviour:
   - {r: 0.7735849, g: 0.7735849, b: 0.7735849, a: 1}
   - {r: 0.9811321, g: 0.27305093, b: 0.7963991, a: 1}
   - {r: 0.019607833, g: 0.90588236, b: 0.52847594, a: 1}
-  lvlEndBlocks: 9
+  lvlEndBlocks: 10
+  gm: {fileID: 1723051163}
 --- !u!4 &315471598
 Transform:
   m_ObjectHideFlags: 0
@@ -3620,6 +3621,7 @@ MonoBehaviour:
   exhaustedAudioEvent: Exhausted
   sugarAudioEvent: Sugar
   depletedAudioEvent: Depleted
+  player: {fileID: 0}
 --- !u!4 &1723051164
 Transform:
   m_ObjectHideFlags: 0
