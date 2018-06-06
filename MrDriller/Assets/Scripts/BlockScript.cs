@@ -47,7 +47,7 @@ public class BlockScript : MonoBehaviour {
     public bool levelEnd;
     public int hitsLeft = 1;
     Collider2D c2d;
-    public bool didGreyGetDrilled = true;
+    public bool didGreyGetDrilled = false;
     public string poppedAudioEvent;
     private void Awake() {
         bm = FindObjectOfType<BlockManager>().GetComponent<BlockManager>();
@@ -251,6 +251,7 @@ public class BlockScript : MonoBehaviour {
         hitsLeft = hitsLeft - hits;
         if (hitsLeft < 1) {
             if (bc == BlockColor.Grey && didGreyGetDrilled) {
+                group.Remove(this);
                 gm.SugarDepletion();
             }
             Fabric.EventManager.Instance.PostEvent(poppedAudioEvent);

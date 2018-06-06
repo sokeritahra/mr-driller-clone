@@ -12,6 +12,7 @@ public class BlockManager : MonoBehaviour {
     //how many columns (how wide the grid is -> x)
     public GameObject blockPrefab;
 	public GameObject candyPrefab;
+    public GameObject greyPrefab;
     public PlayerCharacter player;
     public Vector2 firstBlock = new Vector2(0,0);
     //blokki prefabi
@@ -26,9 +27,8 @@ public class BlockManager : MonoBehaviour {
     public Color[] colorList;
     public int lvlEndBlocks;
     public GameManager gm;
+    public string poppedAudioEvent;
 
-    // public string poppedAudioEvent;
-    // Fabric.EventManager.Instance.PostEvent(poppedAudioEvent); Sara, laita tämä sinne missä kaikki paukkuu!
     public void AtLevelStart(int level) {
         //luodaan taulukko ja generoidaan blokit sinne
         GenerateBlocks(level);
@@ -46,13 +46,16 @@ public class BlockManager : MonoBehaviour {
 
 
     public void CreateBlock(int type, int row, int column) {
-        //candy = type 1, block = type 2,  level end block = type 3
+        //candy = type 1, block = type 2, durable block = type 3, level end block = type 4
         string typeS;
         if (type == 1) {
             typeS = "Candy";
         } else if (type == 2) {
             typeS = "Block";
-        } else {
+        } else if (type == 3) {
+            typeS = "Fluori";
+        }
+        else {
             typeS = "LvlEnd";
         }
         GameObject go;
@@ -63,7 +66,10 @@ public class BlockManager : MonoBehaviour {
             blockScript = go.GetComponent<BlockScript>();
             blockScript.bc = BlockColor.Candy;
 			blockScript.bs = BlockState.Static;
-		} else {
+		} else if (type == 3) {
+            go = Instantiate (greyPrefab);
+        }
+        else {
 			go = Instantiate (blockPrefab);
 		} 
         //for all types, change name and position
@@ -74,7 +80,7 @@ public class BlockManager : MonoBehaviour {
 
         //separate level end blocks from blocks and candies (why?)
         //configure level end blocks
-        if (type < 3)
+        if (type < 4)
         {
             go.transform.parent = blockFolder;
         }
@@ -98,7 +104,11 @@ public class BlockManager : MonoBehaviour {
                             CreateBlock(1, i, j);
                             //tee cndy ja else tee blokki
                         }
-                        else {
+                        else if (candyRandomizer < .15) {
+                            CreateBlock(3, i, j);
+                            blockScript.bc = BlockColor.Grey;
+                            }
+                        else { 
                             CreateBlock(2, i, j);
                             //assign color to blocks
                             var blockColorRandomizer = Random.value;
@@ -114,21 +124,18 @@ public class BlockManager : MonoBehaviour {
                             {
                                 blockScript.bc = BlockColor.Red;
                             }
-                            else if (blockColorRandomizer > .1f)
-                            {
+                            else {
                                 blockScript.bc = BlockColor.Yellow;
                             }
-                            else
-                            {
-                                blockScript.bc = BlockColor.Grey;
-                            }
+
                             }
                     } else {
-                        CreateBlock(3, i, j);
+                        CreateBlock(4, i, j);
                     }
                 }
             }
-        } 
+        }
+
         else if (level == 2) {
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < columns; j++) {
@@ -138,73 +145,67 @@ public class BlockManager : MonoBehaviour {
                             CreateBlock(1, i, j);
                             //tee cndy ja else tee blokki
                         }
-                        else {
+                        else if (candyRandomizer < .1) {
+                            CreateBlock(3, i, j);
+                            blockScript.bc = BlockColor.Grey;
+                            }
+                        else { 
                             CreateBlock(2, i, j);
                             //assign color to blocks
                             var blockColorRandomizer = Random.value;
                             if (blockColorRandomizer > .5f) {
                                 blockScript.bc = BlockColor.Blue;
                             }
-                            else if (blockColorRandomizer > .2f) {
+                            else {
                                 blockScript.bc = BlockColor.Green;
                             }
-                            //else if (blockColorRandomizer > .4f)
-                            //{
-                            //    blockScript.bc = BlockColor.Red;
-                            //}
-                            //else if (blockColorRandomizer > .3f)
-                            //{
-                            //    blockScript.bc = BlockColor.Yellow;
-                            //}
-                            else {
-                                blockScript.bc = BlockColor.Grey;
+
+
                             }
-                        }
-                    }
-                    else {
-                        CreateBlock(3, i, j);
+                    } else {
+                        CreateBlock(4, i, j);
                     }
                 }
             }
         }
-        else {
-            for (int i = 0; i < rows; i++) {
-                for (int j = 0; j < columns; j++) {
-                    if (i < rows - lvlEndBlocks) {
-                        var candyRandomizer = Random.value;
-                        if (candyRandomizer < .001) {
-                            CreateBlock(1, i, j);
-                            //tee cndy ja else tee blokki
-                        }
-                        else {
-                            CreateBlock(2, i, j);
-                            //assign color to blocks
-                            var blockColorRandomizer = Random.value;
-                            if (blockColorRandomizer > .01f) {
-                                blockScript.bc = BlockColor.Blue;
-                            }
-                            else if (blockColorRandomizer > .002f) {
-                                blockScript.bc = BlockColor.Green;
-                            }
-                            //else if (blockColorRandomizer > .4f)
-                            //{
-                            //    blockScript.bc = BlockColor.Red;
-                            //}
-                            //else if (blockColorRandomizer > .3f)
-                            //{
-                            //    blockScript.bc = BlockColor.Yellow;
-                            //}
-                            else {
-                                blockScript.bc = BlockColor.Grey;
-                            }
-                        }
-                    }
-                    else {
-                        CreateBlock(3, i, j);
-                    }
-                }
-            }
-        } 
+        //else {
+        //    for (int i = 0; i < rows; i++) {
+        //        for (int j = 0; j < columns; j++) {
+        //            if (i < rows - lvlEndBlocks) {
+        //                var candyRandomizer = Random.value;
+        //                if (candyRandomizer < .001) {
+        //                    CreateBlock(1, i, j);
+        //                    //tee cndy ja else tee blokki
+        //                }
+        //                else {
+        //                    CreateBlock(2, i, j);
+        //                    //assign color to blocks
+        //                    var blockColorRandomizer = Random.value;
+        //                    if (blockColorRandomizer > .01f) {
+        //                        blockScript.bc = BlockColor.Blue;
+        //                    }
+        //                    else if (blockColorRandomizer > .002f) {
+        //                        blockScript.bc = BlockColor.Green;
+        //                    }
+        //                    //else if (blockColorRandomizer > .4f)
+        //                    //{
+        //                    //    blockScript.bc = BlockColor.Red;
+        //                    //}
+        //                    //else if (blockColorRandomizer > .3f)
+        //                    //{
+        //                    //    blockScript.bc = BlockColor.Yellow;
+        //                    //}
+        //                    else {
+        //                        blockScript.bc = BlockColor.Grey;
+        //                    }
+        //                }
+        //            }
+        //            else {
+        //                CreateBlock(3, i, j);
+        //            }
+        //        }
+        //    }
+        //} 
     }
 
     public void SetBlockInGrid (BlockScript block) {
@@ -347,6 +348,7 @@ public class BlockManager : MonoBehaviour {
     void FixedUpdate() {
         List<List<BlockScript>> toBeRemoved = new List<List<BlockScript>>();
         List<List<BlockScript>> toBePopped = new List<List<BlockScript>>();
+        int anyStatic = 0;
 
         foreach (List<BlockScript> g in AllGroups) {
             //tsekkaa putoavista snäppääkö
@@ -372,23 +374,29 @@ public class BlockManager : MonoBehaviour {
                         }
                         else if (block.CheckAnyBelow()) {
                             snaps++;
+                            if(block.blockBelow.bs == BlockState.Static) {
+                                anyStatic++;
+                            }
                         }
 
                         if (block.CheckLeft()) {
                             merges.Add(block.blockLeft.group);
-                            print("merging from the LEFT " + block.blockLeft + " with " + block);
+                            //print("merging from the LEFT " + block.blockLeft + " with " + block);
                             //jos jokin näistä on static, snäpätessä staticiks
                         }
 
                         if (block.CheckRight()) {
                             merges.Add(block.blockRight.group);
-                            print("merging from the RighT " + block.blockRight + " with " + block);
+                            //print("merging from the RighT " + block.blockRight + " with " + block);
                             //jos jokin näistä on static, snäpätessä staticiks
                         }
                     }
                     //candyiltä pitää tarkistaa myös snäpätäänkö
                     else if (block.CheckAnyBelow()) {
                         snaps++;
+                        if (block.blockBelow.bs == BlockState.Static) {
+                            anyStatic++;
+                        }
                     }
                     
                 }
@@ -397,7 +405,7 @@ public class BlockManager : MonoBehaviour {
                     foreach (List<BlockScript> mg in merges) {
                         MergeGroups(mg, g);
                         toBeRemoved.Add(mg);
-                        print("merging " + mg + " with " + g);
+                        //print("merging " + mg + " with " + g);
                         //SHOULD POP IF GROUP.COUNT > 3
                         if (g.Count > 3 && !toBePopped.Contains(g)) {
                             toBePopped.Add(g);
@@ -424,17 +432,29 @@ public class BlockManager : MonoBehaviour {
                     //MILLON TÄÄ PITÄÄ TEHÄ bm.SetBlockInGrid(this);
                 }
                 else if (snaps > 0) {
-                    foreach (BlockScript block in g) {
-                        block.SnapInPlace(BlockState.Static);
-                        //block.SnapInPlace(block.blockBelow.bs);
-                        //TODO: tässä tapahtuu nyt niin että jokainen blokki ottaa alapuolella sijaitsevasta blokista erikseen sen
-                        //blockstaten ja sen pitäis mennä sillee että jos jokin niistä (blockbelow) on static sen pitäis olla kaikille 
-                        //g:ssä static ja jos ne kaikki (blockbelow) on hold, blockille myös hold
+
+                    if (anyStatic > 0) {
+                        foreach (BlockScript block in g) {
+                            block.SnapInPlace(BlockState.Static);
+                        }
                     }
-                    
-                    if (g.Count > 3 && !toBePopped.Contains(g))
-                    {
-                        toBePopped.Add(g);
+                    else {
+                        float holdTime = 2f;
+                        foreach (BlockScript block in g) {
+                            if(block.blockBelow) {
+                                holdTime = holdTime < block.blockBelow.holdTimer ? holdTime : block.blockBelow.holdTimer;
+                            }
+                        }
+
+                        foreach (BlockScript block in g) {
+                            block.holdTimer = holdTime;
+                            block.SnapInPlace(BlockState.Hold);
+                            //print("snapping and changing to hold " + block + " and holdtime is " + block.holdTimer);
+                        }
+
+                        if (g.Count > 3 && !toBePopped.Contains(g)) {
+                            toBePopped.Add(g);
+                        }
                     }
                 }
                 else {
@@ -507,6 +527,7 @@ public class BlockManager : MonoBehaviour {
     public void PopBlocks(List<BlockScript> gToPop, int hits, int score) {
         //print(popped);
         bool lvlEndReached = false;
+        //Fabric.EventManager.Instance.PostEvent(poppedAudioEvent);
         foreach (BlockScript block in gToPop) {
             lvlEndReached = block.levelEnd;
                 block.Pop(hits, score);
@@ -554,55 +575,64 @@ public class BlockManager : MonoBehaviour {
             AllGroups.Remove(g);
         }
         foreach (List<BlockScript> g in toBePopped) {
-            PopBlocks(g, 6, 0);
+            foreach(BlockScript block in g) {
+                Destroy(block.gameObject);
+            }
         }
 
     }
 
-        //public void PopFarAwayBlocks() {
-        //    for (int y = Mathf.Abs(Mathf.RoundToInt(player.transform.position.y)) -15 ; y > -1; y--) {
-        //        // Destroy blocks without adding to score
-        //        //lisätään toBePopped-listaan kaikki joihin pätee: vai toBeRemoved? kysyy Ari molempiin t. Sara
-        //        List<List<BlockScript>> toBeRemoved = new List<List<BlockScript>>();
-        //        List<List<BlockScript>> toBePopped = new List<List<BlockScript>>();
+    public void PopFarAwayBlocks() {
 
-        //        foreach (List<BlockScript> group in AllGroups) {
-        //            int onTop = 0;
-        //            foreach (BlockScript block in group) {
-        //                var roundedPos = new Vector3(Mathf.RoundToInt(block.transform.position.x), Mathf.RoundToInt(block.transform.position.y),
-        //                    Mathf.RoundToInt(block.transform.position.z));
+        List<List<BlockScript>> toBeRemoved = new List<List<BlockScript>>();
+        List<List<BlockScript>> toBePopped = new List<List<BlockScript>>();
 
-        //                if (roundedPos.y == y * -1) {
-        //                    onTop++;
-        //                    print("going to destroy " + block);
-        //                }
-        //            }
-        //            if (onTop > 0) {
-        //                toBeRemoved.Add(group);
+        for (int y = Mathf.Abs(Mathf.RoundToInt(player.transform.position.y)) - 15; y > -1; y--) {
+            // Destroy blocks without adding to score
+            //lisätään toBePopped-listaan kaikki joihin pätee: vai toBeRemoved? kysyy Ari molempiin t. Sara
 
-        //                toBePopped.Add(group);
-        //            }
-        //        }
+            foreach (List<BlockScript> group in AllGroups) {
+                int onTop = 0;
+                foreach (BlockScript block in group) {
+                    var roundedPos = new Vector3(Mathf.RoundToInt(block.transform.position.x), Mathf.RoundToInt(block.transform.position.y),
+                        Mathf.RoundToInt(block.transform.position.z));
 
-        //        foreach (List<BlockScript> g in toBeRemoved) {
-        //            AllGroups.Remove(g);
-        //        }
+                    if (roundedPos.y == y * -1) {
+                        onTop++;
+                        print("going to destroy " + block);
+                    }
+                }
+                if (onTop > 0) {
+                    toBeRemoved.Add(group);
 
-        //        foreach (List<BlockScript> g in toBePopped) {
-        //            PopBlocks(g, 6, 0);
-        //        }
+                    toBePopped.Add(group);
+                }
+            }
 
-        //    }
-        //}
+        }
 
-        public void PopThreeColumnsOnTop() {
+        foreach (List<BlockScript> g in toBeRemoved) {
+            AllGroups.Remove(g);
+        }
+
+        foreach (List<BlockScript> g in toBePopped) {
+            foreach (BlockScript block in g) {
+                Destroy(block.gameObject);
+            }
+        }
+
+    }
+
+    public void PopThreeColumnsOnTop() {
         print("pop three columns");
         print(Mathf.Abs(Mathf.RoundToInt(player.transform.position.y)));
+
+        List<List<BlockScript>> toBeRemoved = new List<List<BlockScript>>();
+        List<List<BlockScript>> toBePopped = new List<List<BlockScript>>();
         for (int y = Mathf.Abs(Mathf.RoundToInt(player.transform.position.y)); y > -1; y--) {
             // Destroy blocks without adding to score
             //lisätään toBePopped-listaan kaikki joihin pätee: vai toBeRemoved? kysyy Ari molempiin t. Sara
-            List<List<BlockScript>> toBeRemoved = new List<List<BlockScript>>();
-            List<List<BlockScript>> toBePopped = new List<List<BlockScript>>();
+
 
             foreach(List<BlockScript> group in AllGroups) {
                 int onTop = 0;
@@ -624,14 +654,19 @@ public class BlockManager : MonoBehaviour {
                 }
             }
 
-            foreach (List<BlockScript> g in toBeRemoved) {
-                AllGroups.Remove(g);
-            }
+        }
 
-            foreach (List<BlockScript> g in toBePopped) {
-                PopBlocks(g, 6, 0);
-            }
+        foreach (List<BlockScript> g in toBeRemoved) {
+            AllGroups.Remove(g);
+        }
 
+        foreach (List<BlockScript> g in toBePopped) {
+            foreach (BlockScript block in g) {
+                if (block.bc == BlockColor.Grey) {
+                    block.didGreyGetDrilled = false;
+                }
+            }
+            PopBlocks(g, 6, 0);
         }
     }
 }

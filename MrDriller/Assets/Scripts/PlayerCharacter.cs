@@ -182,13 +182,11 @@ public class PlayerCharacter : MonoBehaviour {
                 }
 
             } else {
-                //if (alive) {
                 rb.velocity = new Vector2(0, 0);
                 pm = previousPm;
                 alreadyPlayed = false;
                 animS = animDefault;
                 fallTimer = .2f;
-                //}
             }
 
             if (pm == PlayerMode.Falling || pm == PlayerMode.Static) { // Shouldn't move when falling or static
@@ -333,14 +331,11 @@ public class PlayerCharacter : MonoBehaviour {
             if (centerHeadAntenna || leftHeadAntenna || rightHeadAntenna) {
                 if (leftHeadAntenna && rightHeadAntenna) {
                     // Squash player
-                    animS = "Death_Squashed";
-                    pm = PlayerMode.Static;
-                    anim.Play(animS);
-                    alive = false;
                     Fabric.EventManager.Instance.PostEvent(squashedAudioEvent);
-                    ColdAndLonelyDeath();
+                    ColdAndLonelyDeath(true);
                     c.enabled = false;
-                    reviveTimer = 2f;
+                    print(leftHandAntenna.collider);
+                    print(rightHandAntenna.collider);
 
                 } else if (leftHeadAntenna) {
                     // NDE bellied or assed towards right
@@ -427,7 +422,6 @@ public class PlayerCharacter : MonoBehaviour {
         //jos blokki on grey, pitää poksauttaa vain se ja POISTAA RYHMÄSTÄÄN!
         if(block.bs == BlockState.Static || block.bs == BlockState.Hold) {
             if (block.bc == BlockColor.Grey) {
-                block.group.Remove(block);
                 block.didGreyGetDrilled = true;
                 block.Pop(1, 0);
             } else {
@@ -450,9 +444,15 @@ public class PlayerCharacter : MonoBehaviour {
     }
 
     // Death on arrival
-    void ColdAndLonelyDeath() { // Name probably says it all
-        gm.DeadOnArrival();
-        print("Aarghh!");
+    public void ColdAndLonelyDeath(bool selfCalled) { // Name probably says it all
+        animS = "Death_Squashed";
+        pm = PlayerMode.Static;
+        anim.Play(animS);
+        alive = false;
+        if (selfCalled) {
+            gm.DeadOnArrival();
+        }
+        reviveTimer = 2f;
     }
 
     public void StartNewLvl() {
