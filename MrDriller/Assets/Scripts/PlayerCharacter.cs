@@ -447,6 +447,7 @@ public class PlayerCharacter : MonoBehaviour {
     public void ColdAndLonelyDeath(bool selfCalled) { // Name probably says it all
         animS = "Death_Squashed";
         pm = PlayerMode.Static;
+        rb.velocity = new Vector2(0, 0);
         anim.Play(animS);
         alive = false;
         if (selfCalled) {

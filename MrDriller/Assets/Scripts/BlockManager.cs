@@ -28,6 +28,14 @@ public class BlockManager : MonoBehaviour {
     public int lvlEndBlocks;
     public GameManager gm;
     public string poppedAudioEvent;
+    public List<int> ekaRivi = new List<int>();
+    public List<int> tokaRivi = new List<int>();
+    public List<int> kolRivi = new List<int>();
+    public List<int> nelRivi = new List<int>();
+    public List<int> viiRivi = new List<int>();
+    public List<int> kuuRivi = new List<int>();
+    public List<int> seiRivi = new List<int>();
+    public List<List<int>> inttiLista = new List<List<int>>();
 
     public void AtLevelStart(int level) {
         //luodaan taulukko ja generoidaan blokit sinne
@@ -97,23 +105,34 @@ public class BlockManager : MonoBehaviour {
         if (level == 1) {
             //TODO: TUTORIAL ALKU!
             int levelStartRows = 7;
-            //int[, ,] levelStartBlocks = new int[7, columns, 4] { { { 1, 2, 3 }, { 4, 5, 6 } },
-            //                     { { 7, 8, 9 }, { 10, 11, 12 } } };
-            //Dictionary<Vector2, int> dict = new Dictionary<string, int>
-            //{
-            //    { "one", 1 },
-            //    { "two", 2 },
-            //    { "three", 3 },
-            //    { "four", 4 }
-            //};
-            //for (int i = 0; i < levelStartRows; i++) {
-            //    for (int j = 0; j < columns; j++) {
-            //        if(i == 0 && j == 4) {
 
-            //        }
-            //        CreateBlock(3, i, j);
-            //    }
-            //}
+            inttiLista.Add(ekaRivi);
+            inttiLista.Add(tokaRivi);
+            inttiLista.Add(kolRivi);
+            inttiLista.Add(nelRivi);
+            inttiLista.Add(viiRivi);
+            inttiLista.Add(kuuRivi);
+            inttiLista.Add(seiRivi);
+
+            for (int i = 0; i < levelStartRows; i++) {
+                for (int j = 0; j < columns; j++) {
+                    CreateBlock(inttiLista[i][j], i, j);
+                    if(i+j < 4 || (j > 4 && j - i >= 5)) {
+                        blockScript.bc = BlockColor.Grey;
+                    } else if (i == 0){
+                        blockScript.bc = BlockColor.Yellow;
+                    } else if (i == 1) {
+                        blockScript.bc = BlockColor.Blue;
+                    } else if (i == 2) {
+                        blockScript.bc = BlockColor.Green;
+                    } else if (i == 3) {
+                        blockScript.bc = BlockColor.Red;
+                    } else if (i == 4) {
+                        blockScript.bc = BlockColor.Yellow;
+                    }
+                }
+            }
+
             for (int i = levelStartRows; i < rows; i++) {
                 for (int j = 0; j < columns; j++) {
                     if (i < rows - lvlEndBlocks) {
@@ -510,9 +529,13 @@ public class BlockManager : MonoBehaviour {
                             //print("snapping and changing to hold " + block + " and holdtime is " + block.holdTimer);
                         }
 
-                        if (g.Count > 3 && !toBePopped.Contains(g)) {
-                            toBePopped.Add(g);
+                    }
+
+                    if (g.Count > 3 && !toBePopped.Contains(g)) {
+                        foreach (BlockScript block in g) {
+                            print(block + " gonna pop!");
                         }
+                        toBePopped.Add(g);
                     }
                 }
                 else {
@@ -547,7 +570,7 @@ public class BlockManager : MonoBehaviour {
                     //print("Group's states changed to hold");
                     foreach (BlockScript block in g) {
                         block.bs = BlockState.Hold;
-                        block.holdTimer = 1.5f;
+                        block.holdTimer = 2f;
                         //print("group contains " + block);
                     }
                 }

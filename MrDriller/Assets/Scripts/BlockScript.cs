@@ -26,7 +26,7 @@ public class BlockScript : MonoBehaviour {
     public int gridPos;
     // paikka taulukossa?
     //ja sit onko blokki perus, X vai AIR
-    public float holdTimer = 1.5f;
+    public float holdTimer = 2f;
     public BlockState bs;
     public BlockColor bc;
     BlockManager bm;
