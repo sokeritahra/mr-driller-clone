@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour {
     public TextMeshProUGUI statusText;
     float statusTextTimer = 0;
     int lifeLeft = 100;
+    int lifeLeftAtLvlEnd = 100;
     int livesLeft = 3;
     float lifeDeductionTick = 0.9f;
     float lifeDeductionCounter = 0;
@@ -26,10 +27,12 @@ public class GameManager : MonoBehaviour {
     public string sugarAudioEvent;
     public string depletedAudioEvent;
     public PlayerCharacter player;
-    float lvlEndTimer = 2f;
+    float lvlEndTimer = 5f;
     bool levelEndReached;
     Camera cam;
     Vector3 camStartPos;
+    public string lvlClearedAudioEvent;
+    bool played;
 
     private void Start() {
         highScore = PlayerPrefs.GetFloat("highScore", 0);
@@ -62,9 +65,11 @@ public class GameManager : MonoBehaviour {
 
     public void LevelEnd() {
         levelEndReached = true;
+        lifeLeftAtLvlEnd = lifeLeft;
     }
 
     void NewLevel() {
+        lifeLeft = lifeLeftAtLvlEnd;
         level++;
         print("starting new level!");
         bm.AtLevelStart(level);
@@ -72,6 +77,7 @@ public class GameManager : MonoBehaviour {
         foreach (BlockSpriteChanger bsc in bscArray) {
             bsc.AtLevelStart();
         }
+        played = false;
     }
 
     private void Update() {
@@ -83,23 +89,27 @@ public class GameManager : MonoBehaviour {
             lvlEndTimer -= Time.deltaTime;
         }
 
-        if (lvlEndTimer < 1) {
+        if (lvlEndTimer < 4) {
             bm.PopAll();
+            if (!played) {
+                Fabric.EventManager.Instance.PostEvent(lvlClearedAudioEvent);
+                played = true;
+            }
+            statusText.text = "LEVEL CLEARED!";
+            statusTextTimer = 3;
         }
 
         if (lvlEndTimer < 0) {
             levelEndReached = false;
             player.StartNewLvl();
             cam.transform.position = camStartPos + new Vector3(0, 5, 0);
-            lvlEndTimer = 2f;
+            lvlEndTimer = 5f;
             NewLevel();
         }
 
     }
 
     private void FixedUpdate() {
-
-
 
         if (lifeLeft > 100) {
             lifeLeft = 100;
@@ -110,10 +120,12 @@ public class GameManager : MonoBehaviour {
             lifeLeft -= 1;
             lifeDeductionCounter -= lifeDeductionTick;
             sugarText.text = ("" + lifeLeft);
+            bm.PopFarAwayBlocks();
         }
 
         if (lifeLeft <= 0) { // Life amount deducter
             DeadOnArrival();
+            player.ColdAndLonelyDeath(false);
             Fabric.EventManager.Instance.PostEvent(exhaustedAudioEvent);
         }
         
@@ -158,20 +170,23 @@ public class GameManager : MonoBehaviour {
     }
     
     public void DeadOnArrival() {
-        if (livesLeft > 1) {
+        if (!levelEndReached && livesLeft > 1) {
             livesLeft--;
             livesText.text = ("" + livesLeft);
             statusText.text = "A Life is lost";
             statusTextTimer = 3;
             lifeLeft = 100;
-        } else {
+        } else if (!levelEndReached) {
             GameOver();
+        } else {
+            print("jotain tapahtui");
         }
     }
 
     void GameOver() {
-        scoreText.text = ("Game");
-        sugarText.text = ("Over");
+        statusText.text = ("Game Over!");
+        statusTextTimer = 2f;
+        //sugarText.text = ("Over");
         //levelText.text = ("Mother");
         //livesText.text = ("Hugger");
         PlayerPrefs.SetFloat("highScore", highScore);
