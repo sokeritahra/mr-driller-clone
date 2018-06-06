@@ -96,11 +96,29 @@ public class BlockManager : MonoBehaviour {
 
         if (level == 1) {
             //TODO: TUTORIAL ALKU!
-            for (int i = 0; i < rows; i++) {
+            int levelStartRows = 7;
+            //int[, ,] levelStartBlocks = new int[7, columns, 4] { { { 1, 2, 3 }, { 4, 5, 6 } },
+            //                     { { 7, 8, 9 }, { 10, 11, 12 } } };
+            //Dictionary<Vector2, int> dict = new Dictionary<string, int>
+            //{
+            //    { "one", 1 },
+            //    { "two", 2 },
+            //    { "three", 3 },
+            //    { "four", 4 }
+            //};
+            //for (int i = 0; i < levelStartRows; i++) {
+            //    for (int j = 0; j < columns; j++) {
+            //        if(i == 0 && j == 4) {
+
+            //        }
+            //        CreateBlock(3, i, j);
+            //    }
+            //}
+            for (int i = levelStartRows; i < rows; i++) {
                 for (int j = 0; j < columns; j++) {
                     if (i < rows - lvlEndBlocks) {
                         var candyRandomizer = Random.value;
-                        if (candyRandomizer < .05) {
+                        if (candyRandomizer < .02) {
                             CreateBlock(1, i, j);
                             //tee cndy ja else tee blokki
                         }
@@ -141,7 +159,7 @@ public class BlockManager : MonoBehaviour {
                 for (int j = 0; j < columns; j++) {
                     if (i < rows - lvlEndBlocks) {
                         var candyRandomizer = Random.value;
-                        if (candyRandomizer < .02) {
+                        if (candyRandomizer < .01) {
                             CreateBlock(1, i, j);
                             //tee cndy ja else tee blokki
                         }
@@ -168,6 +186,46 @@ public class BlockManager : MonoBehaviour {
                 }
             }
         }
+
+        else if (level == 3) {
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < columns; j++) {
+                    if (i < rows - lvlEndBlocks) {
+                        var candyRandomizer = Random.value;
+                        if (candyRandomizer < .015) {
+                            CreateBlock(1, i, j);
+                            //tee cndy ja else tee blokki
+                        }
+                        else if (candyRandomizer < .2) {
+                            CreateBlock(3, i, j);
+                            blockScript.bc = BlockColor.Grey;
+                        }
+                        else {
+                            CreateBlock(2, i, j);
+                            //assign color to blocks
+                            var blockColorRandomizer = Random.value;
+                            if (blockColorRandomizer > .5f) {
+                                blockScript.bc = BlockColor.Red;
+                            }
+                            else if (blockColorRandomizer > .325f) {
+                                blockScript.bc = BlockColor.Green;
+                            }
+                            else if (blockColorRandomizer > .15) {
+                                blockScript.bc = BlockColor.Blue;
+                            }
+                            else {
+                                blockScript.bc = BlockColor.Yellow;
+                            }
+
+                        }
+                    }
+                    else {
+                        CreateBlock(4, i, j);
+                    }
+                }
+            }
+        }
+
         //else {
         //    for (int i = 0; i < rows; i++) {
         //        for (int j = 0; j < columns; j++) {
@@ -489,7 +547,7 @@ public class BlockManager : MonoBehaviour {
                     //print("Group's states changed to hold");
                     foreach (BlockScript block in g) {
                         block.bs = BlockState.Hold;
-                        block.holdTimer = 2f;
+                        block.holdTimer = 1.5f;
                         //print("group contains " + block);
                     }
                 }
