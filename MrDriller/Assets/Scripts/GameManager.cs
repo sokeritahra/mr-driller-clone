@@ -41,11 +41,11 @@ public class GameManager : MonoBehaviour {
         statusText = statusText.GetComponent<TextMeshProUGUI>();
 
         AtGameStart();
-        depthText.text = (depth + "µm");
-        scoreText.text = ("" + score);
-        sugarText.text = ("" + lifeLeft);
-        levelText.text = ("" + level);
-        livesText.text = ("" + livesLeft);
+        depthText.text = ("DEPTH: " + depth + "µm");
+        scoreText.text = ("SCORE: " + score);
+        sugarText.text = ("SUGAR: " + lifeLeft);
+        levelText.text = ("LEVEL: " + level);
+        livesText.text = ("LIVES: " + livesLeft);
         //different levels?
 
         Fabric.EventManager.Instance.PostEvent(BGMaudioEvent);
@@ -54,7 +54,7 @@ public class GameManager : MonoBehaviour {
         camStartPos = cam.transform.position;
     }
 
-    void AtGameStart() {
+    public void AtGameStart() {
         // Load level, generate blocks, drop player in scene
         bm = FindObjectOfType<BlockManager>();
         NewLevel();
@@ -109,7 +109,7 @@ public class GameManager : MonoBehaviour {
         while (lifeDeductionCounter > lifeDeductionTick) {
             lifeLeft -= 1;
             lifeDeductionCounter -= lifeDeductionTick;
-            sugarText.text = ("" + lifeLeft);
+            sugarText.text = ("SUGAR: " + lifeLeft);
         }
 
         if (lifeLeft <= 0) { // Life amount deducter
@@ -149,18 +149,18 @@ public class GameManager : MonoBehaviour {
 
     public void AddScore(int addS) {
         score += addS;
-        scoreText.text = ("" + score);
+        scoreText.text = ("SCORE:" + score);
     }
 
     public void Depth(int d) {
         depth = d;
-        depthText.text = (depth + "µm");
+        depthText.text = ("DEPTH: " + depth + "µm");
     }
     
     public void DeadOnArrival() {
         if (livesLeft > 1) {
             livesLeft--;
-            livesText.text = ("" + livesLeft);
+            livesText.text = ("LIVES: " + livesLeft);
             statusText.text = "A Life is lost";
             statusTextTimer = 3;
             lifeLeft = 100;
