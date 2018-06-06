@@ -12,6 +12,7 @@ public class BlockManager : MonoBehaviour {
     //how many columns (how wide the grid is -> x)
     public GameObject blockPrefab;
 	public GameObject candyPrefab;
+    public GameObject greyPrefab;
     public PlayerCharacter player;
     public Vector2 firstBlock = new Vector2(0,0);
     //blokki prefabi
@@ -45,13 +46,16 @@ public class BlockManager : MonoBehaviour {
 
 
     public void CreateBlock(int type, int row, int column) {
-        //candy = type 1, block = type 2,  level end block = type 3
+        //candy = type 1, block = type 2, durable block = type 3, level end block = type 4
         string typeS;
         if (type == 1) {
             typeS = "Candy";
         } else if (type == 2) {
             typeS = "Block";
-        } else {
+        } else if (type == 3) {
+            typeS = "Fluori";
+        }
+        else {
             typeS = "LvlEnd";
         }
         GameObject go;
@@ -62,7 +66,10 @@ public class BlockManager : MonoBehaviour {
             blockScript = go.GetComponent<BlockScript>();
             blockScript.bc = BlockColor.Candy;
 			blockScript.bs = BlockState.Static;
-		} else {
+		} else if (type == 3) {
+            go = Instantiate (greyPrefab);
+        }
+        else {
 			go = Instantiate (blockPrefab);
 		} 
         //for all types, change name and position
@@ -73,7 +80,7 @@ public class BlockManager : MonoBehaviour {
 
         //separate level end blocks from blocks and candies (why?)
         //configure level end blocks
-        if (type < 3)
+        if (type < 4)
         {
             go.transform.parent = blockFolder;
         }
@@ -97,7 +104,11 @@ public class BlockManager : MonoBehaviour {
                             CreateBlock(1, i, j);
                             //tee cndy ja else tee blokki
                         }
-                        else {
+                        else if (candyRandomizer < .15) {
+                            CreateBlock(3, i, j);
+                            blockScript.bc = BlockColor.Grey;
+                            }
+                        else { 
                             CreateBlock(2, i, j);
                             //assign color to blocks
                             var blockColorRandomizer = Random.value;
@@ -113,21 +124,18 @@ public class BlockManager : MonoBehaviour {
                             {
                                 blockScript.bc = BlockColor.Red;
                             }
-                            else if (blockColorRandomizer > .1f)
-                            {
+                            else {
                                 blockScript.bc = BlockColor.Yellow;
                             }
-                            else
-                            {
-                                blockScript.bc = BlockColor.Grey;
-                            }
+
                             }
                     } else {
-                        CreateBlock(3, i, j);
+                        CreateBlock(4, i, j);
                     }
                 }
             }
-        } 
+        }
+
         else if (level == 2) {
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < columns; j++) {
@@ -137,73 +145,67 @@ public class BlockManager : MonoBehaviour {
                             CreateBlock(1, i, j);
                             //tee cndy ja else tee blokki
                         }
-                        else {
+                        else if (candyRandomizer < .1) {
+                            CreateBlock(3, i, j);
+                            blockScript.bc = BlockColor.Grey;
+                            }
+                        else { 
                             CreateBlock(2, i, j);
                             //assign color to blocks
                             var blockColorRandomizer = Random.value;
                             if (blockColorRandomizer > .5f) {
                                 blockScript.bc = BlockColor.Blue;
                             }
-                            else if (blockColorRandomizer > .2f) {
+                            else {
                                 blockScript.bc = BlockColor.Green;
                             }
-                            //else if (blockColorRandomizer > .4f)
-                            //{
-                            //    blockScript.bc = BlockColor.Red;
-                            //}
-                            //else if (blockColorRandomizer > .3f)
-                            //{
-                            //    blockScript.bc = BlockColor.Yellow;
-                            //}
-                            else {
-                                blockScript.bc = BlockColor.Grey;
+
+
                             }
-                        }
-                    }
-                    else {
-                        CreateBlock(3, i, j);
+                    } else {
+                        CreateBlock(4, i, j);
                     }
                 }
             }
         }
-        else {
-            for (int i = 0; i < rows; i++) {
-                for (int j = 0; j < columns; j++) {
-                    if (i < rows - lvlEndBlocks) {
-                        var candyRandomizer = Random.value;
-                        if (candyRandomizer < .001) {
-                            CreateBlock(1, i, j);
-                            //tee cndy ja else tee blokki
-                        }
-                        else {
-                            CreateBlock(2, i, j);
-                            //assign color to blocks
-                            var blockColorRandomizer = Random.value;
-                            if (blockColorRandomizer > .01f) {
-                                blockScript.bc = BlockColor.Blue;
-                            }
-                            else if (blockColorRandomizer > .002f) {
-                                blockScript.bc = BlockColor.Green;
-                            }
-                            //else if (blockColorRandomizer > .4f)
-                            //{
-                            //    blockScript.bc = BlockColor.Red;
-                            //}
-                            //else if (blockColorRandomizer > .3f)
-                            //{
-                            //    blockScript.bc = BlockColor.Yellow;
-                            //}
-                            else {
-                                blockScript.bc = BlockColor.Grey;
-                            }
-                        }
-                    }
-                    else {
-                        CreateBlock(3, i, j);
-                    }
-                }
-            }
-        } 
+        //else {
+        //    for (int i = 0; i < rows; i++) {
+        //        for (int j = 0; j < columns; j++) {
+        //            if (i < rows - lvlEndBlocks) {
+        //                var candyRandomizer = Random.value;
+        //                if (candyRandomizer < .001) {
+        //                    CreateBlock(1, i, j);
+        //                    //tee cndy ja else tee blokki
+        //                }
+        //                else {
+        //                    CreateBlock(2, i, j);
+        //                    //assign color to blocks
+        //                    var blockColorRandomizer = Random.value;
+        //                    if (blockColorRandomizer > .01f) {
+        //                        blockScript.bc = BlockColor.Blue;
+        //                    }
+        //                    else if (blockColorRandomizer > .002f) {
+        //                        blockScript.bc = BlockColor.Green;
+        //                    }
+        //                    //else if (blockColorRandomizer > .4f)
+        //                    //{
+        //                    //    blockScript.bc = BlockColor.Red;
+        //                    //}
+        //                    //else if (blockColorRandomizer > .3f)
+        //                    //{
+        //                    //    blockScript.bc = BlockColor.Yellow;
+        //                    //}
+        //                    else {
+        //                        blockScript.bc = BlockColor.Grey;
+        //                    }
+        //                }
+        //            }
+        //            else {
+        //                CreateBlock(3, i, j);
+        //            }
+        //        }
+        //    }
+        //} 
     }
 
     public void SetBlockInGrid (BlockScript block) {
