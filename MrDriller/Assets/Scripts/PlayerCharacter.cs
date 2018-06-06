@@ -59,7 +59,7 @@ public class PlayerCharacter : MonoBehaviour {
     public string fallingAudioEvent;
     public string flippedAudioEvent;
     public string squashedAudioEvent;
-    Vector3 startPos;
+    public Vector3 startPos;
 
     void Awake() {
         rb = GetComponent<Rigidbody2D>();
@@ -72,9 +72,7 @@ public class PlayerCharacter : MonoBehaviour {
     }
 
     private void Update() {
-        if (Input.GetButtonDown("Fire2")) {
-            gm.PauseGame();
-        }
+
 
         // Debug drawings of playercharacter head antennas and falling sensors
 
@@ -96,9 +94,25 @@ public class PlayerCharacter : MonoBehaviour {
         anim.Play(animS);
 
         reviveTimer -= Time.deltaTime;
+        if (Input.GetButtonDown("Fire1") && drillTimer <= 0) {
+            CheckBlock(pm);
+            Fabric.EventManager.Instance.PostEvent(vomitAudioEvent);
+            //print("poranäppäintä painettu!");
+        }
+        if (Input.GetButtonDown("Fire2")) {
+            gm.PauseGame();
+        }
+        if (gm.gameEnded && Input.anyKeyDown) {
+            gm.ReturnToMenu();
+        }
     }
 
     void FixedUpdate() {
+
+
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            gm.ReturnToMenu();
+        }
         // Player Left, right and center collider points (in relation to collider)
         playerCenter = c.bounds.center;
         playerLeft = c.bounds.center - (c.bounds.size.x / 2 * Vector3.right);
@@ -279,7 +293,7 @@ public class PlayerCharacter : MonoBehaviour {
                     }
                 }
                 previousPm = pm;
-                gm.Depth(Mathf.Abs(Mathf.RoundToInt(transform.position.y - 1)));
+                gm.Depth(-Mathf.RoundToInt(transform.position.y - 1));
             }
 
 
@@ -321,11 +335,11 @@ public class PlayerCharacter : MonoBehaviour {
                 drillTimer -= Time.deltaTime;
             }
             // Drilling
-            if (Input.GetButtonDown("Fire1") && drillTimer <= 0) {
-                CheckBlock(pm);
-                Fabric.EventManager.Instance.PostEvent(vomitAudioEvent);
-                //print("poranäppäintä painettu!");
-            }
+            //if (Input.GetButtonDown("Fire1") && drillTimer <= 0) {
+            //    CheckBlock(pm);
+            //    Fabric.EventManager.Instance.PostEvent(vomitAudioEvent);
+            //    //print("poranäppäintä painettu!");
+            //}
 
 
             if (centerHeadAntenna || leftHeadAntenna || rightHeadAntenna) {
@@ -447,7 +461,6 @@ public class PlayerCharacter : MonoBehaviour {
     public void ColdAndLonelyDeath(bool selfCalled) { // Name probably says it all
         animS = "Death_Squashed";
         pm = PlayerMode.Static;
-        rb.velocity = new Vector2(0, 0);
         anim.Play(animS);
         alive = false;
         if (selfCalled) {

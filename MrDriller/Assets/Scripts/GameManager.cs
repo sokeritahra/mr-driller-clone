@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour {
     float lifeDeductionTick = 0.9f;
     float lifeDeductionCounter = 0;
     BlockSpriteChanger[] bscArray;
-    BlockManager bm;
+    public BlockManager bm;
     int level = 1;
     int depth = 0;
     float score;
@@ -35,7 +35,11 @@ public class GameManager : MonoBehaviour {
     bool played;
     Transform endBlokit;
     Transform blokit;
-    bool gameEnded;
+    public bool gameEnded;
+    bool gameOn;
+    public GameObject canGame;
+    public GameObject canMenu;
+    public GameObject canCred;
 
     private void Start() {
         highScore = PlayerPrefs.GetFloat("highScore", 0);
@@ -46,8 +50,8 @@ public class GameManager : MonoBehaviour {
         livesText = livesText.GetComponent<TextMeshProUGUI>();
         statusText = statusText.GetComponent<TextMeshProUGUI>();
 
-        AtGameStart();
-        depthText.text = ("DEPTH: " + depth + "µm");
+        //AtGameStart();
+        depthText.text = ("DEPTH: " + depth + "um");
         scoreText.text = ("SCORE: " + score);
         sugarText.text = ("SUGAR: " + lifeLeft);
         levelText.text = ("LEVEL: " + level);
@@ -55,20 +59,30 @@ public class GameManager : MonoBehaviour {
         //different levels?
 
         Fabric.EventManager.Instance.PostEvent(BGMaudioEvent);
-        player = FindObjectOfType<PlayerCharacter>();
         cam = FindObjectOfType<Camera>();
         camStartPos = cam.transform.position;
     }
 
+    //TODO KORJAA UUSI PELI
     public void AtGameStart() {
         // Load level, generate blocks, drop player in scene
-        bm = FindObjectOfType<BlockManager>();
+        canCred.SetActive(false);
+        gameOn = true;
+        print(bm);
+        bm.gameObject.SetActive(true);
         endBlokit = bm.endBlocks;
         blokit = bm.blockFolder;
         blokit.gameObject.SetActive(true);
         endBlokit.gameObject.SetActive(true);
         player.gameObject.SetActive(true);
+        level = 1;
+        gameEnded = false;
         NewLevel();
+        player.transform.position = player.startPos;
+        cam.transform.position = camStartPos;
+        levelEndReached = false;
+        player.alive = true;
+        player.pm = PlayerMode.Down;
     }
 
     public void LevelEnd() {
@@ -89,65 +103,69 @@ public class GameManager : MonoBehaviour {
     }
 
     private void Update() {
+        if (gameOn) {
 
-        if (statusTextTimer < 0) {
-            statusText.text = "";
-        }
-
-        if (level > 3 && !gameEnded) {
-            GameEnd();
-        } else if (level < 4 && levelEndReached && lvlEndTimer >= 0) {
-            lvlEndTimer -= Time.deltaTime;
-        }
-
-        if (lvlEndTimer < 3) {
-            bm.PopAll();
-            if (!played) {
-                Fabric.EventManager.Instance.PostEvent(lvlClearedAudioEvent);
-                played = true;
+            if (statusTextTimer < 0) {
+                statusText.text = "";
             }
-            statusText.text = "LEVEL CLEARED!";
-            statusTextTimer = 2;
-        }
 
-        if (lvlEndTimer < 0) {
-            levelEndReached = false;
-            player.StartNewLvl();
-            cam.transform.position = camStartPos + new Vector3(0, 5, 0);
-            lvlEndTimer = 4f;
-            NewLevel();
-        }
+            if (level > 3 && !gameEnded) {
+                GameEnd(true);
+            } else if (level < 4 && levelEndReached && lvlEndTimer >= 0) {
+                lvlEndTimer -= Time.deltaTime;
+            }
 
+            if (lvlEndTimer < 3) {
+                bm.PopAll();
+                if (!played) {
+                    Fabric.EventManager.Instance.PostEvent(lvlClearedAudioEvent);
+                    played = true;
+                }
+                statusText.text = "LEVEL CLEARED!";
+                statusTextTimer = 2;
+            }
+
+            if (lvlEndTimer < 0) {
+                levelEndReached = false;
+                player.StartNewLvl();
+                cam.transform.position = camStartPos + new Vector3(0, 5, 0);
+                lvlEndTimer = 4f;
+                NewLevel();
+            }
+
+        }
     }
 
     private void FixedUpdate() {
+        if (gameOn) {
+            if (lifeLeft > 100) {
+                lifeLeft = 100;
+            }
 
-        if (lifeLeft > 100) {
-            lifeLeft = 100;
-        }
+            lifeDeductionCounter += Time.deltaTime;
+            while (lifeDeductionCounter > lifeDeductionTick) {
+                lifeLeft -= 1;
+                lifeDeductionCounter -= lifeDeductionTick;
 
-        lifeDeductionCounter += Time.deltaTime;
-        while (lifeDeductionCounter > lifeDeductionTick) {
-            lifeLeft -= 1;
-            lifeDeductionCounter -= lifeDeductionTick;
+                sugarText.text = ("SUGAR: " + lifeLeft + "%");
+                bm.PopFarAwayBlocks();
 
-            sugarText.text = ("SUGAR: " + lifeLeft);
-            bm.PopFarAwayBlocks();
+            }
 
-        }
+            if (lifeLeft <= 0) { // Life amount deducter
+                DeadOnArrival();
+                player.ColdAndLonelyDeath(false);
+                Fabric.EventManager.Instance.PostEvent(exhaustedAudioEvent);
+            }
 
-        if (lifeLeft <= 0) { // Life amount deducter
-            DeadOnArrival();
-            player.ColdAndLonelyDeath(false);
-            Fabric.EventManager.Instance.PostEvent(exhaustedAudioEvent);
-        }
-        
-        if (Input.GetKeyDown(KeyCode.Escape)) {
-            Application.Quit();
-        }
+            if (Input.GetKeyDown(KeyCode.Escape)) {
+                Application.Quit();
+            }
 
-        if(statusTextTimer > 0) {
-            statusTextTimer -= Time.deltaTime;
+            if (statusTextTimer > 0) {
+                statusTextTimer -= Time.deltaTime;
+            }
+
         }
 
     }
@@ -167,19 +185,19 @@ public class GameManager : MonoBehaviour {
 
     public void CandyGet() {
         lifeLeft = lifeLeft + 20;
-        statusText.text = "Candy GET! Sugar +20%";
+        statusText.text = "Sugar +20%";
         statusTextTimer = 3;
         Fabric.EventManager.Instance.PostEvent(sugarAudioEvent);
     }
 
     public void AddScore(int addS) {
         score += addS;
-        scoreText.text = ("SCORE:" + score);
+        scoreText.text = ("SCORE: " + score);
     }
 
     public void Depth(int d) {
-        depth = d;
-        depthText.text = ("DEPTH: " + depth + "µm");
+            depth = d + bm.rows * (level-1);
+        depthText.text = ("DEPTH: " + depth + "um");
     }
     
     public void DeadOnArrival() {
@@ -197,28 +215,35 @@ public class GameManager : MonoBehaviour {
     }
 
     void GameOver() {
-        statusText.text = ("Game Over!");
-        statusTextTimer = 2f;
-        //sugarText.text = ("Over");
-        //levelText.text = ("Mother");
-        //livesText.text = ("Hugger");
         PlayerPrefs.SetFloat("highScore", highScore);
-        Time.timeScale = 0;
+        GameEnd(false);
     }
 
     public void ReturnToMenu() {
+        gameEnded = true;
         bm.PopAll();
         blokit.gameObject.SetActive(false);
         endBlokit.gameObject.SetActive(false);
         player.gameObject.SetActive(false);
+        bm.gameObject.SetActive(false);
+        canGame.SetActive(false);
+        canMenu.SetActive(true);
     }
 
-    void GameEnd() {
+    void GameEnd(bool win) {
         Fabric.EventManager.Instance.PostEvent(lvlClearedAudioEvent);
+        bm.PopAll();
         played = true;
-        statusText.text = "YOU WIN!!!";
+        if (win) {
+            statusText.text = "YOU WIN!!! \n \n \n \n Press any key\nto quit";
+        }
+        else {
+            statusText.text = "GAME OVER!!! \n \n \n \n Press any key\nto quit";
+        }
         statusTextTimer = 5f;
         gameEnded = true;
+        gameOn = false;
+
         //pysäytä laskureita, ReturnToMenu();
     }
 }
