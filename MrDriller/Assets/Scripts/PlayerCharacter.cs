@@ -94,7 +94,7 @@ public class PlayerCharacter : MonoBehaviour {
         anim.Play(animS);
 
         reviveTimer -= Time.deltaTime;
-        if (Input.GetButtonDown("Fire1") && drillTimer <= 0) {
+        if ((Input.GetButtonDown("Fire1") || Input.GetKeyDown(KeyCode.Space)) && drillTimer <= 0) {
             CheckBlock(pm);
             Fabric.EventManager.Instance.PostEvent(vomitAudioEvent);
             //print("poranäppäintä painettu!");
