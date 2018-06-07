@@ -341,9 +341,12 @@ public class PlayerCharacter : MonoBehaviour {
             //    //print("poranäppäintä painettu!");
             //}
 
-
+            //jos ei ole reunassa nämä pätee mutta reunassa pitää kuolla
             if (centerHeadAntenna || leftHeadAntenna || rightHeadAntenna) {
-                if (leftHeadAntenna && rightHeadAntenna) {
+                if (leftHeadAntenna && rightHeadAntenna 
+                    //|| (leftHandAntenna && Mathf.RoundToInt(rb.transform.position.x) >= Mathf.RoundToInt(bm.columns - 1)) ||
+                    //(rightHandAntenna && Mathf.RoundToInt(rb.transform.position.x) <= Mathf.RoundToInt(bm.firstBlock.x))
+                    ) {
                     // Squash player
                     Fabric.EventManager.Instance.PostEvent(squashedAudioEvent);
                     ColdAndLonelyDeath(true);
