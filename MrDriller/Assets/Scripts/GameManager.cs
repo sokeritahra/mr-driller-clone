@@ -142,14 +142,15 @@ public class GameManager : MonoBehaviour {
                 lifeLeft = 100;
             }
 
-            lifeDeductionCounter += Time.deltaTime;
-            while (lifeDeductionCounter > lifeDeductionTick) {
-                lifeLeft -= 1;
-                lifeDeductionCounter -= lifeDeductionTick;
+           if(!levelEndReached) {
+                lifeDeductionCounter += Time.deltaTime;
+                while (lifeDeductionCounter > lifeDeductionTick) {
+                    lifeLeft -= 1;
+                    lifeDeductionCounter -= lifeDeductionTick;
 
-                sugarText.text = ("SUGAR: " + lifeLeft + "%");
-                bm.PopFarAwayBlocks();
-
+                    sugarText.text = ("SUGAR: " + lifeLeft + "%");
+                    bm.PopFarAwayBlocks();
+                }
             }
 
             if (lifeLeft <= 0) { // Life amount deducter
