@@ -103,10 +103,12 @@ public class PlayerCharacter : MonoBehaviour {
             gm.PauseGame();
         }
         if (gm.gameEnded && Input.anyKeyDown) {
-            gm.ReturnToMenu();
+            if (gm.endTimer < 0)
+                gm.ReturnToMenu();
         }
         if (Input.GetButtonDown("Cancel")) {
-            gm.ReturnToMenu();
+            if (gm.endTimer < 0)
+                gm.ReturnToMenu();
         }
     }
 

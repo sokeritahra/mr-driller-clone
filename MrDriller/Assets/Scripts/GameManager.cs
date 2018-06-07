@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour {
     public TextMeshProUGUI levelText;
     public TextMeshProUGUI livesText;
     public TextMeshProUGUI statusText;
+    public TextMeshProUGUI highScoreText;
     float statusTextTimer = 0;
     int lifeLeft = 100;
     int lifeLeftAtLvlEnd = 100;
@@ -20,7 +21,7 @@ public class GameManager : MonoBehaviour {
     public BlockManager bm;
     int level = 1;
     int depth = 0;
-    float score;
+    float score = 0;
     float highScore;
     public string BGMaudioEvent;
     public string exhaustedAudioEvent;
@@ -40,19 +41,21 @@ public class GameManager : MonoBehaviour {
     public GameObject canGame;
     public GameObject canMenu;
     public GameObject canCred;
+    public float endTimer;
 
     private void Start() {
         highScore = PlayerPrefs.GetFloat("highScore", 0);
         depthText = depthText.GetComponent<TextMeshProUGUI>();
         scoreText = scoreText.GetComponent<TextMeshProUGUI>();
+        highScoreText = highScoreText.GetComponent<TextMeshProUGUI>();
         sugarText = sugarText.GetComponent<TextMeshProUGUI>();
         levelText = levelText.GetComponent<TextMeshProUGUI>();
         livesText = livesText.GetComponent<TextMeshProUGUI>();
         statusText = statusText.GetComponent<TextMeshProUGUI>();
 
-        //AtGameStart();
         depthText.text = ("DEPTH: " + depth + "um");
         scoreText.text = ("SCORE: " + score);
+        highScoreText.text = ("HISCORE: " + highScore);
         sugarText.text = ("SUGAR: " + lifeLeft);
         levelText.text = ("LEVEL: " + level);
         livesText.text = ("LIVES: " + livesLeft);
@@ -83,6 +86,16 @@ public class GameManager : MonoBehaviour {
         levelEndReached = false;
         player.alive = true;
         player.pm = PlayerMode.Down;
+        livesLeft = 3;
+        endTimer = 1f;
+        score = 0;
+        lifeLeft = 100;
+        depthText.text = ("DEPTH: " + depth + "um");
+        scoreText.text = ("SCORE: " + score);
+        highScoreText.text = ("HISCORE: " + highScore);
+        sugarText.text = ("SUGAR: " + lifeLeft);
+        levelText.text = ("LEVEL: " + level);
+        livesText.text = ("LIVES: " + livesLeft);
     }
 
     public void LevelEnd() {
@@ -94,6 +107,7 @@ public class GameManager : MonoBehaviour {
     void NewLevel() {
         lifeLeft = lifeLeftAtLvlEnd;
         statusText.text = "Level " + level + " START!";
+        levelText.text = ("LEVEL: " + level);
         bm.AtLevelStart(level);
         bscArray = FindObjectsOfType<BlockSpriteChanger>();
         foreach (BlockSpriteChanger bsc in bscArray) {
@@ -134,6 +148,9 @@ public class GameManager : MonoBehaviour {
             }
 
         }
+        else {
+                endTimer -= Time.deltaTime;
+        }
     }
 
     private void FixedUpdate() {
@@ -166,7 +183,7 @@ public class GameManager : MonoBehaviour {
             }
 
             if (Input.GetKeyDown(KeyCode.Escape)) {
-                Application.Quit();
+                ReturnToMenu();
             }
 
             if (statusTextTimer > 0) {
@@ -222,11 +239,13 @@ public class GameManager : MonoBehaviour {
     }
 
     void GameOver() {
-        PlayerPrefs.SetFloat("highScore", highScore);
+
+
         GameEnd(false);
     }
 
     public void ReturnToMenu() {
+
         gameEnded = true;
         bm.PopAll();
         blokit.gameObject.SetActive(false);
@@ -252,7 +271,11 @@ public class GameManager : MonoBehaviour {
         statusTextTimer = 5f;
         gameEnded = true;
         gameOn = false;
-
+        if (score > highScore) {
+            highScore = score;
+            PlayerPrefs.SetFloat("highScore", highScore);
+            highScoreText.text = ("HISCORE: " + highScore);
+        }
         //pysäytä laskureita, ReturnToMenu();
     }
 }
