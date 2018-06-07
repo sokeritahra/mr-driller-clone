@@ -105,14 +105,15 @@ public class PlayerCharacter : MonoBehaviour {
         if (gm.gameEnded && Input.anyKeyDown) {
             gm.ReturnToMenu();
         }
+        if (Input.GetButtonDown("Cancel")) {
+            gm.ReturnToMenu();
+        }
     }
 
     void FixedUpdate() {
 
 
-        if (Input.GetKeyDown(KeyCode.Escape)) {
-            gm.ReturnToMenu();
-        }
+
         // Player Left, right and center collider points (in relation to collider)
         playerCenter = c.bounds.center;
         playerLeft = c.bounds.center - (c.bounds.size.x / 2 * Vector3.right);
@@ -459,6 +460,7 @@ public class PlayerCharacter : MonoBehaviour {
 
     // Death on arrival
     public void ColdAndLonelyDeath(bool selfCalled) { // Name probably says it all
+        rb.velocity = new Vector2(0, 0);
         animS = "Death_Squashed";
         pm = PlayerMode.Static;
         anim.Play(animS);

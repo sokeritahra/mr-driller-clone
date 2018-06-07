@@ -9,4 +9,7 @@ public class Credits : MonoBehaviour {
             transform.position = transform.position + (Vector3.up * 0.03f);
         }
 	}
+    public void ResetCredPos() {
+        transform.position = new Vector3(4, -15, 0);
+    }
 }

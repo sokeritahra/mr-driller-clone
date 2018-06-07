@@ -228,6 +228,8 @@ public class GameManager : MonoBehaviour {
         bm.gameObject.SetActive(false);
         canGame.SetActive(false);
         canMenu.SetActive(true);
+        player.transform.position = player.startPos;
+        cam.transform.position = camStartPos;
     }
 
     void GameEnd(bool win) {
