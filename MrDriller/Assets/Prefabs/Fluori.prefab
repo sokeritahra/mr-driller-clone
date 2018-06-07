@@ -228,7 +228,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62a6fbfbc13c558458d818aba436d89b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocity: 1
+  velocity: 1.2
   gridPos: 0
   holdTimer: 2
   bs: 0

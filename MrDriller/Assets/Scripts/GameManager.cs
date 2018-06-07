@@ -138,6 +138,12 @@ public class GameManager : MonoBehaviour {
 
     private void FixedUpdate() {
         if (gameOn) {
+
+            if(lifeLeft < 20) {
+                statusText.text = "Running out of\nsugar!";
+                statusTextTimer = 0.1f;
+            }
+
             if (lifeLeft > 100) {
                 lifeLeft = 100;
             }

@@ -570,7 +570,7 @@ public class BlockManager : MonoBehaviour {
                     //print("Group's states changed to hold");
                     foreach (BlockScript block in g) {
                         block.bs = BlockState.Hold;
-                        block.holdTimer = 2f;
+                        block.holdTimer = 1.5f;
                         //print("group contains " + block);
                     }
                 }
