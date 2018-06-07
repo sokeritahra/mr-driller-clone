@@ -276,6 +276,12 @@ GameObject:
   m_PrefabParentObject: {fileID: 1411399747216646, guid: e6f260073f93fee4697e8bb4f43bfa82,
     type: 2}
   m_PrefabInternal: {fileID: 379339032}
+--- !u!114 &39048229 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114098784204549162, guid: e6f260073f93fee4697e8bb4f43bfa82,
+    type: 2}
+  m_PrefabInternal: {fileID: 379339032}
+  m_Script: {fileID: 11500000, guid: 511d548ed653ec64a9f1d0c9d6320afe, type: 3}
 --- !u!1 &109622346
 GameObject:
   m_ObjectHideFlags: 0
@@ -5013,6 +5019,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+      - m_Target: {fileID: 39048229}
+        m_MethodName: ResetCredPos
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1848998120
@@ -5144,7 +5161,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1889832074}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 9.020004, y: 1, z: -10}
+  m_LocalPosition: {x: 9, y: 1, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1563645544}
