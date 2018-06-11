@@ -53,6 +53,8 @@ public class GameManager : MonoBehaviour {
         livesText = livesText.GetComponent<TextMeshProUGUI>();
         statusText = statusText.GetComponent<TextMeshProUGUI>();
 
+        endBlokit = bm.endBlocks;
+        blokit = bm.blockFolder;
         depthText.text = ("DEPTH: " + depth + "um");
         scoreText.text = ("SCORE: " + score);
         highScoreText.text = ("HISCORE: " + highScore);
@@ -73,8 +75,6 @@ public class GameManager : MonoBehaviour {
         gameOn = true;
         print(bm);
         bm.gameObject.SetActive(true);
-        endBlokit = bm.endBlocks;
-        blokit = bm.blockFolder;
         blokit.gameObject.SetActive(true);
         endBlokit.gameObject.SetActive(true);
         player.gameObject.SetActive(true);
@@ -101,11 +101,9 @@ public class GameManager : MonoBehaviour {
     public void LevelEnd() {
         level++;
         levelEndReached = true;
-        lifeLeftAtLvlEnd = lifeLeft;
     }
 
     void NewLevel() {
-        lifeLeft = lifeLeftAtLvlEnd;
         statusText.text = "Level " + level + " START!";
         levelText.text = ("LEVEL: " + level);
         bm.AtLevelStart(level);

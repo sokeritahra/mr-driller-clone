@@ -351,6 +351,8 @@ public class PlayerCharacter : MonoBehaviour {
                     //(rightHandAntenna && Mathf.RoundToInt(rb.transform.position.x) <= Mathf.RoundToInt(bm.firstBlock.x))
                     ) {
                     // Squash player
+                    print(leftHandAntenna.collider + " LEFT");
+                    print(rightHandAntenna.collider + " Right");
                     Fabric.EventManager.Instance.PostEvent(squashedAudioEvent);
                     ColdAndLonelyDeath(true);
                     c.enabled = false;
