@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+// SARA TÄÄLLÄ SULLE SINIAALTOA  transform.position = startingPosition + Vector3.right * Mathf.Sin(Time.time * 0.5f) * floatWidth;
 public enum BlockColor {
     Red,
     Blue,
