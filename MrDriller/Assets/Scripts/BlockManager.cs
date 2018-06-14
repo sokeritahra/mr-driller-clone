@@ -567,6 +567,9 @@ public class BlockManager : MonoBehaviour {
                 }
 
                 if (CheckIfGroupOnAir(g)) {
+                    //jos kaksi ryhmää lepäävät toistensa päällä mutta niiden alla ei ole mitään
+                    //(eivät lepää muiden staattisten blokkien päällä)
+                    //pitäisi tippua
                     //print("Group's states changed to hold");
                     foreach (BlockScript block in g) {
                         block.bs = BlockState.Hold;

@@ -106,6 +106,8 @@ public class GameManager : MonoBehaviour {
     void NewLevel() {
         statusText.text = "Level " + level + " START!";
         levelText.text = ("LEVEL: " + level);
+        player.StartNewLvl();
+        cam.transform.position = camStartPos + new Vector3(0, 5, 0);
         bm.AtLevelStart(level);
         bscArray = FindObjectsOfType<BlockSpriteChanger>();
         foreach (BlockSpriteChanger bsc in bscArray) {
@@ -139,8 +141,7 @@ public class GameManager : MonoBehaviour {
 
             if (lvlEndTimer < 0) {
                 levelEndReached = false;
-                player.StartNewLvl();
-                cam.transform.position = camStartPos + new Vector3(0, 5, 0);
+                
                 lvlEndTimer = 4f;
                 NewLevel();
             }
